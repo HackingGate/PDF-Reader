@@ -27,7 +27,7 @@ class DocumentViewController: UIViewController {
         document?.open(completionHandler: { (success) in
             if success {
                 // Display the content of the document, e.g.:
-
+                self.navigationItem.title = self.document?.localizedName
             
                 if let document = PDFDocument(url: (self.document?.fileURL)!) {
                     self.pdfView.document = document
@@ -58,6 +58,8 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        self.navigationController?.hidesBarsOnTap = true
+        
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
         pdfView.displayBox = .cropBox
@@ -66,9 +68,17 @@ class DocumentViewController: UIViewController {
         
         let center = NotificationCenter.default
         center.addObserver(self,
-                           selector: #selector(saveCurrentPage),
+                           selector: #selector(saveAndClose),
                            name: .UIApplicationDidEnterBackground,
                            object: nil)
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return navigationController?.isNavigationBarHidden == true
+    }
+    
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
+        return UIStatusBarAnimation.slide
     }
     
     func moveToLastReadingProsess() {
@@ -85,7 +95,7 @@ class DocumentViewController: UIViewController {
         self.pdfView.go(to: (self.pdfView.document?.page(at: pageIndex)!)!)
     }
     
-    @objc func saveCurrentPage() {
+    @objc func saveAndClose() {
         self.userDeaults.set(self.pdfView.document?.index(for: self.pdfView.currentPage!), forKey: (self.pdfView.document?.documentURL?.path)!)
         
         self.document?.close(completionHandler: nil)
@@ -93,7 +103,7 @@ class DocumentViewController: UIViewController {
     
     @IBAction func dismissDocumentViewController() {
         dismiss(animated: true) {
-            self.document?.close(completionHandler: nil)
+            self.saveAndClose()
         }
     }
 }

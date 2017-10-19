@@ -65,10 +65,13 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     func presentDocument(at documentURL: URL) {
         
         let storyBoard = UIStoryboard(name: "Main", bundle: nil)
-        let documentViewController = storyBoard.instantiateViewController(withIdentifier: "DocumentViewController") as! DocumentViewController
+        
+        let navigationController = storyBoard.instantiateViewController(withIdentifier: "NavigationController") as! UINavigationController
+        
+        let documentViewController = navigationController.viewControllers.first as! DocumentViewController
         documentViewController.document = Document(fileURL: documentURL)
         
-        present(documentViewController, animated: true, completion: nil)
+        present(navigationController, animated: true, completion: nil)
     }
 }
 
