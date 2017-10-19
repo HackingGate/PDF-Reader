@@ -74,11 +74,11 @@ class DocumentViewController: UIViewController {
     }
     
     override var prefersStatusBarHidden: Bool {
-        return navigationController?.isNavigationBarHidden == true
+        return navigationController?.isNavigationBarHidden == true || super.prefersStatusBarHidden
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return UIStatusBarAnimation.slide
+        return .slide
     }
     
     func moveToLastReadingProsess() {
