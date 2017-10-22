@@ -23,11 +23,28 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         // browserUserInterfaceStyle = .dark
         // view.tintColor = .white
         
+        // get Settings.bundle
+        var appDefaults = Dictionary<String, AnyObject>()
+        appDefaults["browserUserInterfaceStyle"] = 0 as NSNumber // Default .white
+        
+        UserDefaults.standard.register(defaults: appDefaults)
+        updateInterface()
+        
+        let center = NotificationCenter.default
+        center.addObserver(self,
+                           selector: #selector(updateInterface),
+                           name: .UIApplicationWillEnterForeground,
+                           object: nil)
+
         // Specify the allowed content types of your application via the Info.plist.
         
         // Do any additional setup after loading the view, typically from a nib.
     }
     
+    @objc func updateInterface() {
+        UserDefaults.standard.synchronize()
+        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: "browserUserInterfaceStyle")))!
+    }
     
     // MARK: UIDocumentBrowserViewControllerDelegate
     

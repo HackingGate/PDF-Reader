@@ -14,6 +14,7 @@
 		766439F01F7C92D600DAF771 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 766439EE1F7C92D600DAF771 /* Main.storyboard */; };
 		766439F21F7C92D600DAF771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 766439F11F7C92D600DAF771 /* Assets.xcassets */; };
 		766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */; };
+		767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 767C12C71F9CEC87000CE311 /* Settings.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		766439F11F7C92D600DAF771 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		766439F41F7C92D600DAF771 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		766439F61F7C92D600DAF771 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +68,7 @@
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
 				766439F61F7C92D600DAF771 /* Info.plist */,
+				767C12C71F9CEC87000CE311 /* Settings.bundle */,
 			);
 			path = PDFReader;
 			sourceTree = "<group>";
@@ -129,6 +132,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */,
 				766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */,
 				766439F21F7C92D600DAF771 /* Assets.xcassets in Resources */,
 				766439F01F7C92D600DAF771 /* Main.storyboard in Resources */,
