@@ -79,17 +79,16 @@ class DocumentViewController: UIViewController {
     }
     
     @objc func updateInterface() {
-        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
-        let documentBrowserViewController = storyBoard.instantiateViewController(withIdentifier: "DocumentBrowserViewController") as! DocumentBrowserViewController
-        
-        // use same UI style as DocumentBrowserViewController
-        if UserDefaults.standard.integer(forKey: documentBrowserViewController.browserUserInterfaceStyleKey) == 2 {
-            navigationController?.navigationBar.barStyle = .black
-        } else {
-            navigationController?.navigationBar.barStyle = .default
+        if presentingViewController != nil {
+            // use same UI style as DocumentBrowserViewController
+            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == 2 {
+                navigationController?.navigationBar.barStyle = .black
+            } else {
+                navigationController?.navigationBar.barStyle = .default
+            }
+            view.backgroundColor = presentingViewController?.view.backgroundColor
+            navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
         }
-        view.backgroundColor = documentBrowserViewController.view.backgroundColor
-        navigationController?.navigationBar.tintColor = documentBrowserViewController.view.tintColor
     }
     
     override var prefersStatusBarHidden: Bool {
