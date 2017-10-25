@@ -21,6 +21,7 @@ class DocumentViewController: UIViewController {
     var verticalWriting = false
     
     override func viewWillAppear(_ animated: Bool) {
+        updateInterface()
         super.viewWillAppear(animated)
         
         // Access the document
@@ -68,9 +69,27 @@ class DocumentViewController: UIViewController {
         
         let center = NotificationCenter.default
         center.addObserver(self,
+                           selector: #selector(updateInterface),
+                           name: .UIApplicationWillEnterForeground,
+                           object: nil)
+        center.addObserver(self,
                            selector: #selector(saveAndClose),
                            name: .UIApplicationDidEnterBackground,
                            object: nil)
+    }
+    
+    @objc func updateInterface() {
+        let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+        let documentBrowserViewController = storyBoard.instantiateViewController(withIdentifier: "DocumentBrowserViewController") as! DocumentBrowserViewController
+        
+        // use same UI style as DocumentBrowserViewController
+        if UserDefaults.standard.integer(forKey: documentBrowserViewController.browserUserInterfaceStyleKey) == 2 {
+            navigationController?.navigationBar.barStyle = .black
+        } else {
+            navigationController?.navigationBar.barStyle = .default
+        }
+        view.backgroundColor = documentBrowserViewController.view.backgroundColor
+        navigationController?.navigationBar.tintColor = documentBrowserViewController.view.tintColor
     }
     
     override var prefersStatusBarHidden: Bool {

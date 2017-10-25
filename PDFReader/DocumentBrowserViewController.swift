@@ -11,6 +11,8 @@ import UIKit
 
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
     
+    let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -21,11 +23,11 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         // Update the style of the UIDocumentBrowserViewController
         // browserUserInterfaceStyle = .dark
-        // view.tintColor = .white
+        view.tintColor = .orange
         
         // get Settings.bundle
         var appDefaults = Dictionary<String, AnyObject>()
-        appDefaults["browserUserInterfaceStyle"] = 0 as NSNumber // Default .white
+        appDefaults[browserUserInterfaceStyleKey] = 0 as NSNumber // Default .white
         
         UserDefaults.standard.register(defaults: appDefaults)
         updateInterface()
@@ -43,7 +45,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
-        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: "browserUserInterfaceStyle")))!
+        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey)))!
     }
     
     // MARK: UIDocumentBrowserViewControllerDelegate
