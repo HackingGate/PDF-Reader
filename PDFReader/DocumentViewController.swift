@@ -9,7 +9,7 @@
 import UIKit
 import PDFKit
 
-class DocumentViewController: UIViewController {
+class DocumentViewController: UIViewController, UISearchBarDelegate {
     
     @IBOutlet weak var pdfView: PDFView!
     
@@ -59,7 +59,12 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        self.navigationController?.hidesBarsOnTap = true
+        navigationController?.hidesBarsOnTap = true
+        
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
         
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
@@ -88,11 +93,12 @@ class DocumentViewController: UIViewController {
             }
             view.backgroundColor = presentingViewController?.view.backgroundColor
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
+            navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
         }
     }
     
     override var prefersStatusBarHidden: Bool {
-        return navigationController?.isNavigationBarHidden == true || super.prefersStatusBarHidden
+        return navigationController?.isNavigationBarHidden == true && navigationItem.searchController?.isActive == false && navigationItem.searchController?.isBeingDismissed == false || super.prefersStatusBarHidden
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
@@ -122,6 +128,17 @@ class DocumentViewController: UIViewController {
     @IBAction func dismissDocumentViewController() {
         dismiss(animated: true) {
             self.saveAndClose()
+        }
+    }
+    
+    // MARK: UIDocumentBrowserViewControllerDelegate
+
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if (searchBar.text != nil) {
+            let selection = PDFSelection.init(document: self.pdfView.document!)
+            if let selection = pdfView.document?.findString(searchBar.text!, fromSelection: selection, withOptions: .regularExpression) {
+                pdfView.setCurrentSelection(selection, animate: true)
+            }
         }
     }
 }
