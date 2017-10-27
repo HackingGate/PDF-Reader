@@ -21,10 +21,6 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         allowsDocumentCreation = true
         allowsPickingMultipleItems = false
         
-        // Update the style of the UIDocumentBrowserViewController
-        // browserUserInterfaceStyle = .dark
-        view.tintColor = .orange
-        
         // get Settings.bundle
         var appDefaults = Dictionary<String, AnyObject>()
         appDefaults[browserUserInterfaceStyleKey] = 0 as NSNumber // Default .white
@@ -46,6 +42,12 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
         browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey)))!
+        if browserUserInterfaceStyle.rawValue == 2 {
+            view.tintColor = .orange
+        } else {
+            // system tint color
+            view.tintColor = UIButton(type: .system).titleColor(for: .normal)!
+        }
     }
     
     // MARK: UIDocumentBrowserViewControllerDelegate
