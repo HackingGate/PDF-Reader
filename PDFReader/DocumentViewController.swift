@@ -17,6 +17,9 @@ class DocumentViewController: UIViewController {
     
     let userDeaults = UserDefaults.standard
     
+    var portraitScaleFactorForSizeToFit: CGFloat = 0.0
+    var landscapeScaleFactorForSizeToFit: CGFloat = 0.0
+    
 //    縦書き
     var verticalWriting = false
     
@@ -45,12 +48,15 @@ class DocumentViewController: UIViewController {
                     if self.verticalWriting {
                         // ページ交換ファンクションを利用して、降順ソートして置き換える。
                         let actionCount = document.pageCount/2
-                        for i in 0...actionCount{
+                        for i in 0...actionCount {
                             document.exchangePage(at: i, withPageAt: document.pageCount-i)
                         }
                     }
 
                     self.moveToLastReadingProsess()
+                    if self.pdfView.displayDirection == .vertical {
+                        self.getScaleFactorForSizeToFit()
+                    }
                 }
             } else {
                 // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
@@ -76,6 +82,10 @@ class DocumentViewController: UIViewController {
                            selector: #selector(saveAndClose),
                            name: .UIApplicationDidEnterBackground,
                            object: nil)
+        center.addObserver(self,
+                           selector: #selector(didChangeOrientationHandler),
+                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           object: nil)
     }
     
     @objc func updateInterface() {
@@ -99,6 +109,22 @@ class DocumentViewController: UIViewController {
         return .slide
     }
     
+    func getScaleFactorForSizeToFit() {
+        let frame = pdfView.frame
+        let aspectRatio = frame.size.width / frame.size.height
+        if portraitScaleFactorForSizeToFit == 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
+            portraitScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit
+            landscapeScaleFactorForSizeToFit = portraitScaleFactorForSizeToFit / aspectRatio            
+            pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
+            pdfView.scaleFactor = portraitScaleFactorForSizeToFit
+        } else if landscapeScaleFactorForSizeToFit == 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
+            landscapeScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit
+            portraitScaleFactorForSizeToFit = landscapeScaleFactorForSizeToFit / aspectRatio
+            pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
+            pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
+        }
+    }
+    
     func moveToLastReadingProsess() {
         var pageIndex = 0
         if self.userDeaults.object(forKey: (self.pdfView.document?.documentURL?.path)!) != nil {
@@ -117,6 +143,16 @@ class DocumentViewController: UIViewController {
         self.userDeaults.set(self.pdfView.document?.index(for: self.pdfView.currentPage!), forKey: (self.pdfView.document?.documentURL?.path)!)
         
         self.document?.close(completionHandler: nil)
+    }
+    
+    @objc func didChangeOrientationHandler() {
+        if portraitScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
+            pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
+            pdfView.scaleFactor = portraitScaleFactorForSizeToFit
+        } else if landscapeScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
+            pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
+            pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
+        }
     }
     
     @IBAction func dismissDocumentViewController() {
