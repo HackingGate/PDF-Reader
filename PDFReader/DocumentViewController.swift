@@ -57,6 +57,8 @@ class DocumentViewController: UIViewController {
                     if self.pdfView.displayDirection == .vertical {
                         self.getScaleFactorForSizeToFit()
                     }
+                    
+                    self.setPDFThumbnailView()
                 }
             } else {
                 // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
@@ -65,7 +67,9 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        self.navigationController?.hidesBarsOnTap = true
+        navigationController?.hidesBarsOnTap = true
+        navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
+        
         
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
@@ -93,12 +97,27 @@ class DocumentViewController: UIViewController {
             // use same UI style as DocumentBrowserViewController
             if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == 2 {
                 navigationController?.navigationBar.barStyle = .black
+                navigationController?.toolbar.barStyle = .black
             } else {
                 navigationController?.navigationBar.barStyle = .default
+                navigationController?.toolbar.barStyle = .default
             }
             view.backgroundColor = presentingViewController?.view.backgroundColor
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
         }
+    }
+    
+    func setPDFThumbnailView() {
+        let pdfThumbnailView = PDFThumbnailView.init()
+        pdfThumbnailView.pdfView = pdfView
+        pdfThumbnailView.layoutMode = .horizontal
+        pdfThumbnailView.translatesAutoresizingMaskIntoConstraints = false
+        navigationController!.toolbar.addSubview(pdfThumbnailView)
+        let margins = navigationController!.toolbar.safeAreaLayoutGuide
+        pdfThumbnailView.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
+        pdfThumbnailView.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+        pdfThumbnailView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+        pdfThumbnailView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -109,11 +128,15 @@ class DocumentViewController: UIViewController {
         return .slide
     }
     
+    @objc func barHideOnTapGestureRecognizerHandler() {
+        navigationController?.setToolbarHidden(navigationController?.isNavigationBarHidden == true, animated: true)
+    }
+    
     func getScaleFactorForSizeToFit() {
         let frame = pdfView.frame
         let aspectRatio = frame.size.width / frame.size.height
         if portraitScaleFactorForSizeToFit == 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
-            portraitScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit
+            portraitScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit 
             landscapeScaleFactorForSizeToFit = portraitScaleFactorForSizeToFit / aspectRatio            
             pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
             pdfView.scaleFactor = portraitScaleFactorForSizeToFit
@@ -159,5 +182,10 @@ class DocumentViewController: UIViewController {
         dismiss(animated: true) {
             self.saveAndClose()
         }
+    }
+    
+    @IBAction func shareAction() {
+        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
+        self.present(activityVC, animated: true, completion: nil)
     }
 }
