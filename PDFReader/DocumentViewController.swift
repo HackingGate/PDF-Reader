@@ -128,8 +128,13 @@ class DocumentViewController: UIViewController {
         return .slide
     }
     
+    override func prefersHomeIndicatorAutoHidden() -> Bool {
+        return navigationController?.isToolbarHidden == true
+    }
+    
     @objc func barHideOnTapGestureRecognizerHandler() {
         navigationController?.setToolbarHidden(navigationController?.isNavigationBarHidden == true, animated: true)
+        setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
     
     func getScaleFactorForSizeToFit() {
