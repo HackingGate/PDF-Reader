@@ -21,7 +21,8 @@ class DocumentViewController: UIViewController {
     var landscapeScaleFactorForSizeToFit: CGFloat = 0.0
     
 //    縦書き
-    var verticalWriting = false
+    var isVerticalWriting = false
+    var isRightToLeft = false
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
@@ -32,34 +33,25 @@ class DocumentViewController: UIViewController {
             if success {
                 // Display the content of the document, e.g.:
                 self.navigationItem.title = self.document?.localizedName
-            
-                if let document = PDFDocument(url: (self.document?.fileURL)!) {
-                    self.pdfView.document = document
-                    let pageSize = self.pdfView.rowSize(for: self.pdfView.currentPage!)
-                    
-                    if (pageSize.width > pageSize.height) {
-                        self.pdfView.displayDirection = .horizontal
-                        self.verticalWriting = true
-                        // document must be reset after displayDirection setted
-                        self.pdfView.document = nil
-                        self.pdfView.document = document
-                    }
-                    
-                    if self.verticalWriting {
-                        // ページ交換ファンクションを利用して、降順ソートして置き換える。
-                        let actionCount = document.pageCount/2
-                        for i in 0...actionCount {
-                            document.exchangePage(at: i, withPageAt: document.pageCount-i)
-                        }
-                    }
+                
+                guard let pdfURL: URL = (self.document?.fileURL) else { return }
+                guard let document = PDFDocument(url: pdfURL) else { return }
+                
+                self.pdfView.document = document
 
-                    self.moveToLastReadingProsess()
-                    if self.pdfView.displayDirection == .vertical {
-                        self.getScaleFactorForSizeToFit()
+                if let currentPage = self.pdfView.currentPage {
+                    let pageSize = self.pdfView.rowSize(for: currentPage)
+                    if (pageSize.width > pageSize.height) {
+                        self.writing(vertically: true, rightToLeft: true)
                     }
-                    
-                    self.setPDFThumbnailView()
                 }
+                
+                self.moveToLastReadingProsess()
+                if self.pdfView.displayDirection == .vertical {
+                    self.getScaleFactorForSizeToFit()
+                }
+                
+                self.setPDFThumbnailView()
             } else {
                 // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
             }
@@ -95,7 +87,7 @@ class DocumentViewController: UIViewController {
     @objc func updateInterface() {
         if presentingViewController != nil {
             // use same UI style as DocumentBrowserViewController
-            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == 2 {
+            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
                 navigationController?.navigationBar.barStyle = .black
                 navigationController?.toolbar.barStyle = .black
             } else {
@@ -107,17 +99,48 @@ class DocumentViewController: UIViewController {
         }
     }
     
+    func writing(vertically: Bool, rightToLeft: Bool) {
+        // experimental feature
+        if vertically != isVerticalWriting {
+            if vertically {
+                pdfView.displayDirection = .horizontal
+            } else {
+                pdfView.displayDirection = .vertical
+            }
+            
+            // document must be reset after displayDirection setted
+            let document = pdfView.document
+            pdfView.document = nil
+            pdfView.document = document
+            isVerticalWriting = vertically
+        }
+        
+        if rightToLeft != isRightToLeft {
+            // ページ交換ファンクションを利用して、降順ソートして置き換える。
+            let pageCount: Int = pdfView.document?.pageCount ?? 0
+            if pageCount > 1 {
+                print("pageCount: \(pageCount)")
+                for i in 0..<pageCount/2 {
+                    print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
+                    pdfView.document?.exchangePage(at: i, withPageAt: pageCount-i-1)
+                }
+            }
+            isRightToLeft = rightToLeft
+        }
+    }
+    
     func setPDFThumbnailView() {
-        let pdfThumbnailView = PDFThumbnailView.init()
-        pdfThumbnailView.pdfView = pdfView
-        pdfThumbnailView.layoutMode = .horizontal
-        pdfThumbnailView.translatesAutoresizingMaskIntoConstraints = false
-        navigationController!.toolbar.addSubview(pdfThumbnailView)
-        let margins = navigationController!.toolbar.safeAreaLayoutGuide
-        pdfThumbnailView.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
-        pdfThumbnailView.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
-        pdfThumbnailView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
-        pdfThumbnailView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
+        if let margins = navigationController?.toolbar.safeAreaLayoutGuide {
+            let pdfThumbnailView = PDFThumbnailView.init()
+            pdfThumbnailView.pdfView = pdfView
+            pdfThumbnailView.layoutMode = .horizontal
+            pdfThumbnailView.translatesAutoresizingMaskIntoConstraints = false
+            navigationController?.toolbar.addSubview(pdfThumbnailView)
+            pdfThumbnailView.leadingAnchor.constraint(equalTo: margins.leadingAnchor).isActive = true
+            pdfThumbnailView.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
+            pdfThumbnailView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
+            pdfThumbnailView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
+        }
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -155,21 +178,32 @@ class DocumentViewController: UIViewController {
     
     func moveToLastReadingProsess() {
         var pageIndex = 0
-        if self.userDeaults.object(forKey: (self.pdfView.document?.documentURL?.path)!) != nil {
-            // key exists
-            pageIndex = self.userDeaults.integer(forKey: (self.pdfView.document?.documentURL?.path)!)
-        } else if verticalWriting {
-            // 初めて読む　且つ　縦書き
-            pageIndex = (self.pdfView.document?.pageCount)! - 1
+        if let documentURL = pdfView.document?.documentURL {
+            if userDeaults.object(forKey: documentURL.path) != nil {
+                // key exists
+                pageIndex = userDeaults.integer(forKey: documentURL.path)
+            } else if isVerticalWriting {
+                // 初めて読む　且つ　縦書き
+                if let pageCount: Int = pdfView.document?.pageCount {
+                    pageIndex = pageCount - 1
+                }
+            }
+            // TODO: if pageIndex == pageCount - 1, then go to last CGRect
+            if let pdfPage = pdfView.document?.page(at: pageIndex) {
+                pdfView.go(to: pdfPage)
+            }
         }
-        
-        // TODO: if pageIndex == pageCount - 1, then go to last CGRect
-        self.pdfView.go(to: (self.pdfView.document?.page(at: pageIndex)!)!)
     }
     
     @objc func saveAndClose() {
-        self.userDeaults.set(self.pdfView.document?.index(for: self.pdfView.currentPage!), forKey: (self.pdfView.document?.documentURL?.path)!)
-        
+        if let currentPage = pdfView.currentPage {
+            let currentIndex = pdfView.document?.index(for: currentPage)
+            if let documentURL = pdfView.document?.documentURL {
+                userDeaults.set(currentIndex, forKey: documentURL.path)
+                print("saved page index: \(String(describing: currentIndex))")
+            }
+        }
+
         self.document?.close(completionHandler: nil)
     }
     

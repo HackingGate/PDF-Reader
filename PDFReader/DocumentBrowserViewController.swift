@@ -12,6 +12,7 @@ import UIKit
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
     
     let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
+    let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +24,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         // get Settings.bundle
         var appDefaults = Dictionary<String, AnyObject>()
-        appDefaults[browserUserInterfaceStyleKey] = 0 as NSNumber // Default .white
+        appDefaults[browserUserInterfaceStyleKey] = defaultBrowserUserInterfaceStyle.rawValue as NSNumber
         
         UserDefaults.standard.register(defaults: appDefaults)
         updateInterface()
@@ -41,12 +42,12 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
-        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey)))!
-        if browserUserInterfaceStyle.rawValue == 2 {
+        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
+        if browserUserInterfaceStyle == .dark {
             view.tintColor = .orange
         } else {
             // system tint color
-            view.tintColor = UIButton(type: .system).titleColor(for: .normal)!
+            view.tintColor = UIButton(type: .system).titleColor(for: .normal)
         }
     }
     
