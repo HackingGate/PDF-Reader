@@ -9,7 +9,13 @@
 import UIKit
 import PDFKit
 
-class DocumentViewController: UIViewController {
+protocol SettingsDelegate {
+    var isVerticalWriting: Bool { get }
+    var isRightToLeft: Bool { get }
+    func writing(vertically: Bool, rightToLeft: Bool) -> Void
+}
+
+class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate {
     
     @IBOutlet weak var pdfView: PDFView!
     
@@ -38,18 +44,18 @@ class DocumentViewController: UIViewController {
                 guard let document = PDFDocument(url: pdfURL) else { return }
                 
                 self.pdfView.document = document
-
-                if let currentPage = self.pdfView.currentPage {
-                    let pageSize = self.pdfView.rowSize(for: currentPage)
-                    if (pageSize.width > pageSize.height) {
-                        self.writing(vertically: true, rightToLeft: true)
-                    }
-                }
                 
                 self.moveToLastReadingProsess()
                 if self.pdfView.displayDirection == .vertical {
                     self.getScaleFactorForSizeToFit()
                 }
+                
+//                if let currentPage = self.pdfView.currentPage {
+//                    let pageSize = self.pdfView.rowSize(for: currentPage)
+//                    if (pageSize.width > pageSize.height) {
+//                        self.writing(vertically: true, rightToLeft: true)
+//                    }
+//                }
                 
                 self.setPDFThumbnailView()
             } else {
@@ -67,6 +73,11 @@ class DocumentViewController: UIViewController {
         pdfView.displaysPageBreaks = false
         pdfView.displayBox = .cropBox
         pdfView.displayMode = .singlePageContinuous
+        for view in pdfView.subviews {
+            if view.isKind(of: UIScrollView.self) {
+                (view as? UIScrollView)?.scrollsToTop = false
+            }
+        }
         
         
         let center = NotificationCenter.default
@@ -101,32 +112,46 @@ class DocumentViewController: UIViewController {
     
     func writing(vertically: Bool, rightToLeft: Bool) {
         // experimental feature
-        if vertically != isVerticalWriting {
-            if vertically {
-                pdfView.displayDirection = .horizontal
-            } else {
-                pdfView.displayDirection = .vertical
+        if let currentPage = pdfView.currentPage {
+            if let currentIndex: Int = pdfView.document?.index(for: currentPage) {
+                print("currentIndex: \(currentIndex)")
+
+                if vertically != isVerticalWriting {
+                    if vertically {
+                        pdfView.displayDirection = .horizontal
+                    } else {
+                        pdfView.displayDirection = .vertical
+                    }
+                    
+                    // document must be reset after displayDirection setted
+                    let document = pdfView.document
+                    pdfView.document = nil
+                    pdfView.document = document
+                    isVerticalWriting = vertically
+                    pdfView.go(to: currentPage)
+                }
+                
+                if rightToLeft != isRightToLeft {
+                    // ページ交換ファンクションを利用して、降順ソートして置き換える。
+                    let pageCount: Int = pdfView.document?.pageCount ?? 0
+                    if pageCount > 1 {
+                        print("pageCount: \(pageCount)")
+                        for i in 0..<pageCount/2 {
+                            print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
+                            pdfView.document?.exchangePage(at: i, withPageAt: pageCount-i-1)
+                        }
+                        if let pdfPage = pdfView.document?.page(at: pageCount - currentIndex - 1) {
+                            print("go to: \(pageCount - currentIndex - 1)")
+                            pdfView.go(to: pdfPage)
+                        }
+                    }
+                    isRightToLeft = rightToLeft
+                }
+                
             }
-            
-            // document must be reset after displayDirection setted
-            let document = pdfView.document
-            pdfView.document = nil
-            pdfView.document = document
-            isVerticalWriting = vertically
         }
         
-        if rightToLeft != isRightToLeft {
-            // ページ交換ファンクションを利用して、降順ソートして置き換える。
-            let pageCount: Int = pdfView.document?.pageCount ?? 0
-            if pageCount > 1 {
-                print("pageCount: \(pageCount)")
-                for i in 0..<pageCount/2 {
-                    print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
-                    pdfView.document?.exchangePage(at: i, withPageAt: pageCount-i-1)
-                }
-            }
-            isRightToLeft = rightToLeft
-        }
+        setScaleFactorForSizeToFit()
     }
     
     func setPDFThumbnailView() {
@@ -163,16 +188,25 @@ class DocumentViewController: UIViewController {
     func getScaleFactorForSizeToFit() {
         let frame = pdfView.frame
         let aspectRatio = frame.size.width / frame.size.height
-        if portraitScaleFactorForSizeToFit == 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
+        if UIApplication.shared.statusBarOrientation.isPortrait {
             portraitScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit 
-            landscapeScaleFactorForSizeToFit = portraitScaleFactorForSizeToFit / aspectRatio            
-            pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
-            pdfView.scaleFactor = portraitScaleFactorForSizeToFit
-        } else if landscapeScaleFactorForSizeToFit == 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
+            landscapeScaleFactorForSizeToFit = portraitScaleFactorForSizeToFit / aspectRatio
+        } else if UIApplication.shared.statusBarOrientation.isLandscape {
             landscapeScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit
             portraitScaleFactorForSizeToFit = landscapeScaleFactorForSizeToFit / aspectRatio
-            pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
-            pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
+        }
+    }
+    
+    func setScaleFactorForSizeToFit() {
+        if pdfView.displayDirection == .vertical {
+            // currentlly only works for vertical display direction
+            if portraitScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
+                pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
+                pdfView.scaleFactor = portraitScaleFactorForSizeToFit
+            } else if landscapeScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
+                pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
+                pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
+            }
         }
     }
     
@@ -196,8 +230,12 @@ class DocumentViewController: UIViewController {
     }
     
     @objc func saveAndClose() {
+        guard let pdfDocument = pdfView.document else { return }
         if let currentPage = pdfView.currentPage {
-            let currentIndex = pdfView.document?.index(for: currentPage)
+            var currentIndex = pdfDocument.index(for: currentPage)
+            if isRightToLeft {
+                currentIndex = pdfDocument.pageCount - currentIndex - 1
+            }
             if let documentURL = pdfView.document?.documentURL {
                 userDeaults.set(currentIndex, forKey: documentURL.path)
                 print("saved page index: \(String(describing: currentIndex))")
@@ -208,13 +246,7 @@ class DocumentViewController: UIViewController {
     }
     
     @objc func didChangeOrientationHandler() {
-        if portraitScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
-            pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
-            pdfView.scaleFactor = portraitScaleFactorForSizeToFit
-        } else if landscapeScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
-            pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
-            pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
-        }
+        setScaleFactorForSizeToFit()
     }
     
     @IBAction func dismissDocumentViewController() {
@@ -227,4 +259,21 @@ class DocumentViewController: UIViewController {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
     }
+    
+    // MARK: - PopoverTableViewController Presentation
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "PopoverSettings") {
+            if let popopverVC: PopoverTableViewController = segue.destination as? PopoverTableViewController {
+                popopverVC.modalPresentationStyle = .popover
+                popopverVC.popoverPresentationController?.delegate = self
+                popopverVC.delegate = self
+            }
+        }
+    }
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        return .none
+    }
+    
 }

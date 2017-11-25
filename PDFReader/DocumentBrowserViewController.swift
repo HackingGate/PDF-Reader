@@ -43,11 +43,12 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
         browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
-        if browserUserInterfaceStyle == .dark {
-            view.tintColor = .orange
-        } else {
-            // system tint color
+        if browserUserInterfaceStyle == .white {
             view.tintColor = UIButton(type: .system).titleColor(for: .normal)
+        } else if browserUserInterfaceStyle == .light {
+            view.tintColor = .darkGray
+        } else if browserUserInterfaceStyle == .dark {
+            view.tintColor = .orange
         }
     }
     
@@ -93,6 +94,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         let documentViewController = navigationController.viewControllers.first as! DocumentViewController
         documentViewController.document = Document(fileURL: documentURL)
         
+        navigationController.modalTransitionStyle = .crossDissolve
         present(navigationController, animated: true, completion: nil)
     }
 }
