@@ -50,12 +50,7 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     self.getScaleFactorForSizeToFit()
                 }
                 
-//                if let currentPage = self.pdfView.currentPage {
-//                    let pageSize = self.pdfView.rowSize(for: currentPage)
-//                    if (pageSize.width > pageSize.height) {
-//                        self.writing(vertically: true, rightToLeft: true)
-//                    }
-//                }
+                self.writing(vertically: self.isVerticalWriting, rightToLeft: self.isRightToLeft)
                 
                 self.setPDFThumbnailView()
             } else {
@@ -76,6 +71,7 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         for view in pdfView.subviews {
             if view.isKind(of: UIScrollView.self) {
                 (view as? UIScrollView)?.scrollsToTop = false
+                (view as? UIScrollView)?.contentInsetAdjustmentBehavior = .scrollableAxes
             }
         }
         
@@ -122,13 +118,7 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     } else {
                         pdfView.displayDirection = .vertical
                     }
-                    
-                    // document must be reset after displayDirection setted
-                    let document = pdfView.document
-                    pdfView.document = nil
-                    pdfView.document = document
                     isVerticalWriting = vertically
-                    pdfView.go(to: currentPage)
                 }
                 
                 if rightToLeft != isRightToLeft {
@@ -148,6 +138,11 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     isRightToLeft = rightToLeft
                 }
                 
+                // reset document to update interface
+                let document = pdfView.document
+                pdfView.document = nil
+                pdfView.document = document
+                pdfView.go(to: currentPage)
             }
         }
         
@@ -262,6 +257,8 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     
     // MARK: - PopoverTableViewController Presentation
 
+    // iOS Popover presentation Segue
+    // http://sunnycyk.com/2015/08/ios-popover-presentation-segue/
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "PopoverSettings") {
             if let popopverVC: PopoverTableViewController = segue.destination as? PopoverTableViewController {
@@ -272,7 +269,9 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         }
     }
     
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+    // fix for iPhone Plus
+    // https://stackoverflow.com/q/36349303/4063462
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
         return .none
     }
     
