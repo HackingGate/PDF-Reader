@@ -13,7 +13,6 @@ class PopoverTableViewController: UITableViewController {
     var delegate: SettingsDelegate!
 
     @IBOutlet weak var brightnessSlider: UISlider!
-    @IBOutlet weak var styleCell: UITableViewCell!
     @IBOutlet weak var whiteStyleButton: UIButton!
     @IBOutlet weak var lightStyleButton: UIButton!
     @IBOutlet weak var darkStyleButton: UIButton!
@@ -80,6 +79,7 @@ class PopoverTableViewController: UITableViewController {
     }
     
     func updateDirection() {
+        directionLeftButton.isEnabled = delegate.allowsDocumentAssembly
         directionDownButton.tintColor = .lightGray
         directionLeftButton.tintColor = .lightGray
         directionRightButton.tintColor = .lightGray
@@ -88,10 +88,10 @@ class PopoverTableViewController: UITableViewController {
             directionDetailLabel.text = "Normal"
         } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == true {
             directionLeftButton.tintColor = view.tintColor
-            directionDetailLabel.text = "Traditional CJK"
+            directionDetailLabel.text = "From right to left"
         } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == false {
             directionRightButton.tintColor = view.tintColor
-            directionDetailLabel.text = "Traditional Mongolian"
+            directionDetailLabel.text = "From left to right"
         }
     }
     
@@ -138,5 +138,13 @@ class PopoverTableViewController: UITableViewController {
         updateDirection()
     }
 
+    // MARK: - UITableViewDelegate
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if !delegate.isEncrypted && indexPath.row == 3 {
+            return 0
+        }
+        return super.tableView(tableView, heightForRowAt: indexPath)
+    }
 }
 

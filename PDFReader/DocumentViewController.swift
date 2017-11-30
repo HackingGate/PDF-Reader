@@ -12,6 +12,8 @@ import PDFKit
 protocol SettingsDelegate {
     var isVerticalWriting: Bool { get }
     var isRightToLeft: Bool { get }
+    var isEncrypted: Bool { get }
+    var allowsDocumentAssembly: Bool { get }
     func writing(vertically: Bool, rightToLeft: Bool) -> Void
 }
 
@@ -26,9 +28,11 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     var portraitScaleFactorForSizeToFit: CGFloat = 0.0
     var landscapeScaleFactorForSizeToFit: CGFloat = 0.0
     
-//    縦書き
+    // delegate properties
     var isVerticalWriting = false
     var isRightToLeft = false
+    var isEncrypted = false
+    var allowsDocumentAssembly = false
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
@@ -42,6 +46,12 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 
                 guard let pdfURL: URL = (self.document?.fileURL) else { return }
                 guard let document = PDFDocument(url: pdfURL) else { return }
+                
+                self.allowsDocumentAssembly = document.allowsDocumentAssembly
+                if (document.isEncrypted) {
+                    self.navigationItem.title = "🔒" + (self.navigationItem.title ?? "")
+                }
+                self.isEncrypted = document.isEncrypted
                 
                 self.pdfView.document = document
                 
@@ -109,9 +119,32 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     func writing(vertically: Bool, rightToLeft: Bool) {
         // experimental feature
         if let currentPage = pdfView.currentPage {
-            if let currentIndex: Int = pdfView.document?.index(for: currentPage) {
+            if let document: PDFDocument = pdfView.document {
+                let currentIndex: Int = document.index(for: currentPage)
+                
                 print("currentIndex: \(currentIndex)")
-
+                
+                if rightToLeft != isRightToLeft {
+                    if !allowsDocumentAssembly {
+                        return
+                    }
+                    // ページ交換ファンクションを利用して、降順ソートして置き換える。
+                    let pageCount: Int = document.pageCount
+                    
+                    print("pageCount: \(pageCount)")
+                    for i in 0..<pageCount/2 {
+                        print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
+                        document.exchangePage(at: i, withPageAt: pageCount-i-1)
+                    }
+                    if currentIndex != pageCount - currentIndex - 1 {
+                        if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
+                            print("go to: \(pageCount - currentIndex - 1)")
+                            pdfView.go(to: pdfPage)
+                        }
+                    }
+                    isRightToLeft = rightToLeft
+                }
+                
                 if vertically != isVerticalWriting {
                     if vertically {
                         pdfView.displayDirection = .horizontal
@@ -121,25 +154,7 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     isVerticalWriting = vertically
                 }
                 
-                if rightToLeft != isRightToLeft {
-                    // ページ交換ファンクションを利用して、降順ソートして置き換える。
-                    let pageCount: Int = pdfView.document?.pageCount ?? 0
-                    if pageCount > 1 {
-                        print("pageCount: \(pageCount)")
-                        for i in 0..<pageCount/2 {
-                            print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
-                            pdfView.document?.exchangePage(at: i, withPageAt: pageCount-i-1)
-                        }
-                        if let pdfPage = pdfView.document?.page(at: pageCount - currentIndex - 1) {
-                            print("go to: \(pageCount - currentIndex - 1)")
-                            pdfView.go(to: pdfPage)
-                        }
-                    }
-                    isRightToLeft = rightToLeft
-                }
-                
                 // reset document to update interface
-                let document = pdfView.document
                 pdfView.document = nil
                 pdfView.document = document
                 pdfView.go(to: currentPage)
@@ -265,6 +280,10 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
+                if !isEncrypted {
+                    // 201 - 44 = 157
+                    popopverVC.preferredContentSize = CGSize(width: 300, height: 157)
+                }
             }
         }
     }
