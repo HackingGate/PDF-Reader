@@ -12,6 +12,7 @@ import UIKit
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
     
     let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
+    let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,13 +22,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         allowsDocumentCreation = true
         allowsPickingMultipleItems = false
         
-        // Update the style of the UIDocumentBrowserViewController
-        // browserUserInterfaceStyle = .dark
-        view.tintColor = .orange
-        
         // get Settings.bundle
         var appDefaults = Dictionary<String, AnyObject>()
-        appDefaults[browserUserInterfaceStyleKey] = 0 as NSNumber // Default .white
+        appDefaults[browserUserInterfaceStyleKey] = defaultBrowserUserInterfaceStyle.rawValue as NSNumber
         
         UserDefaults.standard.register(defaults: appDefaults)
         updateInterface()
@@ -45,7 +42,14 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
-        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey)))!
+        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
+        if browserUserInterfaceStyle == .white {
+            view.tintColor = UIButton(type: .system).titleColor(for: .normal)
+        } else if browserUserInterfaceStyle == .light {
+            view.tintColor = .darkGray
+        } else if browserUserInterfaceStyle == .dark {
+            view.tintColor = .orange
+        }
     }
     
     // MARK: UIDocumentBrowserViewControllerDelegate
@@ -90,6 +94,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         let documentViewController = navigationController.viewControllers.first as! DocumentViewController
         documentViewController.document = Document(fileURL: documentURL)
         
+        navigationController.modalTransitionStyle = .crossDissolve
         present(navigationController, animated: true, completion: nil)
     }
 }

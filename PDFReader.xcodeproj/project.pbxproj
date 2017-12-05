@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
 		766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E61F7C92D600DAF771 /* AppDelegate.swift */; };
 		766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */; };
 		766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439EA1F7C92D600DAF771 /* DocumentViewController.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
 		766439E31F7C92D600DAF771 /* PDFReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		766439E61F7C92D600DAF771 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */,
 				766439EA1F7C92D600DAF771 /* DocumentViewController.swift */,
 				766439EC1F7C92D600DAF771 /* Document.swift */,
+				763764D11FC3125500B41B05 /* PopoverTableViewController.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
@@ -147,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				766439ED1F7C92D600DAF771 /* Document.swift in Sources */,
+				763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */,
 				766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
