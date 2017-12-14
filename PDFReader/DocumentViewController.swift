@@ -183,6 +183,21 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         }
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        if let navigationController = navigationController {
+            for constraint in navigationController.navigationBar.constraints {
+                if constraint.firstAttribute == NSLayoutAttribute.height {
+                    if navigationController.navigationBar.frame.origin.y == -constraint.constant {
+                        // system will return UIStatusBarStyle.default even when navigation bar style is .black
+                        // a workaround to fix this
+                        return navigationController.navigationBar.barStyle == .black ? .lightContent : .default
+                    }
+                }
+            }
+        }
+        return super.preferredStatusBarStyle
+    }
+    
     override var prefersStatusBarHidden: Bool {
         return navigationController?.isNavigationBarHidden == true && navigationItem.searchController?.isActive == false && navigationItem.searchController?.isBeingDismissed == false || super.prefersStatusBarHidden
     }
@@ -197,7 +212,21 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     
     @objc func barHideOnTapGestureRecognizerHandler() {
         navigationController?.setToolbarHidden(navigationController?.isNavigationBarHidden == true, animated: true)
+        updateSearchController()
         setNeedsUpdateOfHomeIndicatorAutoHidden()
+    }
+    
+    func updateSearchController() {
+        if let navigationController = navigationController, let searchController = navigationItem.searchController {
+            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden
+            
+            if navigationController.isNavigationBarHidden {
+                self.additionalSafeAreaInsets.top = -64 // fixed by a magic num
+            }
+            else {
+                self.additionalSafeAreaInsets.top = 0
+            }
+        }
     }
     
     func getScaleFactorForSizeToFit() {
