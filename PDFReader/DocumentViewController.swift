@@ -292,14 +292,14 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     popopverVC.preferredContentSize = CGSize(width: 300, height: 157)
                 }
             }
-        } else if (segue.identifier == "ThumbnailCollection") {
-            if let thumbnailCollectionVC: ThumbnailCollectionViewController = segue.destination as? ThumbnailCollectionViewController {
-                thumbnailCollectionVC.pdfDocument = pdfView.document
-                thumbnailCollectionVC.displayBox = pdfView.displayBox
+        } else if (segue.identifier == "Container") {
+            if let containerVC: ContainerViewController = segue.destination as? ContainerViewController {
+                containerVC.pdfDocument = pdfView.document
+                containerVC.displayBox = pdfView.displayBox
                 if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
-                    thumbnailCollectionVC.currentIndex = document.index(for: currentPage)
+                    containerVC.currentIndex = document.index(for: currentPage)
                 }
-                thumbnailCollectionVC.delegate = self
+                containerVC.delegate = self
             }
         }
     }

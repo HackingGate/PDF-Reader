@@ -19,11 +19,6 @@ class ThumbnailCollectionViewController: UICollectionViewController {
     var isWidthGreaterThanHeight: Bool = false
     var currentIndex: Int = 0
 
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.hidesBarsOnTap = false
-        super.viewWillAppear(animated)
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
 

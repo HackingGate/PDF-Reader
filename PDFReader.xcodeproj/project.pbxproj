@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7629A3521FF11A7F007402FB /* ContainerViewController.swift */; };
 		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
 		766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E61F7C92D600DAF771 /* AppDelegate.swift */; };
 		766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7629A3521FF11A7F007402FB /* ContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
 		766439E31F7C92D600DAF771 /* PDFReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		766439E61F7C92D600DAF771 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -71,6 +73,7 @@
 				766439EA1F7C92D600DAF771 /* DocumentViewController.swift */,
 				766439EC1F7C92D600DAF771 /* Document.swift */,
 				763764D11FC3125500B41B05 /* PopoverTableViewController.swift */,
+				7629A3521FF11A7F007402FB /* ContainerViewController.swift */,
 				76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */,
 				7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
@@ -157,6 +160,7 @@
 			files = (
 				766439ED1F7C92D600DAF771 /* Document.swift in Sources */,
 				7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */,
+				7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */,
 				763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */,
 				766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,

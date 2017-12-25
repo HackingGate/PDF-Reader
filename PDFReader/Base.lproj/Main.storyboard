@@ -63,7 +63,7 @@
                                 <inset key="imageInsets" minX="0.0" minY="0.0" maxX="8" maxY="0.0"/>
                                 <inset key="landscapeImageInsets" minX="0.0" minY="0.0" maxX="0.0" maxY="8"/>
                                 <connections>
-                                    <segue destination="zyc-PQ-xbA" kind="show" identifier="ThumbnailCollection" id="6bv-nF-blr"/>
+                                    <segue destination="q1f-iy-oJP" kind="show" identifier="Container" id="d5o-Xg-TJ6"/>
                                 </connections>
                             </barButtonItem>
                         </leftBarButtonItems>
@@ -157,7 +157,64 @@
                 </collectionViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kNE-II-jFL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2524" y="163.26836581709148"/>
+            <point key="canvasLocation" x="3782" y="-232"/>
+        </scene>
+        <!--Container View Controller-->
+        <scene sceneID="Te5-Mw-Xka">
+            <objects>
+                <viewController hidesBottomBarWhenPushed="YES" id="q1f-iy-oJP" customClass="ContainerViewController" customModule="PDFReader" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="0O5-08-OZk">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <containerView hidden="YES" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="08b-Dd-nHf" userLabel="Table Container">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <connections>
+                                    <segue destination="lLt-tB-FrU" kind="embed" id="t9A-pl-oS0"/>
+                                </connections>
+                            </containerView>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="16M-kS-KBS" userLabel="Collection Container">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <connections>
+                                    <segue destination="zyc-PQ-xbA" kind="embed" identifier="ThumbnailCollection" id="7Mo-J2-aAb"/>
+                                </connections>
+                            </containerView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="16M-kS-KBS" firstAttribute="leading" secondItem="0O5-08-OZk" secondAttribute="leading" id="3m8-nX-cUa"/>
+                            <constraint firstItem="08b-Dd-nHf" firstAttribute="bottom" secondItem="8Pz-0A-bed" secondAttribute="bottom" id="6NY-K7-TSH"/>
+                            <constraint firstAttribute="trailing" secondItem="16M-kS-KBS" secondAttribute="trailing" id="OIr-PG-hot"/>
+                            <constraint firstItem="16M-kS-KBS" firstAttribute="top" secondItem="0O5-08-OZk" secondAttribute="top" id="SaS-8K-kzn"/>
+                            <constraint firstItem="08b-Dd-nHf" firstAttribute="trailing" secondItem="8Pz-0A-bed" secondAttribute="trailing" id="UT6-A7-IRQ"/>
+                            <constraint firstItem="08b-Dd-nHf" firstAttribute="leading" secondItem="8Pz-0A-bed" secondAttribute="leading" id="XuA-gi-wOV"/>
+                            <constraint firstAttribute="bottom" secondItem="16M-kS-KBS" secondAttribute="bottom" id="e54-j1-r5t"/>
+                            <constraint firstItem="08b-Dd-nHf" firstAttribute="top" secondItem="0O5-08-OZk" secondAttribute="top" id="iZy-C2-Gq3"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="8Pz-0A-bed"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="5D5-cw-oZq">
+                        <nil key="title"/>
+                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="FGX-3v-YQU">
+                            <rect key="frame" x="127" y="7.5" width="121" height="29"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <segments>
+                                <segment title="First"/>
+                                <segment title="Second"/>
+                            </segments>
+                            <connections>
+                                <action selector="segmentControlValueChanged:" destination="q1f-iy-oJP" eventType="valueChanged" id="DMo-Bt-fwd"/>
+                            </connections>
+                        </segmentedControl>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="collectionContainer" destination="16M-kS-KBS" id="MUR-RE-jz9"/>
+                        <outlet property="tableContainer" destination="08b-Dd-nHf" id="QeE-VL-dmd"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x6c-m7-KZS" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2556" y="160.56971514242881"/>
         </scene>
         <!--Popover Table View Controller-->
         <scene sceneID="7Q2-Vz-9qZ">
@@ -387,6 +444,34 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MB6-Ty-AZg" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2555.1999999999998" y="653.07346326836591"/>
+        </scene>
+        <!--Table View Controller-->
+        <scene sceneID="KOT-wh-oxf">
+            <objects>
+                <tableViewController hidesBottomBarWhenPushed="YES" id="lLt-tB-FrU" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="lkl-MF-Hmw">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="Bru-YU-p21">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Bru-YU-p21" id="BUy-Di-VTR">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="lLt-tB-FrU" id="koF-g6-eGz"/>
+                            <outlet property="delegate" destination="lLt-tB-FrU" id="uxy-EX-GwQ"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="obX-dQ-h7t" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3782" y="538"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="2cn-hS-8JH">
