@@ -16,6 +16,8 @@
 		766439F21F7C92D600DAF771 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 766439F11F7C92D600DAF771 /* Assets.xcassets */; };
 		766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */; };
 		767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 767C12C71F9CEC87000CE311 /* Settings.bundle */; };
+		7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */; };
+		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,8 @@
 		766439F41F7C92D600DAF771 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		766439F61F7C92D600DAF771 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
+		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +71,8 @@
 				766439EA1F7C92D600DAF771 /* DocumentViewController.swift */,
 				766439EC1F7C92D600DAF771 /* Document.swift */,
 				763764D11FC3125500B41B05 /* PopoverTableViewController.swift */,
+				76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */,
+				7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
@@ -150,10 +156,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				766439ED1F7C92D600DAF771 /* Document.swift in Sources */,
+				7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */,
 				763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */,
 				766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
+				76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

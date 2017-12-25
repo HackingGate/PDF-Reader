@@ -15,6 +15,7 @@ protocol SettingsDelegate {
     var isEncrypted: Bool { get }
     var allowsDocumentAssembly: Bool { get }
     func writing(vertically: Bool, rightToLeft: Bool) -> Void
+    func goToPage(page: PDFPage) -> Void
 }
 
 class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate {
@@ -37,6 +38,9 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
         super.viewWillAppear(animated)
+        navigationController?.hidesBarsOnTap = true
+        
+        if (pdfView.document != nil) { return }
         
         // Access the document
         document?.open(completionHandler: { (success) in
@@ -70,7 +74,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     }
     
     override func viewDidLoad() {
-        navigationController?.hidesBarsOnTap = true
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
         
         
@@ -162,6 +165,10 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         }
         
         setScaleFactorForSizeToFit()
+    }
+    
+    func goToPage(page: PDFPage) {
+        pdfView.go(to: page)
     }
     
     func setPDFThumbnailView() {
@@ -284,6 +291,15 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                     // 201 - 44 = 157
                     popopverVC.preferredContentSize = CGSize(width: 300, height: 157)
                 }
+            }
+        } else if (segue.identifier == "ThumbnailCollection") {
+            if let thumbnailCollectionVC: ThumbnailCollectionViewController = segue.destination as? ThumbnailCollectionViewController {
+                thumbnailCollectionVC.pdfDocument = pdfView.document
+                thumbnailCollectionVC.displayBox = pdfView.displayBox
+                if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+                    thumbnailCollectionVC.currentIndex = document.index(for: currentPage)
+                }
+                thumbnailCollectionVC.delegate = self
             }
         }
     }
