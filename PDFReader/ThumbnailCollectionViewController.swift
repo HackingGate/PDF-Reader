@@ -18,6 +18,7 @@ class ThumbnailCollectionViewController: UICollectionViewController {
     var displayBox: PDFDisplayBox = .cropBox
     var isWidthGreaterThanHeight: Bool = false
     var currentIndex: Int = 0
+    var onceOnly = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +40,15 @@ class ThumbnailCollectionViewController: UICollectionViewController {
             }
         }
         
-        collectionView?.scrollToItem(at: IndexPath(item: currentIndex, section: 0), at: .centeredVertically, animated: false)
+    }
+    
+    // Start UICollectionView at a specific indexpath
+    // https://stackoverflow.com/a/35679859/4063462
+    internal override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if !onceOnly {
+            collectionView.scrollToItem(at: IndexPath(item: currentIndex, section: 0), at: .centeredVertically, animated: false)
+            onceOnly = true
+        }
     }
 
     override func didReceiveMemoryWarning() {
