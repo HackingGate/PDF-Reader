@@ -19,6 +19,7 @@ class ThumbnailCollectionViewController: UICollectionViewController {
     var isWidthGreaterThanHeight: Bool = false
     var currentIndex: Int = 0
     var onceOnly = false
+    let thumbnailCache = NSCache<NSNumber, UIImage>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +50,14 @@ class ThumbnailCollectionViewController: UICollectionViewController {
             collectionView.scrollToItem(at: IndexPath(item: currentIndex, section: 0), at: .centeredVertically, animated: false)
             onceOnly = true
         }
+        
+        let imageView = cell.viewWithTag(1) as? UIImageView
+        if imageView?.image == nil {
+            if let thumbnail: UIImage = thumbnailCache.object(forKey: NSNumber(value: indexPath.item)) {
+                imageView?.image = thumbnail
+            }
+        }
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -75,14 +84,42 @@ class ThumbnailCollectionViewController: UICollectionViewController {
         let numberLabel = cell.viewWithTag(2) as? PaddingLabel
         numberLabel?.text = String(indexPath.item + 1)
         
-        let cellScreenSize = CGSize(width: cell.bounds.size.width * UIScreen.main.scale, height: cell.bounds.size.height * UIScreen.main.scale)
+        var multiplier: CGFloat = 1.0
+        if UIApplication.shared.statusBarOrientation.isPortrait {
+            // calculate size for landscape
+            var safeAreaWidth = UIScreen.main.bounds.height
+            if UIApplication.shared.statusBarFrame.height != 20 {
+                // for iPhone X
+                safeAreaWidth -= UIApplication.shared.statusBarFrame.height * 2
+            }
+            let width: CGFloat = (safeAreaWidth - (isWidthGreaterThanHeight ? 64 : 80)) / (isWidthGreaterThanHeight ? 3 : 4)
+            let flooredWidth = width.flooredFloat
+            multiplier = flooredWidth / cell.bounds.size.width
+        }
+        
+        let cellScreenSize = CGSize(width: cell.bounds.size.width * UIScreen.main.scale * multiplier, height: cell.bounds.size.height * UIScreen.main.scale * multiplier)
         
         let imageView = cell.viewWithTag(1) as? UIImageView
         
-        if let page = self.pdfDocument?.page(at: indexPath.item) {
-            
-            let thumbnail = page.thumbnail(of: cellScreenSize, for: displayBox)
+        if let thumbnail: UIImage = thumbnailCache.object(forKey: NSNumber(value: indexPath.item)) {
             imageView?.image = thumbnail
+        } else {
+            imageView?.image = nil
+            // cache images
+            // https://stackoverflow.com/a/16694019/4063462
+            DispatchQueue.global(qos: .userInteractive).async {
+                if let page = self.pdfDocument?.page(at: indexPath.item) {
+                    let thumbnail = page.thumbnail(of: cellScreenSize, for: self.displayBox)
+                    self.thumbnailCache.setObject(thumbnail, forKey: NSNumber(value: indexPath.item))
+                    DispatchQueue.main.async {
+                        let updateCell = collectionView.cellForItem(at: indexPath)
+                        let updateImageView = updateCell?.viewWithTag(1) as? UIImageView
+                        if updateImageView?.image == nil {
+                            updateImageView?.image = thumbnail
+                        }
+                    }
+                }
+            }
         }
 
         cell.layer.shadowOffset = CGSize(width: 1, height: 1)
@@ -110,18 +147,17 @@ extension ThumbnailCollectionViewController: UICollectionViewDelegateFlowLayout 
         
         let collectionViewSafeAreaWidth = collectionView.frame.size.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right
         
-        var width: Double = 0.0
+        var width: CGFloat = 0.0
         
         if UIApplication.shared.statusBarOrientation.isPortrait {
             // 3 items per line or 2 when width greater than height
-            width = Double((collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 48 : 64)) / (isWidthGreaterThanHeight ? 2 : 3))
+            width = (collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 48 : 64)) / (isWidthGreaterThanHeight ? 2 : 3)
         } else {
             // 4 items per line or 3 when width greater than height
-            width = Double((collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 64 : 80)) / (isWidthGreaterThanHeight ? 3 : 4))
+            width = (collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 64 : 80)) / (isWidthGreaterThanHeight ? 3 : 4)
         }
         
-        // This app requires iOS 11. And iOS 11 requires 64-bit device.
-        let flooredWidth = CGFloat(floor(width * 1000000000000) / 1000000000000)
+        let flooredWidth = width.flooredFloat
         
         if let page = pdfDocument?.page(at: indexPath.item) {
             
@@ -134,6 +170,14 @@ extension ThumbnailCollectionViewController: UICollectionViewDelegateFlowLayout 
         }
         
         return .zero
+    }
+}
+
+extension CGFloat {
+    // 64-bit device
+    var flooredFloat: CGFloat {
+        let flooredFloat = CGFloat(floor(Double(self) * 1000000000000) / 1000000000000)
+        return flooredFloat
     }
 }
 
