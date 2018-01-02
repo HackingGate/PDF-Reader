@@ -18,6 +18,8 @@
 		766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */; };
 		767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 767C12C71F9CEC87000CE311 /* Settings.bundle */; };
 		7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */; };
+		76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */; };
+		76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */; };
 		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +37,8 @@
 		766439F61F7C92D600DAF771 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewCell.swift; sourceTree = "<group>"; };
+		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -76,6 +80,8 @@
 				7629A3521FF11A7F007402FB /* ContainerViewController.swift */,
 				76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */,
 				7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */,
+				76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */,
+				76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
@@ -163,6 +169,8 @@
 				7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */,
 				763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */,
 				766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */,
+				76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */,
+				76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
 				76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */,

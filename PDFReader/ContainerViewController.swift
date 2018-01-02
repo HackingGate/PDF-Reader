@@ -13,6 +13,7 @@ class ContainerViewController: UIViewController {
 
     @IBOutlet weak var tableContainer: UIView!
     @IBOutlet weak var collectionContainer: UIView!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
@@ -37,7 +38,9 @@ class ContainerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        if pdfDocument?.outlineRoot?.numberOfChildren == nil {
+            segmentedControl.removeSegment(at: 1, animated: false)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -52,6 +55,11 @@ class ContainerViewController: UIViewController {
                 thumbnailCollectionVC.displayBox = displayBox
                 thumbnailCollectionVC.currentIndex = currentIndex
                 thumbnailCollectionVC.delegate = delegate
+            }
+        } else if (segue.identifier == "OutlineTable") {
+            if let outlineTableVC: OutlineTableViewController = segue.destination as? OutlineTableViewController {
+                outlineTableVC.outlineRoot = pdfDocument?.outlineRoot
+                outlineTableVC.delegate = delegate
             }
         }
     }

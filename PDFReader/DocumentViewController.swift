@@ -16,9 +16,22 @@ protocol SettingsDelegate {
     var allowsDocumentAssembly: Bool { get }
     func writing(vertically: Bool, rightToLeft: Bool) -> Void
     func goToPage(page: PDFPage) -> Void
+    func selectOutline(outline: PDFOutline) -> Void
 }
 
-class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate {
+extension DocumentViewController: SettingsDelegate {
+    func goToPage(page: PDFPage) {
+        pdfView.go(to: page)
+    }
+    
+    func selectOutline(outline: PDFOutline) {
+        if let action = outline.action as? PDFActionGoTo {
+            pdfView.go(to: action.destination)
+        }
+    }
+}
+
+class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate {
     
     @IBOutlet weak var pdfView: PDFView!
     
@@ -165,10 +178,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         }
         
         setScaleFactorForSizeToFit()
-    }
-    
-    func goToPage(page: PDFPage) {
-        pdfView.go(to: page)
     }
     
     func setPDFThumbnailView() {
