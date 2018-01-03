@@ -31,7 +31,7 @@ extension DocumentViewController: SettingsDelegate {
     }
 }
 
-class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate {
+class DocumentViewController: UIViewController {
     
     @IBOutlet weak var pdfView: PDFView!
     
@@ -65,9 +65,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 guard let document = PDFDocument(url: pdfURL) else { return }
                 
                 self.allowsDocumentAssembly = document.allowsDocumentAssembly
-                if (document.isEncrypted) {
-                    self.navigationItem.title = "🔒" + (self.navigationItem.title ?? "")
-                }
                 self.isEncrypted = document.isEncrypted
                 
                 self.pdfView.document = document
@@ -286,6 +283,9 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         self.present(activityVC, animated: true, completion: nil)
     }
     
+}
+
+extension DocumentViewController: UIPopoverPresentationControllerDelegate {
     // MARK: - PopoverTableViewController Presentation
 
     // iOS Popover presentation Segue

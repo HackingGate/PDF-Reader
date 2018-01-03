@@ -85,13 +85,13 @@ class PopoverTableViewController: UITableViewController {
         directionRightButton.tintColor = .lightGray
         if delegate.isVerticalWriting == false && delegate.isRightToLeft == false {
             directionDownButton.tintColor = view.tintColor
-            directionDetailLabel.text = "Normal"
+            directionDetailLabel.text = "Natural"
         } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == true {
             directionLeftButton.tintColor = view.tintColor
-            directionDetailLabel.text = "From right to left"
+            directionDetailLabel.text = "Right to left"
         } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == false {
             directionRightButton.tintColor = view.tintColor
-            directionDetailLabel.text = "From left to right"
+            directionDetailLabel.text = "Left to right"
         }
     }
     

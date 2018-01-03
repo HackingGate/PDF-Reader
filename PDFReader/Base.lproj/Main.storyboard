@@ -272,7 +272,7 @@
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Normal" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p96-se-Myf">
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Natural" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p96-se-Myf">
                                     <rect key="frame" x="15" y="25.5" width="41" height="14.5"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                     <nil key="textColor"/>
@@ -532,8 +532,8 @@
         <image name="direction_left" width="30" height="30"/>
         <image name="direction_right" width="30" height="30"/>
         <image name="grid-Compact" width="18" height="18"/>
-        <image name="list_item" width="26" height="17"/>
-        <image name="list_item-Compact" width="19" height="13"/>
+        <image name="list_item" width="21" height="13"/>
+        <image name="list_item-Compact" width="15" height="9"/>
         <image name="nav_back" width="13" height="21"/>
         <image name="nav_back-Compact" width="11" height="18"/>
         <image name="settings_item" width="25" height="25"/>
