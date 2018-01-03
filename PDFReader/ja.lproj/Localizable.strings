@@ -1,0 +1,12 @@
+/* 
+  Localizable.strings
+  PDFReader
+
+  Created by ERU on H30/01/03.
+  Copyright © 平成30年 Hacking Gate. All rights reserved.
+*/
+
+//  PopoverTableViewController.swift
+"Natural" = "横書き";
+"Right to left" = "縦書き";
+"Left to right" = "左縦書き";

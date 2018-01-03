@@ -1,0 +1,24 @@
+
+/* Class = "UILabel"; text = "Page"; ObjectID = "FJw-Gx-9U7"; */
+"FJw-Gx-9U7.text" = "Page";
+
+/* Class = "UIBarButtonItem"; title = " "; ObjectID = "HEo-Mk-C1l"; */
+"HEo-Mk-C1l.title" = " ";
+
+/* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
+"IgN-wB-cSg.text" = "一部機能が利用できない場合があります";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
+"P85-Tx-Jdt.text" = "Label";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
+"V6z-zU-NJK.text" = "Title";
+
+/* Class = "UILabel"; text = "Writing System"; ObjectID = "c6G-KP-IC3"; */
+"c6G-KP-IC3.text" = "書字方向";
+
+/* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
+"nNe-pC-STL.text" = "この書類は保護されっているため";
+
+/* Class = "UILabel"; text = "Natural"; ObjectID = "p96-se-Myf"; */
+"p96-se-Myf.text" = "横書き";
