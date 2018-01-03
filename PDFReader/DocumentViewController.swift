@@ -227,7 +227,9 @@ class DocumentViewController: UIViewController {
                 pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
                 pdfView.scaleFactor = portraitScaleFactorForSizeToFit
             } else if landscapeScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
-                pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
+                let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+                // set minScaleFactor to safe area for iPhone X and later
+                pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit * multiplier
                 pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
             }
         }
