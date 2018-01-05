@@ -93,6 +93,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         let documentViewController = navigationController.viewControllers.first as! DocumentViewController
         documentViewController.document = Document(fileURL: documentURL)
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+            documentViewController.managedObjectContext = appDelegate.persistentContainer.viewContext
+        }
         
         navigationController.modalTransitionStyle = .crossDissolve
         present(navigationController, animated: true, completion: nil)

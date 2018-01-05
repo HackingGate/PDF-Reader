@@ -20,6 +20,7 @@
 		767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 767C12C71F9CEC87000CE311 /* Settings.bundle */; };
 		7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */; };
 		76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */; };
+		76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */; };
 		76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */; };
 		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
 /* End PBXBuildFile section */
@@ -42,6 +43,7 @@
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
 		76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewCell.swift; sourceTree = "<group>"; };
+		76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PDFReader.xcdatamodel; sourceTree = "<group>"; };
 		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -92,6 +94,7 @@
 				766439F61F7C92D600DAF771 /* Info.plist */,
 				767C12C71F9CEC87000CE311 /* Settings.bundle */,
 				766D15921FFCCFA500A57C18 /* Localizable.strings */,
+				76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */,
 			);
 			path = PDFReader;
 			sourceTree = "<group>";
@@ -181,6 +184,7 @@
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
 				76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */,
+				76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +381,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */,
+			);
+			currentVersion = 76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */;
+			path = PDFReader.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 766439DB1F7C92D600DAF771 /* Project object */;
 }
