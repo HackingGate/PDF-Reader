@@ -40,8 +40,6 @@ class DocumentViewController: UIViewController {
     
     // data
     var managedObjectContext: NSManagedObjectContext? = nil
-    var _fetchedResultsController: NSFetchedResultsController<DocumentEntity>? = nil
-    var isBookmarkExists = false
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
     
@@ -91,8 +89,6 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        self.fetchAllObjects()
-        
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
         
         
@@ -245,8 +241,8 @@ class DocumentViewController: UIViewController {
     }
     
     func moveToLastReadingProsess() {
-        if isBookmarkExists {
-            // key exists
+        if let currentEntity = currentEntity {
+            pageIndex = currentEntity.pageIndex
         } else if isVerticalWriting {
             // 初めて読む　且つ　縦書き
             if let pageCount: Int = pdfView.document?.pageCount {
@@ -259,6 +255,38 @@ class DocumentViewController: UIViewController {
         }
     }
     
+    // MARK: - Save Data
+    
+    @objc
+    func insertNewObject(_ bookmark: Data, pageIndex: Int64) {
+        if let context = self.managedObjectContext {
+            let newDocument = DocumentEntity(context: context)
+            
+            // If appropriate, configure the new managed object.
+            newDocument.timestamp = Date()
+            newDocument.bookmark = bookmark
+            newDocument.pageIndex = pageIndex
+            
+            print("saving: \(newDocument)")
+            
+            self.saveContext(context)
+        } else {
+            print("context not exist")
+        }
+    }
+    
+    func saveContext(_ context: NSManagedObjectContext) {
+        // Save the context.
+        do {
+            try context.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+    
     @objc func saveAndClose() {
         guard let pdfDocument = pdfView.document else { return }
         if let currentPage = pdfView.currentPage {
@@ -266,11 +294,13 @@ class DocumentViewController: UIViewController {
             if isRightToLeft {
                 currentIndex = pdfDocument.pageCount - currentIndex - 1
             }
-            if isBookmarkExists, let documentEntity = currentEntity {
+            if let documentEntity = currentEntity {
                 documentEntity.timestamp = Date()
                 documentEntity.pageIndex = Int64(currentIndex)
                 print("updating entity: \(documentEntity)")
-                self.saveContext()
+                if let context = self.managedObjectContext {
+                    self.saveContext(context)
+                }
             } else {
                 do {
                     if let bookmark = try document?.fileURL.bookmarkData() {
@@ -298,120 +328,6 @@ class DocumentViewController: UIViewController {
     @IBAction func shareAction() {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
-    }
-    
-}
-
-extension DocumentViewController: NSFetchedResultsControllerDelegate {
-    // MARK: - CoreData
-    
-    func fetchAllObjects() {
-        if let sectionInfo = fetchedResultsController.sections?.first {
-            print("numberOfObjects: \(sectionInfo.numberOfObjects)")
-            guard let objects = sectionInfo.objects else { return }
-            for object in objects {
-                if let documentEntity = object as? DocumentEntity {
-                    if let bookmarkData = documentEntity.bookmark {
-                        do {
-                            var isStale = false
-                            if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
-                                print("resolved url: \(bookmarkURL)")
-                                if !isBookmarkExists && bookmarkURL == document?.fileURL {
-                                    isBookmarkExists = true
-                                    pageIndex = documentEntity.pageIndex
-                                    currentEntity = documentEntity
-                                    self.saveContext()
-                                }
-                                if isStale {
-                                    print("bookmark is stale")
-                                    // create a new bookmark using the returned URL
-                                    // https://developer.apple.com/documentation/foundation/nsurl/1572035-urlbyresolvingbookmarkdata
-                                    do {
-                                        documentEntity.timestamp = Date()
-                                        try documentEntity.bookmark = bookmarkURL.bookmarkData()
-                                    } catch let error as NSError {
-                                        print("Bookmark Creation Fails: \(error.description)")
-                                    }
-                                }
-                            }
-                        } catch let error as NSError {
-                            print("Bookmark Access Fails: \(error.description)")
-                            if error.code == -1005 {
-                                // file not exists
-                                let context = fetchedResultsController.managedObjectContext
-                                print("deleting: \(documentEntity)")
-                                context.delete(documentEntity)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    @objc
-    func insertNewObject(_ bookmark: Data, pageIndex: Int64) {
-        let context = self.fetchedResultsController.managedObjectContext
-        
-        let newDocument = DocumentEntity(context: context)
-        
-        // If appropriate, configure the new managed object.
-        newDocument.timestamp = Date()
-        newDocument.bookmark = bookmark
-        newDocument.pageIndex = pageIndex
-        
-        print("saving: \(newDocument)")
-        
-        self.saveContext()
-    }
-    
-    func saveContext() {
-        let context = self.fetchedResultsController.managedObjectContext
-
-        // Save the context.
-        do {
-            try context.save()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-    }
-    
-    // MARK: - Fetched results controller
-    
-    var fetchedResultsController: NSFetchedResultsController<DocumentEntity> {
-        if _fetchedResultsController != nil {
-            return _fetchedResultsController!
-        }
-        
-        let fetchRequest: NSFetchRequest<DocumentEntity> = DocumentEntity.fetchRequest()
-        
-        // Set the batch size to a suitable number.
-        fetchRequest.fetchBatchSize = 20
-        
-        // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
-        
-        fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        // Edit the section name key path and cache name if appropriate.
-        // nil for section name key path means "no sections".
-        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Document")
-        aFetchedResultsController.delegate = self
-        _fetchedResultsController = aFetchedResultsController
-        
-        do {
-            try _fetchedResultsController!.performFetch()
-        } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-            let nserror = error as NSError
-            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
-        }
-        
-        return _fetchedResultsController!
     }
 
 }
