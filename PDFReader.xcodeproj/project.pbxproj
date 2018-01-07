@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7629A3521FF11A7F007402FB /* ContainerViewController.swift */; };
 		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
+		7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7654260C2001CB8600D2FB72 /* CloudKit.framework */; };
 		766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E61F7C92D600DAF771 /* AppDelegate.swift */; };
 		766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */; };
 		766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439EA1F7C92D600DAF771 /* DocumentViewController.swift */; };
@@ -28,6 +29,8 @@
 /* Begin PBXFileReference section */
 		7629A3521FF11A7F007402FB /* ContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
+		7654260A2001CB8400D2FB72 /* PDFReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDFReader.entitlements; sourceTree = "<group>"; };
+		7654260C2001CB8600D2FB72 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		766439E31F7C92D600DAF771 /* PDFReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		766439E61F7C92D600DAF771 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
@@ -53,17 +56,27 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7654260B2001CB8600D2FB72 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7654260C2001CB8600D2FB72 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		766439DA1F7C92D600DAF771 = {
 			isa = PBXGroup;
 			children = (
 				766439E51F7C92D600DAF771 /* PDFReader */,
 				766439E41F7C92D600DAF771 /* Products */,
+				7654260B2001CB8600D2FB72 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -78,6 +91,7 @@
 		766439E51F7C92D600DAF771 /* PDFReader */ = {
 			isa = PBXGroup;
 			children = (
+				7654260A2001CB8400D2FB72 /* PDFReader.entitlements */,
 				766439E61F7C92D600DAF771 /* AppDelegate.swift */,
 				766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */,
 				766439EA1F7C92D600DAF771 /* DocumentViewController.swift */,
@@ -132,6 +146,14 @@
 					766439E21F7C92D600DAF771 = {
 						CreatedOnToolsVersion = 9.0;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -333,6 +355,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReader/Info.plist;
@@ -348,6 +371,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReader/Info.plist;

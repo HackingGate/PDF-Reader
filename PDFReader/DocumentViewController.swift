@@ -9,6 +9,7 @@
 import UIKit
 import PDFKit
 import CoreData
+import CloudKit
 
 protocol SettingsDelegate {
     var isVerticalWriting: Bool { get }
@@ -42,6 +43,7 @@ class DocumentViewController: UIViewController {
     var managedObjectContext: NSManagedObjectContext? = nil
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
+    var currentCKRecord: CKRecord? = nil
     
     // scale
     var portraitScaleFactorForSizeToFit: CGFloat = 0.0
@@ -253,6 +255,37 @@ class DocumentViewController: UIViewController {
         if let pdfPage = pdfView.document?.page(at: Int(pageIndex)) {
             pdfView.go(to: pdfPage)
         }
+        
+        if let record = currentCKRecord, let cloudPageIndex = record["pageIndex"] as? NSNumber {
+            if cloudPageIndex.int64Value != pageIndex {
+                var message = ""
+                if let modificationDate = record["modificationDate"] as? Date {
+                    message += "Time: \(modificationDate)"
+                }
+                if let modifiedByDevice = record["modifiedByDevice"] as? String {
+                    message += "\nDevice: \(modifiedByDevice)"
+                }
+                message += "\nLast viewed page: \(cloudPageIndex)"
+                
+                let alertController: UIAlertController = UIAlertController(title: "Cloud Data Found", message: message, preferredStyle: .alert)
+                
+                let defaultAction: UIAlertAction = UIAlertAction(title: "Move", style: .default, handler: { (action: UIAlertAction?) in
+                    self.pageIndex = cloudPageIndex.int64Value
+                    if let pdfPage = self.pdfView.document?.page(at: Int(self.pageIndex)) {
+                        self.pdfView.go(to: pdfPage)
+                    }
+                })
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil)
+                
+                alertController.addAction(cancelAction)
+                alertController.addAction(defaultAction)
+                
+                present(alertController, animated: true, completion: {
+                    
+                })
+            }
+        }
     }
     
     // MARK: - Save Data
@@ -263,8 +296,9 @@ class DocumentViewController: UIViewController {
             let newDocument = DocumentEntity(context: context)
             
             // If appropriate, configure the new managed object.
-            newDocument.timestamp = Date()
-            newDocument.bookmark = bookmark
+            newDocument.uuid = UUID()
+            newDocument.modificationDate = Date()
+            newDocument.bookmarkData = bookmark
             newDocument.pageIndex = pageIndex
             
             print("saving: \(newDocument)")
@@ -295,7 +329,7 @@ class DocumentViewController: UIViewController {
                 currentIndex = pdfDocument.pageCount - currentIndex - 1
             }
             if let documentEntity = currentEntity {
-                documentEntity.timestamp = Date()
+                documentEntity.modificationDate = Date()
                 documentEntity.pageIndex = Int64(currentIndex)
                 print("updating entity: \(documentEntity)")
                 if let context = self.managedObjectContext {

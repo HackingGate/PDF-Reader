@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import CloudKit
 
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate, NSFetchedResultsControllerDelegate {
     
@@ -15,6 +16,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
     var managedObjectContext: NSManagedObjectContext? = nil
     var fetchedResults: [DocumentEntity]?
+    var downloadedCKRecords: [CKRecord]?
+    let privateCloudDatabase = CKContainer.default().privateCloudDatabase
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +25,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         if let sectionInfo = fetchedResultsController.sections?.first{
             fetchedResults = sectionInfo.objects as? [DocumentEntity]
         }
+        self.downloadRecords()
 
         delegate = self
         
@@ -103,6 +107,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         if let documentEntity = self.currentEntityFor(documentURL) {
             documentViewController.currentEntity = documentEntity
         }
+        if let documentCKRecord = self.currentCKRecordFor(documentURL) {
+            documentViewController.currentCKRecord = documentCKRecord
+        }
         
         navigationController.modalTransitionStyle = .crossDissolve
         present(navigationController, animated: true, completion: nil)
@@ -113,7 +120,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     func currentEntityFor(_ documentURL: URL) -> DocumentEntity? {
         guard let objects = fetchedResults else { return nil }
         for documentEntity in objects {
-            if let bookmarkData = documentEntity.bookmark {
+            if let bookmarkData = documentEntity.bookmarkData {
                 do {
                     var isStale = false
                     if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
@@ -126,8 +133,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                             // create a new bookmark using the returned URL
                             // https://developer.apple.com/documentation/foundation/nsurl/1572035-urlbyresolvingbookmarkdata
                             do {
-                                documentEntity.timestamp = Date()
-                                try documentEntity.bookmark = bookmarkURL.bookmarkData()
+                                documentEntity.modificationDate = Date()
+                                try documentEntity.bookmarkData = bookmarkURL.bookmarkData()
                             } catch let error as NSError {
                                 print("Bookmark Creation Fails: \(error.description)")
                             }
@@ -147,6 +154,38 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         return nil
     }
     
+    func currentCKRecordFor(_ documentURL: URL) -> CKRecord? {
+        guard let records = downloadedCKRecords else { return nil }
+        for record in records {
+            if let bookmarkData = record["bookmarkData"] as? Data {
+                do {
+                    var isStale = false
+                    if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
+                        if bookmarkURL == documentURL {
+                            return record
+                        }
+                    }
+                } catch let error as NSError {
+                    print("Bookmark Access Fails: \(error.description)")
+                }
+            }
+        }
+        return nil
+    }
+    
+    func downloadRecords() {
+        let database = CKContainer.default().privateCloudDatabase
+        let query = CKQuery(recordType: "Document", predicate: NSPredicate(format: "TRUEPREDICATE"))
+        
+        // submit a query
+        database.perform(query, inZoneWith: nil, completionHandler: { (records: [CKRecord]?, error: Error?) in
+            if let error = error {
+                print("query: \(error)")
+            }
+            self.downloadedCKRecords = records
+        })
+    }
+    
     // MARK: - Fetched results controller
     
     var fetchedResultsController: NSFetchedResultsController<DocumentEntity> {
@@ -160,13 +199,12 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         fetchRequest.fetchBatchSize = 20
         
         // Edit the sort key as appropriate.
-        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "modificationDate", ascending: false)
         
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         // Edit the section name key path and cache name if appropriate.
         // nil for section name key path means "no sections".
-        // workaround: use random string as cacheName to prevent 0 numberOfObjects
         let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Document")
         aFetchedResultsController.delegate = self
         _fetchedResultsController = aFetchedResultsController
@@ -185,6 +223,54 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     var _fetchedResultsController: NSFetchedResultsController<DocumentEntity>? = nil
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        if let documentEntity = anObject as? DocumentEntity {
+            if let bookmarkData = documentEntity.bookmarkData as NSData?, let uuid = documentEntity.uuid {
+                
+                let recordID = CKRecordID(recordName: uuid.uuidString)
+                
+                let documentCKRecord = CKRecord(recordType: "Document", recordID: recordID)
+                
+                print(documentEntity)
+                documentCKRecord["bookmarkData"] = bookmarkData
+                documentCKRecord["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
+                print(NSNumber(value: documentEntity.pageIndex))
+                
+                
+                if type == .insert {
+                    privateCloudDatabase.save(documentCKRecord, completionHandler: { (record: CKRecord?, error: Error?) in
+                        if let error = error {
+                            print("CKRecord: \(String(describing: record)) save failed: \(error)")
+                            return
+                        }
+                    })
+                } else if type == .update {
+                    privateCloudDatabase.fetch(withRecordID: recordID, completionHandler: { (record: CKRecord?, error: Error?) in
+                        if let error = error {
+                            print("CKRecord: \(String(describing: record)) fetch failed: \(error)")
+                        } else if let updatedRecord = record {
+                            updatedRecord["bookmarkData"] = documentCKRecord["bookmarkData"]
+                            updatedRecord["pageIndex"] = documentCKRecord["pageIndex"]
+                            print(updatedRecord)
+                            self.privateCloudDatabase.save(updatedRecord, completionHandler: { (record: CKRecord?, error: Error?) in
+                                if let error = error {
+                                    print("CKRecord: \(String(describing: record)) update failed: \(error)")
+                                }
+                            })
+                        }
+                    })
+                } else if type == .delete {
+                    privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                        if let error = error {
+                            print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
+                            return
+                        }
+                    })
+                }
+                
+            }
+        }
+        
         switch type {
         case .insert:
             fetchedResults?.insert(anObject as! DocumentEntity, at: newIndexPath!.row)
