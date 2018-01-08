@@ -16,7 +16,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
     var managedObjectContext: NSManagedObjectContext? = nil
     var fetchedResults: [DocumentEntity]?
-    var downloadedCKRecords: [CKRecord]?
+    var fetchedCKRecords: [CKRecord]?
     let privateCloudDatabase = CKContainer.default().privateCloudDatabase
     
     override func viewDidLoad() {
@@ -25,7 +25,6 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         if let sectionInfo = fetchedResultsController.sections?.first{
             fetchedResults = sectionInfo.objects as? [DocumentEntity]
         }
-        self.downloadRecords()
 
         delegate = self
         
@@ -107,12 +106,15 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         if let documentEntity = self.currentEntityFor(documentURL) {
             documentViewController.currentEntity = documentEntity
         }
-        if let documentCKRecord = self.currentCKRecordFor(documentURL) {
-            documentViewController.currentCKRecord = documentCKRecord
-        }
+//        if let records = self.fetchCKRecords() {
+//            let documentCKRecords = self.currentCKRecordsFor(documentURL: documentURL, records: records)
+//            documentViewController.currentCKRecords = documentCKRecords
+//        }
         
         navigationController.modalTransitionStyle = .crossDissolve
-        present(navigationController, animated: true, completion: nil)
+        present(navigationController, animated: true) {
+            self.fetchCKRecords()
+        }
     }
     
     // MARK: - Fetch Data
@@ -135,6 +137,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                             do {
                                 documentEntity.modificationDate = Date()
                                 try documentEntity.bookmarkData = bookmarkURL.bookmarkData()
+                                if let context = self.managedObjectContext {
+                                    self.saveContext(context)
+                                }
                             } catch let error as NSError {
                                 print("Bookmark Creation Fails: \(error.description)")
                             }
@@ -154,35 +159,49 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         return nil
     }
     
-    func currentCKRecordFor(_ documentURL: URL) -> CKRecord? {
-        guard let records = downloadedCKRecords else { return nil }
+    func currentCKRecordsFor(documentURL: URL, records: [CKRecord]) -> [CKRecord] {
+        var currentCKRecords: [CKRecord] = []
         for record in records {
             if let bookmarkData = record["bookmarkData"] as? Data {
                 do {
                     var isStale = false
                     if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
                         if bookmarkURL == documentURL {
-                            return record
+                            // sort by modificationDate, ascending false
+                            currentCKRecords.insert(record, at: currentCKRecords.count)
                         }
+                    }
+                    if isStale {
+                        // when the bookmark in CoreData is stale, CKRecord will be updated after CoreData update.
                     }
                 } catch let error as NSError {
                     print("Bookmark Access Fails: \(error.description)")
                 }
             }
         }
-        return nil
+        return currentCKRecords
     }
     
-    func downloadRecords() {
+    func fetchCKRecords() {
         let database = CKContainer.default().privateCloudDatabase
         let query = CKQuery(recordType: "Document", predicate: NSPredicate(format: "TRUEPREDICATE"))
+        query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
         
         // submit a query
         database.perform(query, inZoneWith: nil, completionHandler: { (records: [CKRecord]?, error: Error?) in
             if let error = error {
                 print("query: \(error)")
+            } else {
+                self.fetchedCKRecords = records
+                if let nav = self.presentedViewController as? UINavigationController {
+                    if let documentVC = nav.viewControllers.first as? DocumentViewController {
+                        if let records = records, let fileURL = documentVC.document?.fileURL {
+                            documentVC.currentCKRecords = self.currentCKRecordsFor(documentURL: fileURL, records: records)
+                            documentVC.checkForNewerRecords()
+                        }
+                    }
+                }
             }
-            self.downloadedCKRecords = records
         })
     }
     
@@ -281,6 +300,20 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         case .move:
             fetchedResults?.remove(at: indexPath!.row)
             fetchedResults?.insert(anObject as! DocumentEntity, at: newIndexPath!.row)
+        }
+    }
+    
+    // MARK: - Core Data Saving support
+
+    func saveContext(_ context: NSManagedObjectContext) {
+        // Save the context.
+        do {
+            try context.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
     }
     

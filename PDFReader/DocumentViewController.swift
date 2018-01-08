@@ -43,7 +43,7 @@ class DocumentViewController: UIViewController {
     var managedObjectContext: NSManagedObjectContext? = nil
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
-    var currentCKRecord: CKRecord? = nil
+    var currentCKRecords: [CKRecord]? = nil
     
     // scale
     var portraitScaleFactorForSizeToFit: CGFloat = 0.0
@@ -256,12 +256,16 @@ class DocumentViewController: UIViewController {
             pdfView.go(to: pdfPage)
         }
         
-        if let record = currentCKRecord, let cloudPageIndex = record["pageIndex"] as? NSNumber {
+    }
+    
+    // call after moveToLastReadingProsess()
+    func checkForNewerRecords() {
+        if let record = currentCKRecords?.first, let modificationDate = record["modificationDate"] as? Date, let cloudPageIndex = record["pageIndex"] as? NSNumber {
+            if let currentModificationDate = currentEntity?.modificationDate {
+                if currentModificationDate > modificationDate { return }
+            }
             if cloudPageIndex.int64Value != pageIndex {
-                var message = ""
-                if let modificationDate = record["modificationDate"] as? Date {
-                    message += "Time: \(modificationDate)"
-                }
+                var message = "Time: \(modificationDate.description(with: Locale.current))"
                 if let modifiedByDevice = record["modifiedByDevice"] as? String {
                     message += "\nDevice: \(modifiedByDevice)"
                 }
@@ -281,9 +285,7 @@ class DocumentViewController: UIViewController {
                 alertController.addAction(cancelAction)
                 alertController.addAction(defaultAction)
                 
-                present(alertController, animated: true, completion: {
-                    
-                })
+                present(alertController, animated: true, completion: nil)
             }
         }
     }
@@ -297,6 +299,7 @@ class DocumentViewController: UIViewController {
             
             // If appropriate, configure the new managed object.
             newDocument.uuid = UUID()
+            newDocument.creationDate = Date()
             newDocument.modificationDate = Date()
             newDocument.bookmarkData = bookmark
             newDocument.pageIndex = pageIndex
