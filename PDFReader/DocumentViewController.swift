@@ -303,6 +303,8 @@ class DocumentViewController: UIViewController {
             newDocument.modificationDate = Date()
             newDocument.bookmarkData = bookmark
             newDocument.pageIndex = pageIndex
+            newDocument.isVerticalWriting = self.isVerticalWriting
+            newDocument.isRightToLeft = self.isRightToLeft
             
             print("saving: \(newDocument)")
             

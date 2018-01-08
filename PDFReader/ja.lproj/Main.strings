@@ -14,8 +14,8 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
 "V6z-zU-NJK.text" = "Title";
 
-/* Class = "UILabel"; text = "Scroll"; ObjectID = "c6G-KP-IC3"; */
-"c6G-KP-IC3.text" = "スクロール";
+/* Class = "UILabel"; text = "Scroll Direction"; ObjectID = "c6G-KP-IC3"; */
+"c6G-KP-IC3.text" = "スクロール方向";
 
 /* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
 "nNe-pC-STL.text" = "この書類は保護されっているため";
