@@ -265,22 +265,22 @@ class DocumentViewController: UIViewController {
                 if currentModificationDate > modificationDate { return }
             }
             if cloudPageIndex.int64Value != pageIndex {
-                var message = "Time: \(modificationDate.description(with: Locale.current))"
+                var message = modificationDate.description(with: Locale.current)
                 if let modifiedByDevice = record["modifiedByDevice"] as? String {
-                    message += "\nDevice: \(modifiedByDevice)"
+                    message += "\n\(NSLocalizedString("Device:", comment: "")) \(modifiedByDevice)"
                 }
-                message += "\nLast viewed page: \(cloudPageIndex)"
+                message += "\n\(NSLocalizedString("Last Viewed Page:", comment: "")) \(cloudPageIndex)"
                 
-                let alertController: UIAlertController = UIAlertController(title: "Cloud Data Found", message: message, preferredStyle: .alert)
+                let alertController: UIAlertController = UIAlertController(title: NSLocalizedString("Found iCloud Data", comment: ""), message: message, preferredStyle: .alert)
                 
-                let defaultAction: UIAlertAction = UIAlertAction(title: "Move", style: .default, handler: { (action: UIAlertAction?) in
+                let defaultAction: UIAlertAction = UIAlertAction(title: NSLocalizedString("Move", comment: ""), style: .default, handler: { (action: UIAlertAction?) in
                     self.pageIndex = cloudPageIndex.int64Value
                     if let pdfPage = self.pdfView.document?.page(at: Int(self.pageIndex)) {
                         self.pdfView.go(to: pdfPage)
                     }
                 })
                 
-                let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil)
+                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: UIAlertActionStyle.cancel, handler: nil)
                 
                 alertController.addAction(cancelAction)
                 alertController.addAction(defaultAction)

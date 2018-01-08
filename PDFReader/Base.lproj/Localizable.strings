@@ -11,3 +11,9 @@
 "Right to left" = "Right to left";
 "Left to right" = "Left to right";
 
+//  DocumentViewController.swift
+"Found iCloud Data" = "Found iCloud Data";
+"Device:" = "Device:";
+"Last Viewed Page:" = "Last Viewed Page:";
+"Move" = "Move";
+"Cancel" = "Cancel";

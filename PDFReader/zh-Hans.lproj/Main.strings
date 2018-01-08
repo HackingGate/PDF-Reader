@@ -6,7 +6,7 @@
 "HEo-Mk-C1l.title" = " ";
 
 /* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
-"IgN-wB-cSg.text" = "一部機能が利用できない場合があります";
+"IgN-wB-cSg.text" = "某些功能可能无法使用";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
 "P85-Tx-Jdt.text" = "Label";
@@ -15,10 +15,11 @@
 "V6z-zU-NJK.text" = "Title";
 
 /* Class = "UILabel"; text = "Scroll"; ObjectID = "c6G-KP-IC3"; */
-"c6G-KP-IC3.text" = "スクロール";
+"c6G-KP-IC3.text" = "滚动";
 
 /* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
-"nNe-pC-STL.text" = "この書類は保護されっているため";
+"nNe-pC-STL.text" = "此文件受保护";
 
 /* Class = "UILabel"; text = "Natural"; ObjectID = "p96-se-Myf"; */
-"p96-se-Myf.text" = "横書き";
+"p96-se-Myf.text" = "横排";
+

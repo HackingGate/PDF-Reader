@@ -40,12 +40,18 @@
 		766439F11F7C92D600DAF771 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		766439F41F7C92D600DAF771 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		766439F61F7C92D600DAF771 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		766D158B1FFCCD2100A57C18 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		766D15931FFCCFAE00A57C18 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		766D15941FFCCFB100A57C18 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		76A3CC642003474700E26A9A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewCell.swift; sourceTree = "<group>"; };
+		76B2397B20035B8500DE621B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
+		76B2397C20035B8500DE621B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		76B2397D20035F5100DE621B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		76B2397E20035F5100DE621B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		76B2398020036BE300DE621B /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
+		76B2398120036BE300DE621B /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PDFReader.xcdatamodel; sourceTree = "<group>"; };
 		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
@@ -165,6 +171,9 @@
 				en,
 				Base,
 				ja,
+				"zh-Hant",
+				"zh-Hans",
+				"yue-Hant",
 			);
 			mainGroup = 766439DA1F7C92D600DAF771;
 			productRefGroup = 766439E41F7C92D600DAF771 /* Products */;
@@ -217,7 +226,10 @@
 			isa = PBXVariantGroup;
 			children = (
 				766439EF1F7C92D600DAF771 /* Base */,
-				766D158B1FFCCD2100A57C18 /* ja */,
+				76A3CC642003474700E26A9A /* ja */,
+				76B2397B20035B8500DE621B /* zh-Hant */,
+				76B2397D20035F5100DE621B /* zh-Hans */,
+				76B2398020036BE300DE621B /* yue-Hant */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -235,6 +247,9 @@
 			children = (
 				766D15931FFCCFAE00A57C18 /* Base */,
 				766D15941FFCCFB100A57C18 /* ja */,
+				76B2397C20035B8500DE621B /* zh-Hant */,
+				76B2397E20035F5100DE621B /* zh-Hans */,
+				76B2398120036BE300DE621B /* yue-Hant */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

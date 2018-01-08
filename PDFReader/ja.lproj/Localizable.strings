@@ -10,3 +10,10 @@
 "Natural" = "横書き";
 "Right to left" = "縦書き";
 "Left to right" = "左縦書き";
+
+//  DocumentViewController.swift
+"Found iCloud Data" = "iCloudデータが見つかりました";
+"Device:" = "デバイス：";
+"Last Viewed Page:" = "最後に読んだぺージ：";
+"Move" = "移動";
+"Cancel" = "キャンセル";

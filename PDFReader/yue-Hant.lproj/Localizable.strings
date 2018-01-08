@@ -1,0 +1,19 @@
+/* 
+  Localizable.strings
+  PDFReader
+
+  Created by ERU on H30/01/03.
+  Copyright © 平成30年 Hacking Gate. All rights reserved.
+*/
+
+//  PopoverTableViewController.swift
+"Natural" = "橫睇";
+"Right to left" = "竪睇";
+"Left to right" = "竪睇（由左至右）";
+
+//  DocumentViewController.swift
+"Found iCloud Data" = "搵到iCloud數據";
+"Device:" = "裝置：";
+"Last Viewed Page:" = "上次讀到嘅頁：";
+"Move" = "移動";
+"Cancel" = "取消";
