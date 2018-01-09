@@ -20,6 +20,8 @@ class PopoverTableViewController: UITableViewController {
     @IBOutlet weak var directionLeftButton: UIButton!
     @IBOutlet weak var directionRightButton: UIButton!
     @IBOutlet weak var directionDetailLabel: UILabel!
+    @IBOutlet weak var twoUpSwitch: UISwitch!
+    @IBOutlet weak var twoUpDetailLabel: UILabel!
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
@@ -72,6 +74,7 @@ class PopoverTableViewController: UITableViewController {
         
         updateBrightness()
         updateDirection()
+        updateTwoUp()
     }
     
     @objc func updateBrightness() {
@@ -93,6 +96,11 @@ class PopoverTableViewController: UITableViewController {
             directionRightButton.tintColor = view.tintColor
             directionDetailLabel.text = NSLocalizedString("Left to right", comment: "")
         }
+    }
+    
+    func updateTwoUp() {
+        twoUpSwitch.isOn = delegate.prefersTwoUpInLandscapeForPad
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? "Two pages in landscape" : "One page in landscape"
     }
     
     // MARK: Actions
@@ -138,10 +146,18 @@ class PopoverTableViewController: UITableViewController {
         updateDirection()
     }
 
+    @IBAction func twoUpSwitchValueChanged(_ sender: UISwitch) {
+        delegate.setPreferredDisplayMode(sender.isOn)
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? "Two pages in landscape" : "One page in landscape"
+    }
+    
     // MARK: - UITableViewDelegate
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if !delegate.isEncrypted && indexPath.row == 3 {
+            return 0
+        }
+        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 4 {
             return 0
         }
         return super.tableView(tableView, heightForRowAt: indexPath)

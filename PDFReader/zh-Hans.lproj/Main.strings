@@ -18,7 +18,7 @@
 "c6G-KP-IC3.text" = "滚动方向";
 
 /* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
-"nNe-pC-STL.text" = "此文件受保护";
+"nNe-pC-STL.text" = "此文件受到保护";
 
 /* Class = "UILabel"; text = "Natural"; ObjectID = "p96-se-Myf"; */
 "p96-se-Myf.text" = "横排";

@@ -222,7 +222,7 @@
             <objects>
                 <tableViewController modalPresentationStyle="currentContext" id="8tg-0g-KWr" customClass="PopoverTableViewController" customModule="PDFReader" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" id="u45-Bn-qt2">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="201"/>
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="245"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -263,7 +263,7 @@
                             </constraints>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="4ed-Po-wbE">
-                            <rect key="frame" x="0.0" y="157" width="300" height="44"/>
+                            <rect key="frame" x="0.0" y="201" width="300" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scroll Direction" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c6G-KP-IC3">
@@ -419,6 +419,44 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="44" id="6yl-Z6-8cA">
+                                        <rect key="frame" x="0.0" y="156" width="300" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6yl-Z6-8cA" id="GW1-Fc-MXZ">
+                                            <rect key="frame" x="0.0" y="0.0" width="300" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Two pages mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nb4-pk-auH">
+                                                    <rect key="frame" x="15" y="4.5" width="130.5" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="One page in landscape" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xRC-KL-XPa">
+                                                    <rect key="frame" x="15" y="25" width="129.5" height="14.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="9Zg-hb-wpj">
+                                                    <rect key="frame" x="235" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="twoUpSwitchValueChanged:" destination="8tg-0g-KWr" eventType="valueChanged" id="tr1-gp-Tl6"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="9Zg-hb-wpj" firstAttribute="centerY" secondItem="GW1-Fc-MXZ" secondAttribute="centerY" id="2sP-Nu-sCK"/>
+                                                <constraint firstItem="xRC-KL-XPa" firstAttribute="centerY" secondItem="GW1-Fc-MXZ" secondAttribute="centerY" constant="10.5" id="6L3-bm-ksT"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="9Zg-hb-wpj" secondAttribute="trailing" id="BC1-Zz-H9g"/>
+                                                <constraint firstItem="9Zg-hb-wpj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Nb4-pk-auH" secondAttribute="trailing" constant="16" id="BEN-4i-dd2"/>
+                                                <constraint firstItem="9Zg-hb-wpj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="xRC-KL-XPa" secondAttribute="trailing" constant="16" id="CKK-9c-sSh"/>
+                                                <constraint firstItem="Nb4-pk-auH" firstAttribute="leading" secondItem="GW1-Fc-MXZ" secondAttribute="leading" constant="15" id="JZB-7O-21i"/>
+                                                <constraint firstItem="xRC-KL-XPa" firstAttribute="leading" secondItem="Nb4-pk-auH" secondAttribute="leading" id="kf7-NB-SJj"/>
+                                                <constraint firstItem="Nb4-pk-auH" firstAttribute="centerY" secondItem="GW1-Fc-MXZ" secondAttribute="centerY" constant="-7" id="u7d-Oy-Pi9"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -427,10 +465,10 @@
                             <outlet property="delegate" destination="8tg-0g-KWr" id="kyS-tD-Cdv"/>
                         </connections>
                     </tableView>
-                    <value key="contentSizeForViewInPopover" type="size" width="300" height="201"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="300" height="245"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="300" height="201"/>
+                    <size key="freeformSize" width="300" height="245"/>
                     <connections>
                         <outlet property="brightnessSlider" destination="CXs-UX-bBw" id="YCv-8k-hRi"/>
                         <outlet property="darkStyleButton" destination="k1i-JG-dXv" id="JW9-DN-skx"/>
@@ -439,6 +477,8 @@
                         <outlet property="directionLeftButton" destination="s7V-oo-PyJ" id="C8S-hJ-HYk"/>
                         <outlet property="directionRightButton" destination="nJX-JG-wV9" id="VI2-QB-WpR"/>
                         <outlet property="lightStyleButton" destination="964-2b-fbG" id="1ba-lA-Nxl"/>
+                        <outlet property="twoUpDetailLabel" destination="xRC-KL-XPa" id="glD-Oi-dOV"/>
+                        <outlet property="twoUpSwitch" destination="9Zg-hb-wpj" id="gz7-ea-zLZ"/>
                         <outlet property="whiteStyleButton" destination="xW4-Oi-GZA" id="E5q-ip-uIL"/>
                     </connections>
                 </tableViewController>
