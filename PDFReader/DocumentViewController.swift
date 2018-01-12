@@ -45,7 +45,11 @@ class DocumentViewController: UIViewController {
     var managedObjectContext: NSManagedObjectContext? = nil
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
-    var currentCKRecords: [CKRecord]? = nil
+    var currentCKRecords: [CKRecord]? = nil {
+        didSet {
+            checkForNewerRecords()
+        }
+    }
     
     // scaleFactorForSizeToFit
     var portraitScaleSingle: CGFloat = 0.0
@@ -371,8 +375,12 @@ class DocumentViewController: UIViewController {
         if let context = self.managedObjectContext {
             let newDocument = DocumentEntity(context: context)
             
-            // If appropriate, configure the new managed object.
-            newDocument.uuid = UUID()
+            if let record = currentCKRecords?.first {
+                // if the record exists in iCloud but not in CoreData
+                newDocument.uuid = UUID(uuidString: record.recordID.recordName)
+            } else {
+                newDocument.uuid = UUID()
+            }
             newDocument.creationDate = Date()
             newDocument.modificationDate = Date()
             newDocument.bookmarkData = bookmark
@@ -409,6 +417,10 @@ class DocumentViewController: UIViewController {
                 currentIndex = pdfDocument.pageCount - currentIndex - 1
             }
             if let documentEntity = currentEntity {
+                if let record = currentCKRecords?.first {
+                    // if another device have the same bookmark but different recordID
+                    documentEntity.uuid = UUID(uuidString: record.recordID.recordName)
+                }
                 documentEntity.modificationDate = Date()
                 documentEntity.pageIndex = Int64(currentIndex)
                 documentEntity.isVerticalWriting = self.isVerticalWriting
