@@ -36,7 +36,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MIU-mv-dlq" customClass="PDFView">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
@@ -44,7 +44,7 @@
                         <constraints>
                             <constraint firstItem="MIU-mv-dlq" firstAttribute="bottom" secondItem="SIE-Uh-Zny" secondAttribute="bottom" id="3o7-H4-ZVR"/>
                             <constraint firstItem="MIU-mv-dlq" firstAttribute="leading" secondItem="SIE-Uh-Zny" secondAttribute="leading" id="Ki6-rq-LM8"/>
-                            <constraint firstItem="MIU-mv-dlq" firstAttribute="top" secondItem="SIE-Uh-Zny" secondAttribute="top" id="L2f-R9-5Zn"/>
+                            <constraint firstItem="MIU-mv-dlq" firstAttribute="top" secondItem="BoZ-jc-2Y8" secondAttribute="top" id="L2f-R9-5Zn"/>
                             <constraint firstItem="MIU-mv-dlq" firstAttribute="trailing" secondItem="SIE-Uh-Zny" secondAttribute="trailing" id="wBt-pl-Iqc"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="BoZ-jc-2Y8"/>

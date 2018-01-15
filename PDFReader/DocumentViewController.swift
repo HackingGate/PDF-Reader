@@ -232,7 +232,16 @@ class DocumentViewController: UIViewController {
     }
     
     override var prefersStatusBarHidden: Bool {
-        return navigationController?.isNavigationBarHidden == true || super.prefersStatusBarHidden
+        // do not hide status bar in portrait if height is not 20 (detect if iPhone X)
+        return navigationController?.isNavigationBarHidden == true && UIApplication.shared.statusBarFrame.height == 20 || super.prefersStatusBarHidden
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        if navigationController?.isNavigationBarHidden == true && navigationController?.navigationBar.barStyle == .black {
+            return .lightContent
+        } else {
+            return super.preferredStatusBarStyle
+        }
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
@@ -249,7 +258,7 @@ class DocumentViewController: UIViewController {
     }
     
     func getScaleFactorForSizeToFit() {
-        let frame = pdfView.frame
+        let frame = view.frame
         let aspectRatio = frame.size.width / frame.size.height
         if UIApplication.shared.statusBarOrientation.isPortrait {
             if pdfView.displayMode == .singlePageContinuous {
@@ -294,10 +303,10 @@ class DocumentViewController: UIViewController {
                 let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
                 if pdfView.displayMode == .singlePageContinuous {
                     pdfView.minScaleFactor = landscapeScaleSingle * multiplier
-                    pdfView.scaleFactor = landscapeScaleSingle
+                    pdfView.scaleFactor = landscapeScaleSingle * multiplier
                 } else if pdfView.displayMode == .twoUpContinuous {
                     pdfView.minScaleFactor = landscapeScaleTwo * multiplier
-                    pdfView.scaleFactor = landscapeScaleTwo
+                    pdfView.scaleFactor = landscapeScaleTwo * multiplier
                 }
             }
         }
