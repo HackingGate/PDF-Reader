@@ -244,92 +244,95 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     }
     var _fetchedResultsController: NSFetchedResultsController<DocumentEntity>? = nil
     
+    // MARK: - NSFetchedResultsControllerDelegate
+    
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
         
-        if let documentEntity = anObject as? DocumentEntity {
-            if let bookmarkData = documentEntity.bookmarkData, let uuid = documentEntity.uuid {
-                
-                let recordID = CKRecordID(recordName: uuid.uuidString)
-                
-                if type == .insert || type == .update || type == .move {
-                    var isStale = false
-                    do {
-                        if let documentURL = try URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale),
-                            let shortPath = documentURL.shortMobileDocumentPath(basePath: self.mobileDocumentPath) {
-                            
-                            // fetch by fileURL
-                            self.fetchCKRecordsFor(shortPath: shortPath, completionHandler: { (records: [CKRecord]?, error: Error?) in
-                                if let error = error {
-                                    print(error)
-                                } else if let records = records, let record = records.first {
-                                    // update (file is not renamed or moved)
-                                    record["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
-                                    self.privateCloudDatabase.save(record, completionHandler: { (record: CKRecord?, error: Error?) in
-                                        if let error = error {
-                                            print("CKRecord: \(String(describing: record)) update failed: \(error)")
-                                        }
-                                    })
-                                    for i in 1..<records.count {
-                                        // delete
-                                        self.privateCloudDatabase.delete(withRecordID: records[i].recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
-                                            if let error = error {
-                                                print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
-                                            }
-                                        })
-                                    }
-                                } else {
-                                    // fetch by recordID
-                                    self.privateCloudDatabase.fetch(withRecordID: recordID, completionHandler: { (record: CKRecord?, error: Error?) in
-                                        
-                                        var documentCKRecord: CKRecord?
-                                        if let ckerror = error as? CKError, ckerror.code == .unknownItem {
-                                            // insert https://developer.apple.com/documentation/cloudkit/ckerror.code/1515304-unknownitem
-                                            documentCKRecord = CKRecord(recordType: "Document", recordID: recordID)
-                                        } else if let error = error {
-                                            print(error)
-                                        } else {
-                                            // update (file is renamed or moved)
-                                            documentCKRecord = record
-                                        }
-                                        if let documentCKRecord = documentCKRecord {
-                                            documentCKRecord["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
-                                            documentCKRecord["shortPath"] = shortPath as NSString
-                                            self.privateCloudDatabase.save(documentCKRecord, completionHandler: { (record: CKRecord?, error: Error?) in
-                                                if let error = error {
-                                                    print("CKRecord: \(String(describing: record)) save failed: \(error)")
-                                                }
-                                            })
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    } catch let error as NSError {
-                        print(error.localizedDescription)
-                    }
-                    
-                } else if type == .delete {
-                    privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
-                        if let error = error {
-                            print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
-                        }
-                    })
-                }
-                
-            }
-        }
+        guard let documentEntity = anObject as? DocumentEntity else { return }
         
         switch type {
         case .insert:
-            fetchedResults?.insert(anObject as! DocumentEntity, at: newIndexPath!.row)
+            fetchedResults?.insert(documentEntity, at: newIndexPath!.row)
         case .delete:
             fetchedResults?.remove(at: indexPath!.row)
         case .update:
-            fetchedResults?[indexPath!.row] = anObject as! DocumentEntity
+            fetchedResults?[indexPath!.row] = documentEntity
         case .move:
             fetchedResults?.remove(at: indexPath!.row)
-            fetchedResults?.insert(anObject as! DocumentEntity, at: newIndexPath!.row)
+            fetchedResults?.insert(documentEntity, at: newIndexPath!.row)
         }
+        
+        if let bookmarkData = documentEntity.bookmarkData, let uuid = documentEntity.uuid {
+            
+            let recordID = CKRecordID(recordName: uuid.uuidString)
+            
+            if type == .insert || type == .update || type == .move {
+                var isStale = false
+                do {
+                    if let documentURL = try URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale),
+                        let shortPath = documentURL.shortMobileDocumentPath(basePath: self.mobileDocumentPath) {
+                        
+                        // fetch by fileURL
+                        self.fetchCKRecordsFor(shortPath: shortPath, completionHandler: { (records: [CKRecord]?, error: Error?) in
+                            if let error = error {
+                                print(error)
+                            } else if let records = records, let record = records.first {
+                                // update (file is not renamed or moved)
+                                record["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
+                                self.privateCloudDatabase.save(record, completionHandler: { (record: CKRecord?, error: Error?) in
+                                    if let error = error {
+                                        print("CKRecord: \(String(describing: record)) update failed: \(error)")
+                                    }
+                                })
+                                for i in 1..<records.count {
+                                    // delete
+                                    self.privateCloudDatabase.delete(withRecordID: records[i].recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                                        if let error = error {
+                                            print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
+                                        }
+                                    })
+                                }
+                            } else {
+                                // fetch by recordID
+                                self.privateCloudDatabase.fetch(withRecordID: recordID, completionHandler: { (record: CKRecord?, error: Error?) in
+                                    
+                                    var documentCKRecord: CKRecord?
+                                    if let ckerror = error as? CKError, ckerror.code == .unknownItem {
+                                        // insert https://developer.apple.com/documentation/cloudkit/ckerror.code/1515304-unknownitem
+                                        documentCKRecord = CKRecord(recordType: "Document", recordID: recordID)
+                                    } else if let error = error {
+                                        print(error)
+                                    } else {
+                                        // update (file is renamed or moved)
+                                        documentCKRecord = record
+                                    }
+                                    if let documentCKRecord = documentCKRecord {
+                                        documentCKRecord["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
+                                        documentCKRecord["shortPath"] = shortPath as NSString
+                                        self.privateCloudDatabase.save(documentCKRecord, completionHandler: { (record: CKRecord?, error: Error?) in
+                                            if let error = error {
+                                                print("CKRecord: \(String(describing: record)) save failed: \(error)")
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                } catch let error as NSError {
+                    print(error.localizedDescription)
+                }
+                
+            } else if type == .delete {
+                privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                    if let error = error {
+                        print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
+                    }
+                })
+            }
+            
+        }
+        
     }
     
     // MARK: - Core Data Saving support
