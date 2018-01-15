@@ -48,10 +48,13 @@ class DocumentViewController: UIViewController {
     var currentCKRecords: [CKRecord]? = nil
     
     // scaleFactorForSizeToFit
-    var portraitScaleSingle: CGFloat = 0.0
-    var landscapeScaleSingle: CGFloat = 0.0
-    var portraitScaleTwo: CGFloat = 0.0
-    var landscapeScaleTwo: CGFloat = 0.0
+    struct ScaleFactor {
+        // store factor for single mode
+        var portrait: CGFloat
+        var landscape: CGFloat
+        // devide by 2 for two up mode
+    }
+    var scaleFactorForSizeToFit: ScaleFactor?
     
     // delegate properties
     var isVerticalWriting = false
@@ -256,55 +259,41 @@ class DocumentViewController: UIViewController {
     func getScaleFactorForSizeToFit() {
         let frame = view.frame
         let aspectRatio = frame.size.width / frame.size.height
+        var scaleFactor = pdfView.scaleFactorForSizeToFit
+        if pdfView.displayMode == .twoUpContinuous {
+            scaleFactor *= 2
+        }
         if UIApplication.shared.statusBarOrientation.isPortrait {
-            if pdfView.displayMode == .singlePageContinuous {
-                portraitScaleSingle = pdfView.scaleFactorForSizeToFit
-                landscapeScaleSingle = portraitScaleSingle / aspectRatio
-                portraitScaleTwo = pdfView.scaleFactorForSizeToFit / 2
-                landscapeScaleTwo = portraitScaleTwo / aspectRatio
-            } else if pdfView.displayMode == .twoUpContinuous {
-                portraitScaleTwo = pdfView.scaleFactorForSizeToFit
-                landscapeScaleTwo = portraitScaleTwo / aspectRatio
-                portraitScaleSingle = pdfView.scaleFactorForSizeToFit * 2
-                landscapeScaleSingle = portraitScaleSingle / aspectRatio
-            }
+            scaleFactorForSizeToFit = ScaleFactor.init(portrait: scaleFactor,
+                                                       landscape: scaleFactor / aspectRatio)
         } else if UIApplication.shared.statusBarOrientation.isLandscape {
-            if pdfView.displayMode == .singlePageContinuous {
-                landscapeScaleSingle = pdfView.scaleFactorForSizeToFit
-                portraitScaleSingle = landscapeScaleSingle / aspectRatio
-                landscapeScaleTwo = pdfView.scaleFactorForSizeToFit / 2
-                portraitScaleTwo = landscapeScaleTwo / aspectRatio
-            } else if pdfView.displayMode == .twoUpContinuous {
-                landscapeScaleTwo = pdfView.scaleFactorForSizeToFit
-                portraitScaleTwo = landscapeScaleTwo / aspectRatio
-                landscapeScaleSingle = pdfView.scaleFactorForSizeToFit * 2
-                portraitScaleSingle = landscapeScaleSingle / aspectRatio
-            }
+            scaleFactorForSizeToFit = ScaleFactor.init(portrait: scaleFactor / aspectRatio,
+                                                       landscape: scaleFactor)
         }
         
         setScaleFactorForSizeToFit()
     }
     
     func setScaleFactorForSizeToFit() {
-        if pdfView.displayDirection == .vertical {
+        if pdfView.displayDirection == .vertical, let scaleFactorForSizeToFit = scaleFactorForSizeToFit {
             // currentlly only works for vertical display direction
-            if portraitScaleSingle != 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
+            if UIApplication.shared.statusBarOrientation.isPortrait {
                 if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.minScaleFactor = portraitScaleSingle
-                    pdfView.scaleFactor = portraitScaleSingle
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait
+                    pdfView.scaleFactor = scaleFactorForSizeToFit.portrait
                 } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.minScaleFactor = portraitScaleTwo
-                    pdfView.scaleFactor = portraitScaleTwo
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait / 2
+                    pdfView.scaleFactor = scaleFactorForSizeToFit.portrait / 2
                 }
-            } else if landscapeScaleSingle != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
+            } else if UIApplication.shared.statusBarOrientation.isLandscape {
                 // set minScaleFactor to safe area for iPhone X and later
                 let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
                 if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.minScaleFactor = landscapeScaleSingle * multiplier
-                    pdfView.scaleFactor = landscapeScaleSingle * multiplier
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape * multiplier
+                    pdfView.scaleFactor = scaleFactorForSizeToFit.landscape * multiplier
                 } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.minScaleFactor = landscapeScaleTwo * multiplier
-                    pdfView.scaleFactor = landscapeScaleTwo * multiplier
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape / 2 * multiplier
+                    pdfView.scaleFactor = scaleFactorForSizeToFit.landscape / 2 * multiplier
                 }
             }
         }
