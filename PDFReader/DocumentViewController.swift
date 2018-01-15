@@ -45,11 +45,7 @@ class DocumentViewController: UIViewController {
     var managedObjectContext: NSManagedObjectContext? = nil
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
-    var currentCKRecords: [CKRecord]? = nil {
-        didSet {
-            checkForNewerRecords()
-        }
-    }
+    var currentCKRecords: [CKRecord]? = nil
     
     // scaleFactorForSizeToFit
     var portraitScaleSingle: CGFloat = 0.0
@@ -85,7 +81,7 @@ class DocumentViewController: UIViewController {
                 
                 self.pdfView.document = document
                 
-                self.moveToLastReadingProsess()
+                self.moveToLastViewedPage()
                 if self.pdfView.displayDirection == .vertical {
                     self.getScaleFactorForSizeToFit()
                 }
@@ -285,6 +281,8 @@ class DocumentViewController: UIViewController {
                 portraitScaleSingle = landscapeScaleSingle / aspectRatio
             }
         }
+        
+        setScaleFactorForSizeToFit()
     }
     
     func setScaleFactorForSizeToFit() {
@@ -312,7 +310,7 @@ class DocumentViewController: UIViewController {
         }
     }
     
-    func moveToLastReadingProsess() {
+    func moveToLastViewedPage() {
         if let currentEntity = currentEntity {
             pageIndex = currentEntity.pageIndex
         } else if isVerticalWriting {
@@ -326,9 +324,10 @@ class DocumentViewController: UIViewController {
             pdfView.go(to: pdfPage)
         }
         
+        checkForNewerRecords()
     }
     
-    // call after moveToLastReadingProsess()
+    // call after moveToLastViewedPage()
     func checkForNewerRecords() {
         if let record = currentCKRecords?.first, let modificationDate = record["modificationDate"] as? Date, let cloudPageIndex = record["pageIndex"] as? NSNumber {
             if let currentModificationDate = currentEntity?.modificationDate {
