@@ -6,8 +6,9 @@
         <attribute name="isRightToLeft" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="isVerticalWriting" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="modificationDate" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="offsetLandscape" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="offsetPortrait" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="pageIndex" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="pageRect" optional="YES" attributeType="Transformable" syncable="YES"/>
         <attribute name="prefersTwoUpInLandscapeForPad" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="scaleFactorHorizontalLandscape" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="scaleFactorHorizontalPortrait" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" customClassName="ScaleFactorObj" syncable="YES"/>
@@ -16,6 +17,6 @@
         <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO" syncable="YES"/>
     </entity>
     <elements>
-        <element name="DocumentEntity" positionX="-63" positionY="-18" width="128" height="240"/>
+        <element name="DocumentEntity" positionX="-63" positionY="-18" width="128" height="255"/>
     </elements>
 </model>

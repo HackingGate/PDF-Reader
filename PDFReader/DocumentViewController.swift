@@ -58,6 +58,10 @@ class DocumentViewController: UIViewController {
     var scaleFactorVertical: ScaleFactor?
     var scaleFactorHorizontal: ScaleFactor?
     
+    // offset
+    var offsetPortrait: CGPoint?
+    var offsetLandscape: CGPoint?
+    
     // delegate properties
     var isVerticalWriting = false
     var isRightToLeft = false
@@ -87,14 +91,14 @@ class DocumentViewController: UIViewController {
                 self.pdfView.document = document
                 
                 self.moveToLastViewedPage()
-                self.getScaleFactorForSizeToFit()
+                self.getScaleFactorForSizeToFitAndOffset()
                 self.setMinScaleFactorForSizeToFit()
                 self.setScaleFactorForUser()
                 
                 if let documentEntity = self.currentEntity {
                     self.writing(vertically: documentEntity.isVerticalWriting, rightToLeft: documentEntity.isRightToLeft)
                 }
-                self.moveToLastViewedPageRect()
+                self.moveToLastViewedOffset()
 
                 self.setPDFThumbnailView()
                 
@@ -174,7 +178,7 @@ class DocumentViewController: UIViewController {
     }
     
     func writing(vertically: Bool, rightToLeft: Bool) {
-        updateUserScaleFactor(changeOrientation: false)
+        updateUserScaleFactorAndOffset(changeOrientation: false)
         
         // experimental feature
         if let currentPage = pdfView.currentPage {
@@ -255,7 +259,7 @@ class DocumentViewController: UIViewController {
         setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
     
-    func getScaleFactorForSizeToFit() {
+    func getScaleFactorForSizeToFitAndOffset() {
         // make sure to init
         if let verticalPortrait = currentEntity?.scaleFactorVerticalPortrait, let verticalLandscape = currentEntity?.scaleFactorVerticalLandscape {
             scaleFactorVertical = ScaleFactor(portrait: CGFloat(verticalPortrait), landscape: CGFloat(verticalLandscape))
@@ -284,6 +288,9 @@ class DocumentViewController: UIViewController {
             }
         }
         
+        // offset
+        offsetPortrait = currentEntity?.offsetLandscape as? CGPoint
+        offsetLandscape = currentEntity?.offsetLandscape as? CGPoint
     }
     
     // SizeToFit currentlly only works for vertical display direction
@@ -335,7 +342,7 @@ class DocumentViewController: UIViewController {
         }
     }
     
-    func updateUserScaleFactor(changeOrientation: Bool) {
+    func updateUserScaleFactorAndOffset(changeOrientation: Bool) {
         // for save
         // XOR operator for bool (!=)
         if UIApplication.shared.statusBarOrientation.isPortrait != changeOrientation {
@@ -344,12 +351,16 @@ class DocumentViewController: UIViewController {
             } else if pdfView.displayDirection == .horizontal {
                 scaleFactorHorizontal?.portrait = pdfView.scaleFactor
             }
+            
+            offsetPortrait = pdfView.scrollView?.contentOffset
         } else if UIApplication.shared.statusBarOrientation.isLandscape != changeOrientation {
             if pdfView.displayDirection == .vertical {
                 scaleFactorVertical?.landscape = pdfView.scaleFactor
             } else if pdfView.displayDirection == .horizontal {
                 scaleFactorHorizontal?.landscape = pdfView.scaleFactor
             }
+            
+            offsetLandscape = pdfView.scrollView?.contentOffset
         }
     }
     
@@ -368,9 +379,17 @@ class DocumentViewController: UIViewController {
         }
     }
     
-    func moveToLastViewedPageRect() {
-        if let currentEntity = currentEntity, let currentPage = pdfView.currentPage, let pageRect = currentEntity.pageRect as? CGRect {
-            pdfView.go(to: pageRect, on: currentPage)
+    func moveToLastViewedOffset() {
+        if let currentPage = pdfView.currentPage, let currentOffset = pdfView.scrollView?.contentOffset {
+            if UIApplication.shared.statusBarOrientation.isPortrait, let offsetPortrait = currentEntity?.offsetPortrait as? CGPoint {
+                pdfView.scrollView?.contentOffset = offsetPortrait
+            } else if UIApplication.shared.statusBarOrientation.isLandscape, let offsetLandscape = currentEntity?.offsetLandscape as? CGPoint {
+                pdfView.scrollView?.contentOffset = offsetLandscape
+            }
+            if pdfView.currentPage != currentPage {
+                print("in case something wrong \nOld: \(currentPage) \nNew: \(String(describing: pdfView.currentPage)) \nmove to previous offset")
+                pdfView.scrollView?.contentOffset = currentOffset
+            }
         }
     }
     
@@ -409,7 +428,7 @@ class DocumentViewController: UIViewController {
     }
     
     @objc func willChangeOrientationHandler() {
-        updateUserScaleFactor(changeOrientation: true)
+        updateUserScaleFactorAndOffset(changeOrientation: true)
     }
     
     @objc func didChangeOrientationHandler() {
@@ -494,7 +513,7 @@ class DocumentViewController: UIViewController {
         entity.prefersTwoUpInLandscapeForPad = self.prefersTwoUpInLandscapeForPad
         
         // store user scale factor
-        updateUserScaleFactor(changeOrientation: false)
+        updateUserScaleFactorAndOffset(changeOrientation: false)
         if let scaleFactorVertical = scaleFactorVertical {
             entity.scaleFactorVerticalPortrait = Float(scaleFactorVertical.portrait)
             entity.scaleFactorVerticalLandscape = Float(scaleFactorVertical.landscape)
@@ -504,10 +523,13 @@ class DocumentViewController: UIViewController {
             entity.scaleFactorHorizontalLandscape = Float(scaleFactorHorizontal.landscape)
         }
         
-        if let currentPage = pdfView.currentPage {
-            let pageRect = pdfView.convert(view.frame, to: currentPage)
-            entity.pageRect = pageRect as NSObject
+        if let offsetPortrait = offsetPortrait {
+            entity.offsetPortrait = offsetPortrait as NSObject
         }
+        if let offsetLandscape = offsetLandscape {
+            entity.offsetLandscape = offsetLandscape as NSObject
+        }
+        
     }
     
     func saveContext(_ context: NSManagedObjectContext) {
