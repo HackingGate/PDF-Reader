@@ -94,8 +94,11 @@ class DocumentViewController: UIViewController {
                 if let documentEntity = self.currentEntity {
                     self.writing(vertically: documentEntity.isVerticalWriting, rightToLeft: documentEntity.isRightToLeft)
                 }
-                
+                self.moveToLastViewedPageRect()
+
                 self.setPDFThumbnailView()
+                
+                self.checkForNewerRecords()
             } else {
                 // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
             }
@@ -117,14 +120,9 @@ class DocumentViewController: UIViewController {
         } else {
             pdfView.displayMode = .singlePageContinuous
         }
-        
-        for view in pdfView.subviews {
-            if view.isKind(of: UIScrollView.self) {
-                (view as? UIScrollView)?.scrollsToTop = false
-                (view as? UIScrollView)?.contentInsetAdjustmentBehavior = .scrollableAxes
-            }
-        }
-        
+
+        pdfView.scrollView?.scrollsToTop = false
+        pdfView.scrollView?.contentInsetAdjustmentBehavior = .scrollableAxes
         
         let center = NotificationCenter.default
         center.addObserver(self,
@@ -349,13 +347,13 @@ class DocumentViewController: UIViewController {
     func updateUserScaleFactor(changeOrientation: Bool) {
         // for save
         // XOR operator for bool (!=)
-        if UIDevice.current.orientation.isPortrait != changeOrientation {
+        if UIApplication.shared.statusBarOrientation.isPortrait != changeOrientation {
             if pdfView.displayDirection == .vertical {
                 scaleFactorVertical?.portrait = pdfView.scaleFactor
             } else if pdfView.displayDirection == .horizontal {
                 scaleFactorHorizontal?.portrait = pdfView.scaleFactor
             }
-        } else if UIDevice.current.orientation.isLandscape != changeOrientation {
+        } else if UIApplication.shared.statusBarOrientation.isLandscape != changeOrientation {
             if pdfView.displayDirection == .vertical {
                 scaleFactorVertical?.landscape = pdfView.scaleFactor
             } else if pdfView.displayDirection == .horizontal {
@@ -377,8 +375,12 @@ class DocumentViewController: UIViewController {
         if let pdfPage = pdfView.document?.page(at: Int(pageIndex)) {
             pdfView.go(to: pdfPage)
         }
-        
-        checkForNewerRecords()
+    }
+    
+    func moveToLastViewedPageRect() {
+        if let currentEntity = currentEntity, let currentPage = pdfView.currentPage, let pageRect = currentEntity.pageRect as? CGRect {
+            pdfView.go(to: pageRect, on: currentPage)
+        }
     }
     
     // call after moveToLastViewedPage()
@@ -510,6 +512,11 @@ class DocumentViewController: UIViewController {
             entity.scaleFactorHorizontalPortrait = Float(scaleFactorHorizontal.portrait)
             entity.scaleFactorHorizontalLandscape = Float(scaleFactorHorizontal.landscape)
         }
+        
+        if let currentPage = pdfView.currentPage {
+            let pageRect = pdfView.convert(view.frame, to: currentPage)
+            entity.pageRect = pageRect as NSObject
+        }
     }
     
     func saveContext(_ context: NSManagedObjectContext) {
@@ -567,4 +574,15 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
         return .none
     }
     
+}
+
+extension PDFView {
+    var scrollView: UIScrollView? {
+        for view in self.subviews {
+            if let scrollView = view as? UIScrollView {
+                return scrollView
+            }
+        }
+        return nil
+    }
 }
