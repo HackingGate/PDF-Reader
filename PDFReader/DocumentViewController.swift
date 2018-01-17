@@ -239,16 +239,7 @@ class DocumentViewController: UIViewController {
     }
     
     override var prefersStatusBarHidden: Bool {
-        // do not hide status bar in portrait if height is not 20 (detect if iPhone X)
-        return navigationController?.isNavigationBarHidden == true && UIApplication.shared.statusBarFrame.height == 20 || super.prefersStatusBarHidden
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        if navigationController?.isNavigationBarHidden == true && navigationController?.navigationBar.barStyle == .black {
-            return .lightContent
-        } else {
-            return super.preferredStatusBarStyle
-        }
+        return navigationController?.isNavigationBarHidden == true || super.prefersStatusBarHidden
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
