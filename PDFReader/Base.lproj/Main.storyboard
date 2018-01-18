@@ -222,7 +222,7 @@
             <objects>
                 <tableViewController modalPresentationStyle="currentContext" id="8tg-0g-KWr" customClass="PopoverTableViewController" customModule="PDFReader" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" dataMode="static" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" id="u45-Bn-qt2">
-                        <rect key="frame" x="0.0" y="0.0" width="300" height="245"/>
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="289"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -263,7 +263,7 @@
                             </constraints>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="4ed-Po-wbE">
-                            <rect key="frame" x="0.0" y="201" width="300" height="44"/>
+                            <rect key="frame" x="0.0" y="245" width="300" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scroll Direction" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c6G-KP-IC3">
@@ -279,21 +279,13 @@
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZLc-k4-C1K">
-                                    <rect key="frame" x="178" y="7" width="30" height="30"/>
+                                    <rect key="frame" x="216" y="7" width="30" height="30"/>
                                     <state key="normal" image="direction_down"/>
                                     <connections>
                                         <action selector="directionButtonAction:" destination="8tg-0g-KWr" eventType="touchUpInside" id="Gu0-9K-IXu"/>
                                     </connections>
                                 </button>
-                                <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s7V-oo-PyJ">
-                                    <rect key="frame" x="216" y="7" width="30" height="30"/>
-                                    <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                    <state key="normal" image="direction_left"/>
-                                    <connections>
-                                        <action selector="directionButtonAction:" destination="8tg-0g-KWr" eventType="touchUpInside" id="D4f-2a-EmY"/>
-                                    </connections>
-                                </button>
-                                <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nJX-JG-wV9">
+                                <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nJX-JG-wV9">
                                     <rect key="frame" x="254" y="7" width="30" height="30"/>
                                     <color key="tintColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <state key="normal" image="direction_right"/>
@@ -303,9 +295,8 @@
                                 </button>
                             </subviews>
                             <constraints>
-                                <constraint firstItem="s7V-oo-PyJ" firstAttribute="leading" secondItem="ZLc-k4-C1K" secondAttribute="trailing" constant="8" id="1HX-oD-fRd"/>
                                 <constraint firstAttribute="bottom" secondItem="ZLc-k4-C1K" secondAttribute="bottom" constant="7" id="4D7-pY-3N1"/>
-                                <constraint firstAttribute="bottom" secondItem="s7V-oo-PyJ" secondAttribute="bottom" constant="7" id="AKF-wo-E1H"/>
+                                <constraint firstItem="nJX-JG-wV9" firstAttribute="leading" secondItem="ZLc-k4-C1K" secondAttribute="trailing" constant="8" id="AbM-JA-vu6"/>
                                 <constraint firstItem="ZLc-k4-C1K" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="p96-se-Myf" secondAttribute="trailing" constant="16" id="D27-Wd-adZ"/>
                                 <constraint firstItem="p96-se-Myf" firstAttribute="leading" secondItem="c6G-KP-IC3" secondAttribute="leading" id="EWe-sk-kjm"/>
                                 <constraint firstAttribute="trailingMargin" secondItem="nJX-JG-wV9" secondAttribute="trailing" constant="8" id="Fpf-mv-Qh3"/>
@@ -315,8 +306,6 @@
                                 <constraint firstItem="ZLc-k4-C1K" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="c6G-KP-IC3" secondAttribute="trailing" constant="16" id="Mrv-GS-2IG"/>
                                 <constraint firstItem="c6G-KP-IC3" firstAttribute="leading" secondItem="4ed-Po-wbE" secondAttribute="leading" constant="15" id="Vtz-TQ-Ipm"/>
                                 <constraint firstItem="nJX-JG-wV9" firstAttribute="top" secondItem="4ed-Po-wbE" secondAttribute="top" constant="7" id="h0x-p5-rQg"/>
-                                <constraint firstItem="nJX-JG-wV9" firstAttribute="leading" secondItem="s7V-oo-PyJ" secondAttribute="trailing" constant="8" id="kuJ-6j-fyY"/>
-                                <constraint firstItem="s7V-oo-PyJ" firstAttribute="top" secondItem="4ed-Po-wbE" secondAttribute="top" constant="7" id="kzn-E1-owA"/>
                                 <constraint firstAttribute="bottom" secondItem="nJX-JG-wV9" secondAttribute="bottom" constant="7" id="lfc-lV-4dg"/>
                             </constraints>
                         </view>
@@ -457,6 +446,44 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="44" id="IW1-13-al1">
+                                        <rect key="frame" x="0.0" y="200" width="300" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="IW1-13-al1" id="P9Q-66-jHI">
+                                            <rect key="frame" x="0.0" y="0.0" width="300" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Displays Right-to-Left" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fOs-we-IUy">
+                                                    <rect key="frame" x="15" y="4.5" width="168" height="20.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="For Arabic and vertical CJK" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e71-mL-mL8">
+                                                    <rect key="frame" x="15" y="25" width="154.5" height="14.5"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="jvx-P0-Vb2">
+                                                    <rect key="frame" x="235" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="rightToLeftSwitchValueChanged:" destination="8tg-0g-KWr" eventType="valueChanged" id="Nxc-fU-Ylu"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="fOs-we-IUy" firstAttribute="leading" secondItem="P9Q-66-jHI" secondAttribute="leading" constant="15" id="HxP-P5-c4f"/>
+                                                <constraint firstItem="jvx-P0-Vb2" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="fOs-we-IUy" secondAttribute="trailing" constant="16" id="MWV-MY-RdY"/>
+                                                <constraint firstItem="e71-mL-mL8" firstAttribute="centerY" secondItem="P9Q-66-jHI" secondAttribute="centerY" constant="10.5" id="NeN-QS-oFj"/>
+                                                <constraint firstItem="jvx-P0-Vb2" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="e71-mL-mL8" secondAttribute="trailing" constant="16" id="S1o-cV-9qG"/>
+                                                <constraint firstItem="e71-mL-mL8" firstAttribute="leading" secondItem="fOs-we-IUy" secondAttribute="leading" id="hFI-MK-118"/>
+                                                <constraint firstItem="fOs-we-IUy" firstAttribute="centerY" secondItem="P9Q-66-jHI" secondAttribute="centerY" constant="-7" id="pVj-bt-gzU"/>
+                                                <constraint firstItem="jvx-P0-Vb2" firstAttribute="centerY" secondItem="P9Q-66-jHI" secondAttribute="centerY" id="pj2-9W-a73"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="jvx-P0-Vb2" secondAttribute="trailing" id="uqa-Fp-Mlv"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -465,18 +492,18 @@
                             <outlet property="delegate" destination="8tg-0g-KWr" id="kyS-tD-Cdv"/>
                         </connections>
                     </tableView>
-                    <value key="contentSizeForViewInPopover" type="size" width="300" height="245"/>
+                    <value key="contentSizeForViewInPopover" type="size" width="300" height="289"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="300" height="245"/>
+                    <size key="freeformSize" width="300" height="289"/>
                     <connections>
                         <outlet property="brightnessSlider" destination="CXs-UX-bBw" id="YCv-8k-hRi"/>
                         <outlet property="darkStyleButton" destination="k1i-JG-dXv" id="JW9-DN-skx"/>
-                        <outlet property="directionDetailLabel" destination="p96-se-Myf" id="TUy-II-xhM"/>
-                        <outlet property="directionDownButton" destination="ZLc-k4-C1K" id="fQi-ge-jQ6"/>
-                        <outlet property="directionLeftButton" destination="s7V-oo-PyJ" id="C8S-hJ-HYk"/>
-                        <outlet property="directionRightButton" destination="nJX-JG-wV9" id="VI2-QB-WpR"/>
                         <outlet property="lightStyleButton" destination="964-2b-fbG" id="1ba-lA-Nxl"/>
+                        <outlet property="rightToLeftSwitch" destination="jvx-P0-Vb2" id="niN-M2-SjN"/>
+                        <outlet property="scrollDetailLabel" destination="p96-se-Myf" id="TUy-II-xhM"/>
+                        <outlet property="scrollHorizontalButton" destination="nJX-JG-wV9" id="VI2-QB-WpR"/>
+                        <outlet property="scrollVerticalButton" destination="ZLc-k4-C1K" id="fQi-ge-jQ6"/>
                         <outlet property="twoUpDetailLabel" destination="xRC-KL-XPa" id="glD-Oi-dOV"/>
                         <outlet property="twoUpSwitch" destination="9Zg-hb-wpj" id="gz7-ea-zLZ"/>
                         <outlet property="whiteStyleButton" destination="xW4-Oi-GZA" id="E5q-ip-uIL"/>
@@ -569,7 +596,6 @@
     </scenes>
     <resources>
         <image name="direction_down" width="30" height="30"/>
-        <image name="direction_left" width="30" height="30"/>
         <image name="direction_right" width="30" height="30"/>
         <image name="grid-Compact" width="18" height="18"/>
         <image name="list_item" width="21" height="13"/>

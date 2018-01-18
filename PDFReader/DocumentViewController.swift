@@ -12,18 +12,35 @@ import CoreData
 import CloudKit
 
 protocol SettingsDelegate {
-    var isVerticalWriting: Bool { get }
-    var isRightToLeft: Bool { get }
+    var isHorizontalScroll: Bool { get set }
+    var isRightToLeft: Bool { get set }
     var isEncrypted: Bool { get }
     var allowsDocumentAssembly: Bool { get }
     var prefersTwoUpInLandscapeForPad: Bool { get }
-    func writing(vertically: Bool, rightToLeft: Bool) -> Void
+    var displayMode: PDFDisplayMode { get }
+    func updateScrollDirection() -> Void
     func goToPage(page: PDFPage) -> Void
     func selectOutline(outline: PDFOutline) -> Void
     func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) -> Void
 }
 
 extension DocumentViewController: SettingsDelegate {
+    var allowsDocumentAssembly: Bool {
+        get {
+            if let document = pdfView.document {
+                return document.allowsDocumentAssembly
+            } else {
+                return false
+            }
+        }
+    }
+    
+    var displayMode: PDFDisplayMode {
+        get {
+            return pdfView.displayMode
+        }
+    }
+    
     func goToPage(page: PDFPage) {
         pdfView.go(to: page)
     }
@@ -63,10 +80,11 @@ class DocumentViewController: UIViewController {
     var offsetLandscape: CGPoint?
     
     // delegate properties
-    var isVerticalWriting = false
+    var isHorizontalScroll = false
     var isRightToLeft = false
     var isEncrypted = false
-    var allowsDocumentAssembly = false
+//    var allowsDocumentAssembly = false
+    var isPageExchangedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
     var prefersTwoUpInLandscapeForPad = false // default value
     
     override func viewWillAppear(_ animated: Bool) {
@@ -85,7 +103,7 @@ class DocumentViewController: UIViewController {
                 guard let pdfURL: URL = (self.document?.fileURL) else { return }
                 guard let document = PDFDocument(url: pdfURL) else { return }
                 
-                self.allowsDocumentAssembly = document.allowsDocumentAssembly
+//                self.allowsDocumentAssembly = document.allowsDocumentAssembly
                 self.isEncrypted = document.isEncrypted
                 
                 self.pdfView.document = document
@@ -96,7 +114,9 @@ class DocumentViewController: UIViewController {
                 self.setScaleFactorForUser()
                 
                 if let documentEntity = self.currentEntity {
-                    self.writing(vertically: documentEntity.isVerticalWriting, rightToLeft: documentEntity.isRightToLeft)
+                    self.isHorizontalScroll = documentEntity.isHorizontalScroll
+                    self.isRightToLeft = documentEntity.isRightToLeft
+                    self.updateScrollDirection()
                 }
                 self.moveToLastViewedOffset()
 
@@ -171,61 +191,89 @@ class DocumentViewController: UIViewController {
             } else {
                 pdfView.displayMode = .singlePageContinuous
             }
+            setMinScaleFactorForSizeToFit()
             pdfView.go(to: page) // workaround to fix
+            setScaleFactorForUser()
         }
+
+    }
+    
+    func updateScrollDirection() {
+        updateUserScaleFactorAndOffset(changeOrientation: false)
+        
+        // experimental feature
+        if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+            if pdfView.displayMode == .singlePageContinuous && allowsDocumentAssembly {
+                if isRightToLeft != isPageExchangedForRTL {
+                    if pdfView.displaysRTL {
+                        pdfView.displaysRTL = false
+                    }
+                    exchangePageForRTL(isRightToLeft)
+                }
+                if isRightToLeft {
+                    // single page RTL use horizontal scroll
+                    if isRightToLeft {
+                        isHorizontalScroll = true
+                    }
+                }
+            } else if pdfView.displayMode == .twoUpContinuous {
+                if isRightToLeft != pdfView.displaysRTL  {
+                    if isPageExchangedForRTL {
+                        exchangePageForRTL(false)
+                    }
+                    pdfView.displaysRTL = isRightToLeft
+                }
+                if isRightToLeft {
+                    // two up RTL use vertical scroll
+                    if isRightToLeft {
+                        isHorizontalScroll = false
+                    }
+                }
+            }
+            
+            if isHorizontalScroll != (pdfView.displayDirection == .horizontal) {
+                if isHorizontalScroll {
+                    pdfView.displayDirection = .horizontal
+                } else {
+                    if isPageExchangedForRTL {
+                        exchangePageForRTL(false)
+                    }
+                    pdfView.displayDirection = .vertical
+                }
+            }
+            
+            // reset document to update interface
+            pdfView.document = nil
+            pdfView.document = document
+            pdfView.go(to: currentPage)
+        }
+        
         setMinScaleFactorForSizeToFit()
         setScaleFactorForUser()
     }
     
-    func writing(vertically: Bool, rightToLeft: Bool) {
-        updateUserScaleFactorAndOffset(changeOrientation: false)
-        
-        // experimental feature
-        if let currentPage = pdfView.currentPage {
-            if let document: PDFDocument = pdfView.document {
-                let currentIndex: Int = document.index(for: currentPage)
-                
-                print("currentIndex: \(currentIndex)")
-                
-                if rightToLeft != isRightToLeft {
-                    if !allowsDocumentAssembly {
-                        return
-                    }
-                    // ページ交換ファンクションを利用して、降順ソートして置き換える。
-                    let pageCount: Int = document.pageCount
-                    
-                    print("pageCount: \(pageCount)")
-                    for i in 0..<pageCount/2 {
-                        print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
-                        document.exchangePage(at: i, withPageAt: pageCount-i-1)
-                    }
-                    if currentIndex != pageCount - currentIndex - 1 {
-                        if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
-                            print("go to: \(pageCount - currentIndex - 1)")
-                            pdfView.go(to: pdfPage)
-                        }
-                    }
-                    isRightToLeft = rightToLeft
+    func exchangePageForRTL(_ exchange: Bool) {
+        if exchange != isPageExchangedForRTL, let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+            let currentIndex: Int = document.index(for: currentPage)
+            print("currentIndex: \(currentIndex)")
+            
+            // ページ交換ファンクションを利用して、降順ソートして置き換える。
+            let pageCount: Int = document.pageCount
+            
+            print("pageCount: \(pageCount)")
+            for i in 0..<pageCount/2 {
+                print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
+                document.exchangePage(at: i, withPageAt: pageCount-i-1)
+            }
+            if currentIndex != pageCount - currentIndex - 1 {
+                if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
+                    print("go to: \(pageCount - currentIndex - 1)")
+                    pdfView.go(to: pdfPage)
                 }
-                
-                if vertically != isVerticalWriting {
-                    if vertically {
-                        pdfView.displayDirection = .horizontal
-                    } else {
-                        pdfView.displayDirection = .vertical
-                    }
-                    isVerticalWriting = vertically
-                }
-                
-                // reset document to update interface
-                pdfView.document = nil
-                pdfView.document = document
-                pdfView.go(to: currentPage)
             }
         }
         
-        setMinScaleFactorForSizeToFit()
-        setScaleFactorForUser()
+        isPageExchangedForRTL = exchange
     }
     
     func setPDFThumbnailView() {
@@ -367,7 +415,7 @@ class DocumentViewController: UIViewController {
     func moveToLastViewedPage() {
         if let currentEntity = currentEntity {
             pageIndex = currentEntity.pageIndex
-        } else if isVerticalWriting {
+        } else if isHorizontalScroll {
             // 初めて読む　且つ　縦書き
             if let pageCount: Int = pdfView.document?.pageCount {
                 pageIndex = Int64(pageCount - 1)
@@ -434,6 +482,7 @@ class DocumentViewController: UIViewController {
     @objc func didChangeOrientationHandler() {
         // detect if user enabled and update scale factor
         setPreferredDisplayMode(prefersTwoUpInLandscapeForPad)
+        updateScrollDirection()
     }
     
     @IBAction func shareAction() {
@@ -508,7 +557,7 @@ class DocumentViewController: UIViewController {
 
     func update(entity: DocumentEntity) {
         entity.modificationDate = Date()
-        entity.isVerticalWriting = self.isVerticalWriting
+        entity.isHorizontalScroll = self.isHorizontalScroll
         entity.isRightToLeft = self.isRightToLeft
         entity.prefersTwoUpInLandscapeForPad = self.prefersTwoUpInLandscapeForPad
         
@@ -557,9 +606,9 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
-                var height = 245
+                var height = 289
                 if !isEncrypted {
-                    // 245 - 44 = 201
+                    // 289 - 44 = 245
                     height -= 44
                 }
                 if UIDevice.current.userInterfaceIdiom != .pad {
