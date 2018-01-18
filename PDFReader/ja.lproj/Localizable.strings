@@ -7,9 +7,10 @@
 */
 
 //  PopoverTableViewController.swift
-"Natural" = "横書き";
-"Right to left" = "縦書き";
-"Left to right" = "左縦書き";
+"Horizontal" = "横方向";
+"Vertical" = "縦方向";
+"Two pages in landscape" = "横向きでダブルページを表示";
+"One page in landscape" = "横向きでシングルページを表示";
 
 //  DocumentViewController.swift
 "Found iCloud Data" = "iCloudデータが見つかりました";

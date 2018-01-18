@@ -109,7 +109,7 @@ class PopoverTableViewController: UITableViewController {
     
     func updateTwoUp() {
         twoUpSwitch.isOn = delegate.prefersTwoUpInLandscapeForPad
-        twoUpDetailLabel.text = twoUpSwitch.isOn ? "Two pages in landscape" : "One page in landscape"
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? NSLocalizedString("Two pages in landscape", comment: "") : NSLocalizedString("One page in landscape", comment: "")
     }
     
     func updateRightToLeft() {
@@ -169,7 +169,7 @@ class PopoverTableViewController: UITableViewController {
     @IBAction func twoUpSwitchValueChanged(_ sender: UISwitch) {
         delegate.setPreferredDisplayMode(sender.isOn)
         delegate.updateScrollDirection()
-        twoUpDetailLabel.text = twoUpSwitch.isOn ? "Two pages in landscape" : "One page in landscape"
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? NSLocalizedString("Two pages in landscape", comment: "") : NSLocalizedString("One page in landscape", comment: "")
         updateRightToLeft()
         updateScrollDirection()
     }

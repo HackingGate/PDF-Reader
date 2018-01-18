@@ -7,9 +7,10 @@
 */
 
 //  PopoverTableViewController.swift
-"Natural" = "橫書";
-"Right to left" = "直書";
-"Left to right" = "直書（由左至右）";
+"Horizontal" = "水平";
+"Vertical" = "垂直";
+"Two pages in landscape" = "橫向時雙頁";
+"One page in landscape" = "橫向時單頁";
 
 //  DocumentViewController.swift
 "Found iCloud Data" = "發現iCloud數據";

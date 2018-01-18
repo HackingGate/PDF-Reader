@@ -7,9 +7,10 @@
 */
 
 //  PopoverTableViewController.swift
-"Natural" = "Natural";
-"Right to left" = "Right to left";
-"Left to right" = "Left to right";
+"Horizontal" = "Horizontal";
+"Vertical" = "Vertical";
+"Two pages in landscape" = "Two pages in landscape";
+"One page in landscape" = "One page in landscape";
 
 //  DocumentViewController.swift
 "Found iCloud Data" = "Found iCloud Data";
