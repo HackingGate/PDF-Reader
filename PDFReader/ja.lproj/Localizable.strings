@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  PDFReader
+
+  Created by ERU on H30/01/03.
+  Copyright © 平成30年 Hacking Gate. All rights reserved.
+*/
+
+//  PopoverTableViewController.swift
+"Horizontal" = "横方向";
+"Vertical" = "縦方向";
+"Two pages in landscape" = "横向きでダブルページを表示";
+"One page in landscape" = "横向きでシングルページを表示";
+
+//  DocumentViewController.swift
+"Found iCloud Data" = "iCloudデータが見つかりました";
+"Device:" = "デバイス：";
+"Last Viewed Page:" = "最後に読んだぺージ：";
+"Move" = "移動";
+"Cancel" = "キャンセル";

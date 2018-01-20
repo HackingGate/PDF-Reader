@@ -7,19 +7,32 @@
 //
 
 import UIKit
+import CoreData
+import CloudKit
 
-
-class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate {
+class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate, NSFetchedResultsControllerDelegate {
     
     let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
     let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
-    
+    var managedObjectContext: NSManagedObjectContext? = nil
+    var fetchedResults: [DocumentEntity]?
+    let privateCloudDatabase = CKContainer.default().privateCloudDatabase
+    let mobileDocumentPath = "file:///private/var/mobile/Library/Mobile%20Documents/"
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if let sectionInfo = fetchedResultsController.sections?.first{
+            fetchedResults = sectionInfo.objects as? [DocumentEntity]
+        }
+
         delegate = self
         
-        allowsDocumentCreation = true
+        if !UserDefaults.standard.bool(forKey: "deleteInvalidateCKRecords") {
+            deleteInvalidateCKRecords()
+        }
+        
+        allowsDocumentCreation = false
         allowsPickingMultipleItems = false
         
         // get Settings.bundle
@@ -93,9 +106,257 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         let documentViewController = navigationController.viewControllers.first as! DocumentViewController
         documentViewController.document = Document(fileURL: documentURL)
+        documentViewController.managedObjectContext = self.fetchedResultsController.managedObjectContext
+        if let documentEntity = self.currentEntityFor(documentURL) {
+            documentViewController.currentEntity = documentEntity
+        }
+        
+        if let shortPath = documentURL.shortMobileDocumentPath(basePath: mobileDocumentPath) {
+            self.fetchCKRecordsFor(shortPath: shortPath, completionHandler: { (records: [CKRecord]?, error: Error?) in
+                if let error = error {
+                    print(error.localizedDescription)
+                } else if let records = records {
+                    documentViewController.currentCKRecords = records
+                }
+            })
+        }
         
         navigationController.modalTransitionStyle = .crossDissolve
         present(navigationController, animated: true, completion: nil)
     }
+    
+    // MARK: - Fetch Data
+    
+    func currentEntityFor(_ documentURL: URL) -> DocumentEntity? {
+        guard let objects = fetchedResults else { return nil }
+        var currentEntity: DocumentEntity?
+        for documentEntity in objects {
+            if let bookmarkData = documentEntity.bookmarkData {
+                do {
+                    var isStale = false
+                    if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
+                        print("resolved url: \(bookmarkURL)")
+                        if isStale {
+                            print("bookmark is stale")
+                            // create a new bookmark using the returned URL
+                            // https://developer.apple.com/documentation/foundation/nsurl/1572035-urlbyresolvingbookmarkdata
+                            do {
+                                documentEntity.modificationDate = Date()
+                                try documentEntity.bookmarkData = bookmarkURL.bookmarkData()
+                                if let context = self.managedObjectContext {
+                                    self.saveContext(context)
+                                }
+                            } catch let error as NSError {
+                                print("Bookmark Creation Fails: \(error.description)")
+                            }
+                        }
+                        if bookmarkURL == documentURL {
+                            if currentEntity != nil {
+                                // there's already a currentEntity
+                                let context = fetchedResultsController.managedObjectContext
+                                context.delete(documentEntity)
+                            } else {
+                                currentEntity = documentEntity
+                            }
+                        }
+                    }
+                } catch let error as NSError {
+                    print("Bookmark Access Fails: \(error.description)")
+                    if error.code == -1005 {
+                        // file not exists
+                        let context = fetchedResultsController.managedObjectContext
+                        print("deleting: \(documentEntity)")
+                        context.delete(documentEntity)
+                    }
+                }
+            }
+        }
+        return currentEntity
+    }
+    
+    func fetchCKRecordsFor(shortPath: String, completionHandler: @escaping ([CKRecord]?, Error?) -> ()) {
+        let predicate = NSPredicate(format: "shortPath = %@", shortPath)
+        let query = CKQuery(recordType: "Document", predicate: predicate)
+        query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
+        privateCloudDatabase.perform(query, inZoneWith: nil, completionHandler: { (records: [CKRecord]?, error: Error?) in
+            completionHandler(records, error)
+        })
+    }
+    
+    func deleteInvalidateCKRecords() {
+        let predicate = NSPredicate(value: true)
+        let query = CKQuery(recordType: "Document", predicate: predicate)
+        privateCloudDatabase.perform(query, inZoneWith: nil) { (records: [CKRecord]?, error: Error?) in
+            if let error = error {
+                print(error)
+            } else if let records = records {
+                for record in records {
+                    var recordIDsToDelete: [CKRecordID] = []
+                    if (record.object(forKey: "shortPath") == nil) {
+                        recordIDsToDelete.insert(record.recordID, at: 0)
+                    }
+                    
+                    let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: recordIDsToDelete)
+                    operation.modifyRecordsCompletionBlock = {
+                        (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecordID]?, error: Error?) in
+                        UserDefaults.standard.set(true, forKey: "deleteInvalidateCKRecords")
+                    }
+                    
+                    self.privateCloudDatabase.add(operation)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Fetched results controller
+    
+    var fetchedResultsController: NSFetchedResultsController<DocumentEntity> {
+        if _fetchedResultsController != nil {
+            return _fetchedResultsController!
+        }
+        
+        let fetchRequest: NSFetchRequest<DocumentEntity> = DocumentEntity.fetchRequest()
+        
+        // Set the batch size to a suitable number.
+        fetchRequest.fetchBatchSize = 20
+        
+        // Edit the sort key as appropriate.
+        let sortDescriptor = NSSortDescriptor(key: "modificationDate", ascending: false)
+        
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        // Edit the section name key path and cache name if appropriate.
+        // nil for section name key path means "no sections".
+        let aFetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext!, sectionNameKeyPath: nil, cacheName: "Document")
+        aFetchedResultsController.delegate = self
+        _fetchedResultsController = aFetchedResultsController
+        
+        do {
+            try _fetchedResultsController!.performFetch()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+        
+        return _fetchedResultsController!
+    }
+    var _fetchedResultsController: NSFetchedResultsController<DocumentEntity>? = nil
+    
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        guard let documentEntity = anObject as? DocumentEntity else { return }
+        
+        switch type {
+        case .insert:
+            fetchedResults?.insert(documentEntity, at: newIndexPath!.row)
+        case .delete:
+            fetchedResults?.remove(at: indexPath!.row)
+        case .update:
+            fetchedResults?[indexPath!.row] = documentEntity
+        case .move:
+            fetchedResults?.remove(at: indexPath!.row)
+            fetchedResults?.insert(documentEntity, at: newIndexPath!.row)
+        }
+        
+        if let bookmarkData = documentEntity.bookmarkData, let uuid = documentEntity.uuid {
+            
+            let recordID = CKRecordID(recordName: uuid.uuidString)
+            
+            if type == .insert || type == .update || type == .move {
+                var isStale = false
+                do {
+                    if let documentURL = try URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale),
+                        let shortPath = documentURL.shortMobileDocumentPath(basePath: self.mobileDocumentPath) {
+                        
+                        // fetch by fileURL
+                        self.fetchCKRecordsFor(shortPath: shortPath, completionHandler: { (records: [CKRecord]?, error: Error?) in
+                            if let error = error {
+                                print(error)
+                            } else if let records = records, let record = records.first {
+                                // update (file is not renamed or moved)
+                                record["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
+                                self.privateCloudDatabase.save(record, completionHandler: { (record: CKRecord?, error: Error?) in
+                                    if let error = error {
+                                        print("CKRecord: \(String(describing: record)) update failed: \(error)")
+                                    }
+                                })
+                                for i in 1..<records.count {
+                                    // delete
+                                    self.privateCloudDatabase.delete(withRecordID: records[i].recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                                        if let error = error {
+                                            print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
+                                        }
+                                    })
+                                }
+                            } else {
+                                // fetch by recordID
+                                self.privateCloudDatabase.fetch(withRecordID: recordID, completionHandler: { (record: CKRecord?, error: Error?) in
+                                    
+                                    var documentCKRecord: CKRecord?
+                                    if let ckerror = error as? CKError, ckerror.code == .unknownItem {
+                                        // insert https://developer.apple.com/documentation/cloudkit/ckerror.code/1515304-unknownitem
+                                        documentCKRecord = CKRecord(recordType: "Document", recordID: recordID)
+                                    } else if let error = error {
+                                        print(error)
+                                    } else {
+                                        // update (file is renamed or moved)
+                                        documentCKRecord = record
+                                    }
+                                    if let documentCKRecord = documentCKRecord {
+                                        documentCKRecord["pageIndex"] = NSNumber(value: documentEntity.pageIndex)
+                                        documentCKRecord["shortPath"] = shortPath as NSString
+                                        self.privateCloudDatabase.save(documentCKRecord, completionHandler: { (record: CKRecord?, error: Error?) in
+                                            if let error = error {
+                                                print("CKRecord: \(String(describing: record)) save failed: \(error)")
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                } catch let error as NSError {
+                    print(error.localizedDescription)
+                }
+                
+            } else if type == .delete {
+                privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                    if let error = error {
+                        print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
+                    }
+                })
+            }
+            
+        }
+        
+    }
+    
+    // MARK: - Core Data Saving support
+
+    func saveContext(_ context: NSManagedObjectContext) {
+        // Save the context.
+        do {
+            try context.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+        }
+    }
+    
 }
 
+extension URL {
+    func shortMobileDocumentPath(basePath: String) -> String? {
+        var shortString: String?
+        if self.isFileURL && self.absoluteString.hasPrefix(basePath) {
+            shortString = String(self.absoluteString.dropFirst(basePath.count))
+        }
+        return shortString
+    }
+}

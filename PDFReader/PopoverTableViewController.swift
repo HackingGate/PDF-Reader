@@ -16,10 +16,12 @@ class PopoverTableViewController: UITableViewController {
     @IBOutlet weak var whiteStyleButton: UIButton!
     @IBOutlet weak var lightStyleButton: UIButton!
     @IBOutlet weak var darkStyleButton: UIButton!
-    @IBOutlet weak var directionDownButton: UIButton!
-    @IBOutlet weak var directionLeftButton: UIButton!
-    @IBOutlet weak var directionRightButton: UIButton!
-    @IBOutlet weak var directionDetailLabel: UILabel!
+    @IBOutlet weak var scrollVerticalButton: UIButton!
+    @IBOutlet weak var scrollHorizontalButton: UIButton!
+    @IBOutlet weak var scrollDetailLabel: UILabel!
+    @IBOutlet weak var twoUpSwitch: UISwitch!
+    @IBOutlet weak var twoUpDetailLabel: UILabel!
+    @IBOutlet weak var rightToLeftSwitch: UISwitch!
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
@@ -46,6 +48,10 @@ class PopoverTableViewController: UITableViewController {
                            selector: #selector(updateBrightness),
                            name: .UIScreenBrightnessDidChange,
                            object: nil)
+        center.addObserver(self,
+                           selector: #selector(didChangeOrientationHandler),
+                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           object: nil)
     }
     
     // MARK: Update Interfaces
@@ -71,27 +77,47 @@ class PopoverTableViewController: UITableViewController {
 //            tableView.backgroundColor = popoverPresentationController?.backgroundColor
         
         updateBrightness()
-        updateDirection()
+        updateTwoUp()
+        updateRightToLeft()
+        updateScrollDirection()
     }
     
     @objc func updateBrightness() {
         brightnessSlider.value = Float(UIScreen.main.brightness)
     }
     
-    func updateDirection() {
-        directionLeftButton.isEnabled = delegate.allowsDocumentAssembly
-        directionDownButton.tintColor = .lightGray
-        directionLeftButton.tintColor = .lightGray
-        directionRightButton.tintColor = .lightGray
-        if delegate.isVerticalWriting == false && delegate.isRightToLeft == false {
-            directionDownButton.tintColor = view.tintColor
-            directionDetailLabel.text = "Normal"
-        } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == true {
-            directionLeftButton.tintColor = view.tintColor
-            directionDetailLabel.text = "From right to left"
-        } else if delegate.isVerticalWriting == true && delegate.isRightToLeft == false {
-            directionRightButton.tintColor = view.tintColor
-            directionDetailLabel.text = "From left to right"
+    func updateScrollDirection() {
+        if delegate.isHorizontalScroll {
+            scrollVerticalButton.tintColor = .lightGray
+            scrollHorizontalButton.tintColor = view.tintColor
+            scrollDetailLabel.text = NSLocalizedString("Horizontal", comment: "")
+        } else {
+            scrollHorizontalButton.tintColor = .lightGray
+            scrollVerticalButton.tintColor = view.tintColor
+            scrollDetailLabel.text = NSLocalizedString("Vertical", comment: "")
+        }
+        scrollHorizontalButton.isEnabled = delegate.displayMode == .singlePageContinuous
+        if rightToLeftSwitch.isOn {
+            scrollHorizontalButton.setImage(#imageLiteral(resourceName: "direction_left"), for: .normal)
+            if !delegate.allowsDocumentAssembly && delegate.displayMode == .singlePageContinuous {
+                scrollHorizontalButton.setImage(#imageLiteral(resourceName: "direction_right"), for: .normal)
+            }
+        } else {
+            scrollHorizontalButton.setImage(#imageLiteral(resourceName: "direction_right"), for: .normal)
+        }
+    }
+    
+    func updateTwoUp() {
+        twoUpSwitch.isOn = delegate.prefersTwoUpInLandscapeForPad
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? NSLocalizedString("Two pages in landscape", comment: "") : NSLocalizedString("One page in landscape", comment: "")
+    }
+    
+    func updateRightToLeft() {
+        rightToLeftSwitch.isOn = delegate.isRightToLeft
+        if delegate.displayMode == .singlePageContinuous {
+            rightToLeftSwitch.isEnabled = delegate.allowsDocumentAssembly
+        } else if delegate.displayMode == .twoUpContinuous {
+            rightToLeftSwitch.isEnabled = true
         }
     }
     
@@ -121,27 +147,51 @@ class PopoverTableViewController: UITableViewController {
     }
     
     @IBAction func directionButtonAction(_ sender: UIButton) {
-        directionDownButton.tintColor = .lightGray
-        directionLeftButton.tintColor = .lightGray
-        directionRightButton.tintColor = .lightGray
+        scrollVerticalButton.tintColor = .lightGray
+        scrollHorizontalButton.tintColor = .lightGray
         sender.tintColor = view.tintColor
         switch sender.tag {
         case 1:
-            delegate.writing(vertically: false, rightToLeft: false)
+            delegate.isHorizontalScroll = false
+            if delegate.displayMode == .singlePageContinuous {
+                delegate.isRightToLeft = false
+            }
         case 2:
-            delegate.writing(vertically: true, rightToLeft: true)
-        case 3:
-            delegate.writing(vertically: true, rightToLeft: false)
+            delegate.isHorizontalScroll = true
         default: break
         }
         
-        updateDirection()
+        delegate.updateScrollDirection()
+        updateRightToLeft()
+        updateScrollDirection()
     }
 
+    @IBAction func twoUpSwitchValueChanged(_ sender: UISwitch) {
+        delegate.setPreferredDisplayMode(sender.isOn)
+        delegate.updateScrollDirection()
+        twoUpDetailLabel.text = twoUpSwitch.isOn ? NSLocalizedString("Two pages in landscape", comment: "") : NSLocalizedString("One page in landscape", comment: "")
+        updateRightToLeft()
+        updateScrollDirection()
+    }
+    
+    @IBAction func rightToLeftSwitchValueChanged(_ sender: UISwitch) {
+        delegate.isRightToLeft = sender.isOn
+        delegate.updateScrollDirection()
+        updateScrollDirection()
+    }
+    
+    @objc func didChangeOrientationHandler() {
+        updateRightToLeft()
+        updateScrollDirection()
+    }
+    
     // MARK: - UITableViewDelegate
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if !delegate.isEncrypted && indexPath.row == 3 {
+            return 0
+        }
+        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 4 {
             return 0
         }
         return super.tableView(tableView, heightForRowAt: indexPath)

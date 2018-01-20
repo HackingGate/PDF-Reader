@@ -8,35 +8,91 @@
 
 import UIKit
 import PDFKit
+import CoreData
+import CloudKit
 
 protocol SettingsDelegate {
-    var isVerticalWriting: Bool { get }
-    var isRightToLeft: Bool { get }
+    var isHorizontalScroll: Bool { get set }
+    var isRightToLeft: Bool { get set }
     var isEncrypted: Bool { get }
     var allowsDocumentAssembly: Bool { get }
-    func writing(vertically: Bool, rightToLeft: Bool) -> Void
+    var prefersTwoUpInLandscapeForPad: Bool { get }
+    var displayMode: PDFDisplayMode { get }
+    func updateScrollDirection() -> Void
+    func goToPage(page: PDFPage) -> Void
+    func selectOutline(outline: PDFOutline) -> Void
+    func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) -> Void
 }
 
-class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate {
+extension DocumentViewController: SettingsDelegate {
+    var allowsDocumentAssembly: Bool {
+        get {
+            if let document = pdfView.document {
+                return document.allowsDocumentAssembly
+            } else {
+                return false
+            }
+        }
+    }
+    
+    var displayMode: PDFDisplayMode {
+        get {
+            return pdfView.displayMode
+        }
+    }
+    
+    func goToPage(page: PDFPage) {
+        pdfView.go(to: page)
+    }
+    
+    func selectOutline(outline: PDFOutline) {
+        if let action = outline.action as? PDFActionGoTo {
+            pdfView.go(to: action.destination)
+        }
+    }
+}
+
+class DocumentViewController: UIViewController {
     
     @IBOutlet weak var pdfView: PDFView!
     
     var document: Document?
     
-    let userDeaults = UserDefaults.standard
+    // data
+    var managedObjectContext: NSManagedObjectContext? = nil
+    var pageIndex: Int64 = 0
+    var currentEntity: DocumentEntity? = nil
+    var currentCKRecords: [CKRecord]? = nil
     
-    var portraitScaleFactorForSizeToFit: CGFloat = 0.0
-    var landscapeScaleFactorForSizeToFit: CGFloat = 0.0
+    // scaleFactor
+    struct ScaleFactor {
+        // store factor for single mode
+        var portrait: CGFloat
+        var landscape: CGFloat
+        // devide by 2 for two up mode
+    }
+    var scaleFactorForSizeToFit: ScaleFactor?
+    var scaleFactorVertical: ScaleFactor?
+    var scaleFactorHorizontal: ScaleFactor?
+    
+    // offset
+    var offsetPortrait: CGPoint?
+    var offsetLandscape: CGPoint?
     
     // delegate properties
-    var isVerticalWriting = false
+    var isHorizontalScroll = false
     var isRightToLeft = false
     var isEncrypted = false
-    var allowsDocumentAssembly = false
+//    var allowsDocumentAssembly = false
+    var isPageExchangedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
+    var prefersTwoUpInLandscapeForPad = false // default value
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
         super.viewWillAppear(animated)
+        navigationController?.hidesBarsOnTap = true
+        
+        if (pdfView.document != nil) { return }
         
         // Access the document
         document?.open(completionHandler: { (success) in
@@ -47,22 +103,26 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 guard let pdfURL: URL = (self.document?.fileURL) else { return }
                 guard let document = PDFDocument(url: pdfURL) else { return }
                 
-                self.allowsDocumentAssembly = document.allowsDocumentAssembly
-                if (document.isEncrypted) {
-                    self.navigationItem.title = "🔒" + (self.navigationItem.title ?? "")
-                }
+//                self.allowsDocumentAssembly = document.allowsDocumentAssembly
                 self.isEncrypted = document.isEncrypted
                 
                 self.pdfView.document = document
                 
-                self.moveToLastReadingProsess()
-                if self.pdfView.displayDirection == .vertical {
-                    self.getScaleFactorForSizeToFit()
+                self.moveToLastViewedPage()
+                self.getScaleFactorForSizeToFitAndOffset()
+                self.setMinScaleFactorForSizeToFit()
+                self.setScaleFactorForUser()
+                
+                if let documentEntity = self.currentEntity {
+                    self.isHorizontalScroll = documentEntity.isHorizontalScroll
+                    self.isRightToLeft = documentEntity.isRightToLeft
+                    self.updateScrollDirection()
                 }
-                
-                self.writing(vertically: self.isVerticalWriting, rightToLeft: self.isRightToLeft)
-                
+                self.moveToLastViewedOffset()
+
                 self.setPDFThumbnailView()
+                
+                self.checkForNewerRecords()
             } else {
                 // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
             }
@@ -70,7 +130,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
     }
     
     override func viewDidLoad() {
-        navigationController?.hidesBarsOnTap = true
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
 
         setUpSearch()
@@ -78,14 +137,17 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
         pdfView.displayBox = .cropBox
-        pdfView.displayMode = .singlePageContinuous
-        for view in pdfView.subviews {
-            if view.isKind(of: UIScrollView.self) {
-                (view as? UIScrollView)?.scrollsToTop = false
-                (view as? UIScrollView)?.contentInsetAdjustmentBehavior = .scrollableAxes
-            }
+        if let documentEntity = self.currentEntity {
+            prefersTwoUpInLandscapeForPad = documentEntity.prefersTwoUpInLandscapeForPad
         }
-        
+        if prefersTwoUpInLandscapeForPad && UIDevice.current.userInterfaceIdiom == .pad && UIApplication.shared.statusBarOrientation.isLandscape {
+            pdfView.displayMode = .twoUpContinuous
+        } else {
+            pdfView.displayMode = .singlePageContinuous
+        }
+
+        pdfView.scrollView?.scrollsToTop = false
+        pdfView.scrollView?.contentInsetAdjustmentBehavior = .scrollableAxes
         
         let center = NotificationCenter.default
         center.addObserver(self,
@@ -95,6 +157,10 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         center.addObserver(self,
                            selector: #selector(saveAndClose),
                            name: .UIApplicationDidEnterBackground,
+                           object: nil)
+        center.addObserver(self,
+                           selector: #selector(willChangeOrientationHandler),
+                           name: .UIApplicationDidChangeStatusBarOrientation,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),
@@ -113,57 +179,103 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 navigationController?.toolbar.barStyle = .default
             }
             view.backgroundColor = presentingViewController?.view.backgroundColor
+            view.tintColor = presentingViewController?.view.tintColor
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
         }
     }
     
-    func writing(vertically: Bool, rightToLeft: Bool) {
+    func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) {
+        prefersTwoUpInLandscapeForPad = twoUpInLandscapeForPad
+        if let page = pdfView.currentPage {
+            if twoUpInLandscapeForPad && UIDevice.current.userInterfaceIdiom == .pad && UIApplication.shared.statusBarOrientation.isLandscape {
+                pdfView.displayMode = .twoUpContinuous
+            } else {
+                pdfView.displayMode = .singlePageContinuous
+            }
+            setMinScaleFactorForSizeToFit()
+            pdfView.go(to: page) // workaround to fix
+            setScaleFactorForUser()
+        }
+
+    }
+    
+    func updateScrollDirection() {
+        updateUserScaleFactorAndOffset(changeOrientation: false)
+        
         // experimental feature
-        if let currentPage = pdfView.currentPage {
-            if let document: PDFDocument = pdfView.document {
-                let currentIndex: Int = document.index(for: currentPage)
-                
-                print("currentIndex: \(currentIndex)")
-                
-                if rightToLeft != isRightToLeft {
-                    if !allowsDocumentAssembly {
-                        return
+        if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+            if pdfView.displayMode == .singlePageContinuous && allowsDocumentAssembly {
+                if isRightToLeft != isPageExchangedForRTL {
+                    if pdfView.displaysRTL {
+                        pdfView.displaysRTL = false
                     }
-                    // ページ交換ファンクションを利用して、降順ソートして置き換える。
-                    let pageCount: Int = document.pageCount
-                    
-                    print("pageCount: \(pageCount)")
-                    for i in 0..<pageCount/2 {
-                        print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
-                        document.exchangePage(at: i, withPageAt: pageCount-i-1)
-                    }
-                    if currentIndex != pageCount - currentIndex - 1 {
-                        if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
-                            print("go to: \(pageCount - currentIndex - 1)")
-                            pdfView.go(to: pdfPage)
-                        }
-                    }
-                    isRightToLeft = rightToLeft
+                    exchangePageForRTL(isRightToLeft)
                 }
-                
-                if vertically != isVerticalWriting {
-                    if vertically {
-                        pdfView.displayDirection = .horizontal
-                    } else {
-                        pdfView.displayDirection = .vertical
+                if isRightToLeft {
+                    // single page RTL use horizontal scroll
+                    if isRightToLeft {
+                        isHorizontalScroll = true
                     }
-                    isVerticalWriting = vertically
                 }
-                
-                // reset document to update interface
-                pdfView.document = nil
-                pdfView.document = document
-                pdfView.go(to: currentPage)
+            } else if pdfView.displayMode == .twoUpContinuous {
+                if isRightToLeft != pdfView.displaysRTL  {
+                    if isPageExchangedForRTL {
+                        exchangePageForRTL(false)
+                    }
+                    pdfView.displaysRTL = isRightToLeft
+                }
+                if isRightToLeft {
+                    // two up RTL use vertical scroll
+                    if isRightToLeft {
+                        isHorizontalScroll = false
+                    }
+                }
+            }
+            
+            if isHorizontalScroll != (pdfView.displayDirection == .horizontal) {
+                if isHorizontalScroll {
+                    pdfView.displayDirection = .horizontal
+                } else {
+                    if isPageExchangedForRTL {
+                        exchangePageForRTL(false)
+                    }
+                    pdfView.displayDirection = .vertical
+                }
+            }
+            
+            // reset document to update interface
+            pdfView.document = nil
+            pdfView.document = document
+            pdfView.go(to: currentPage)
+        }
+        
+        setMinScaleFactorForSizeToFit()
+        setScaleFactorForUser()
+    }
+    
+    func exchangePageForRTL(_ exchange: Bool) {
+        if exchange != isPageExchangedForRTL, let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+            let currentIndex: Int = document.index(for: currentPage)
+            print("currentIndex: \(currentIndex)")
+            
+            // ページ交換ファンクションを利用して、降順ソートして置き換える。
+            let pageCount: Int = document.pageCount
+            
+            print("pageCount: \(pageCount)")
+            for i in 0..<pageCount/2 {
+                print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
+                document.exchangePage(at: i, withPageAt: pageCount-i-1)
+            }
+            if currentIndex != pageCount - currentIndex - 1 {
+                if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
+                    print("go to: \(pageCount - currentIndex - 1)")
+                    pdfView.go(to: pdfPage)
+                }
             }
         }
         
-        setScaleFactorForSizeToFit()
+        isPageExchangedForRTL = exchange
     }
     
     func setPDFThumbnailView() {
@@ -213,48 +325,192 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
     
-    
-    func getScaleFactorForSizeToFit() {
-        let frame = pdfView.frame
-        let aspectRatio = frame.size.width / frame.size.height
-        if UIApplication.shared.statusBarOrientation.isPortrait {
-            portraitScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit 
-            landscapeScaleFactorForSizeToFit = portraitScaleFactorForSizeToFit / aspectRatio
-        } else if UIApplication.shared.statusBarOrientation.isLandscape {
-            landscapeScaleFactorForSizeToFit = pdfView.scaleFactorForSizeToFit
-            portraitScaleFactorForSizeToFit = landscapeScaleFactorForSizeToFit / aspectRatio
+    func getScaleFactorForSizeToFitAndOffset() {
+        // make sure to init
+        if let verticalPortrait = currentEntity?.scaleFactorVerticalPortrait, let verticalLandscape = currentEntity?.scaleFactorVerticalLandscape {
+            scaleFactorVertical = ScaleFactor(portrait: CGFloat(verticalPortrait), landscape: CGFloat(verticalLandscape))
+        } else {
+            scaleFactorVertical = ScaleFactor(portrait: 0.25, landscape: 0.25)
         }
-    }
-    
-    func setScaleFactorForSizeToFit() {
+        if let horizontalPortrait = currentEntity?.scaleFactorHorizontalPortrait, let horizontalLandscape = currentEntity?.scaleFactorVerticalLandscape {
+            scaleFactorHorizontal = ScaleFactor(portrait: CGFloat(horizontalPortrait), landscape: CGFloat(horizontalLandscape))
+        } else {
+            scaleFactorHorizontal = ScaleFactor(portrait: 0.25, landscape: 0.25)
+        }
+
         if pdfView.displayDirection == .vertical {
-            // currentlly only works for vertical display direction
-            if portraitScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isPortrait {
-                pdfView.minScaleFactor = portraitScaleFactorForSizeToFit
-                pdfView.scaleFactor = portraitScaleFactorForSizeToFit
-            } else if landscapeScaleFactorForSizeToFit != 0.0 && UIApplication.shared.statusBarOrientation.isLandscape {
-                pdfView.minScaleFactor = landscapeScaleFactorForSizeToFit
-                pdfView.scaleFactor = landscapeScaleFactorForSizeToFit
+            let frame = view.frame
+            let aspectRatio = frame.size.width / frame.size.height
+            var scaleFactor = pdfView.scaleFactorForSizeToFit
+            if pdfView.displayMode == .twoUpContinuous {
+                scaleFactor *= 2
+            }
+            if UIApplication.shared.statusBarOrientation.isPortrait {
+                scaleFactorForSizeToFit = ScaleFactor(portrait: scaleFactor,
+                                                      landscape: scaleFactor / aspectRatio)
+            } else if UIApplication.shared.statusBarOrientation.isLandscape {
+                scaleFactorForSizeToFit = ScaleFactor(portrait: scaleFactor / aspectRatio,
+                                                      landscape: scaleFactor)
             }
         }
+        
+        // offset
+        offsetPortrait = currentEntity?.offsetLandscape as? CGPoint
+        offsetLandscape = currentEntity?.offsetLandscape as? CGPoint
     }
     
-    func moveToLastReadingProsess() {
-        var pageIndex = 0
-        if let documentURL = pdfView.document?.documentURL {
-            if userDeaults.object(forKey: documentURL.path) != nil {
-                // key exists
-                pageIndex = userDeaults.integer(forKey: documentURL.path)
-            } else if isVerticalWriting {
-                // 初めて読む　且つ　縦書き
-                if let pageCount: Int = pdfView.document?.pageCount {
-                    pageIndex = pageCount - 1
+    // SizeToFit currentlly only works for vertical display direction
+    func setMinScaleFactorForSizeToFit() {
+        if pdfView.displayDirection == .vertical, let scaleFactorForSizeToFit = scaleFactorForSizeToFit {
+            if UIApplication.shared.statusBarOrientation.isPortrait {
+                if pdfView.displayMode == .singlePageContinuous {
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait
+                } else if pdfView.displayMode == .twoUpContinuous {
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait / 2
+                }
+            } else if UIApplication.shared.statusBarOrientation.isLandscape {
+                // set minScaleFactor to safe area for iPhone X and later
+                let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+                if pdfView.displayMode == .singlePageContinuous {
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape * multiplier
+                } else if pdfView.displayMode == .twoUpContinuous {
+                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape / 2 * multiplier
                 }
             }
-            // TODO: if pageIndex == pageCount - 1, then go to last CGRect
-            if let pdfPage = pdfView.document?.page(at: pageIndex) {
-                pdfView.go(to: pdfPage)
+        }
+    }
+    
+    func setScaleFactorForUser() {
+        var scaleFactor: ScaleFactor?
+        if pdfView.displayDirection == .vertical {
+            scaleFactor = scaleFactorVertical
+        } else if pdfView.displayDirection == .horizontal {
+            scaleFactor = scaleFactorHorizontal
+        }
+        
+        if let scaleFactor = scaleFactor {
+            print("set scale factor: \(scaleFactor)")
+            if UIApplication.shared.statusBarOrientation.isPortrait {
+                if pdfView.displayMode == .singlePageContinuous {
+                    pdfView.scaleFactor = scaleFactor.portrait
+                } else if pdfView.displayMode == .twoUpContinuous {
+                    pdfView.scaleFactor = scaleFactor.portrait / 2
+                }
+            } else if UIApplication.shared.statusBarOrientation.isLandscape {
+                // set scaleFactor to safe area for iPhone X and later
+                let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+                if pdfView.displayMode == .singlePageContinuous {
+                    pdfView.scaleFactor = scaleFactor.landscape * multiplier
+                } else if pdfView.displayMode == .twoUpContinuous {
+                    pdfView.scaleFactor = scaleFactor.landscape / 2 * multiplier
+                }
             }
+        }
+    }
+    
+    func updateUserScaleFactorAndOffset(changeOrientation: Bool) {
+        // for save
+        // XOR operator for bool (!=)
+        if UIApplication.shared.statusBarOrientation.isPortrait != changeOrientation {
+            if pdfView.displayDirection == .vertical {
+                scaleFactorVertical?.portrait = pdfView.scaleFactor
+            } else if pdfView.displayDirection == .horizontal {
+                scaleFactorHorizontal?.portrait = pdfView.scaleFactor
+            }
+            
+            offsetPortrait = pdfView.scrollView?.contentOffset
+        } else if UIApplication.shared.statusBarOrientation.isLandscape != changeOrientation {
+            if pdfView.displayDirection == .vertical {
+                scaleFactorVertical?.landscape = pdfView.scaleFactor
+            } else if pdfView.displayDirection == .horizontal {
+                scaleFactorHorizontal?.landscape = pdfView.scaleFactor
+            }
+            
+            offsetLandscape = pdfView.scrollView?.contentOffset
+        }
+    }
+    
+    func moveToLastViewedPage() {
+        if let currentEntity = currentEntity {
+            pageIndex = currentEntity.pageIndex
+        } else if isHorizontalScroll {
+            // 初めて読む　且つ　縦書き
+            if let pageCount: Int = pdfView.document?.pageCount {
+                pageIndex = Int64(pageCount - 1)
+            }
+        }
+        // TODO: if pageIndex == pageCount - 1, then go to last CGRect
+        if let pdfPage = pdfView.document?.page(at: Int(pageIndex)) {
+            pdfView.go(to: pdfPage)
+        }
+    }
+    
+    func moveToLastViewedOffset() {
+        if let currentPage = pdfView.currentPage, let currentOffset = pdfView.scrollView?.contentOffset {
+            if UIApplication.shared.statusBarOrientation.isPortrait, let offsetPortrait = currentEntity?.offsetPortrait as? CGPoint {
+                pdfView.scrollView?.contentOffset = offsetPortrait
+            } else if UIApplication.shared.statusBarOrientation.isLandscape, let offsetLandscape = currentEntity?.offsetLandscape as? CGPoint {
+                pdfView.scrollView?.contentOffset = offsetLandscape
+            }
+            if pdfView.currentPage != currentPage {
+                print("in case something wrong \nOld: \(currentPage) \nNew: \(String(describing: pdfView.currentPage)) \nmove to previous offset")
+                pdfView.scrollView?.contentOffset = currentOffset
+            }
+        }
+    }
+    
+    // call after moveToLastViewedPage()
+    func checkForNewerRecords() {
+        if let record = currentCKRecords?.first, let modificationDate = record["modificationDate"] as? Date, let cloudPageIndex = record["pageIndex"] as? NSNumber {
+            if let currentModificationDate = currentEntity?.modificationDate {
+                if currentModificationDate > modificationDate { return }
+            }
+            if cloudPageIndex.int64Value != pageIndex {
+                var message = modificationDate.description(with: Locale.current)
+                if let modifiedByDevice = record["modifiedByDevice"] as? String {
+                    message += "\n\(NSLocalizedString("Device:", comment: "")) \(modifiedByDevice)"
+                }
+                message += "\n\(NSLocalizedString("Last Viewed Page:", comment: "")) \(cloudPageIndex)"
+                
+                let alertController: UIAlertController = UIAlertController(title: NSLocalizedString("Found iCloud Data", comment: ""), message: message, preferredStyle: .alert)
+                
+                alertController.view.tintColor = view.tintColor
+                
+                let defaultAction: UIAlertAction = UIAlertAction(title: NSLocalizedString("Move", comment: ""), style: .default, handler: { (action: UIAlertAction?) in
+                    self.pageIndex = cloudPageIndex.int64Value
+                    if let pdfPage = self.pdfView.document?.page(at: Int(self.pageIndex)) {
+                        self.pdfView.go(to: pdfPage)
+                    }
+                })
+                
+                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: UIAlertActionStyle.cancel, handler: nil)
+                
+                alertController.addAction(cancelAction)
+                alertController.addAction(defaultAction)
+                
+                present(alertController, animated: true, completion: nil)
+            }
+        }
+    }
+    
+    @objc func willChangeOrientationHandler() {
+        updateUserScaleFactorAndOffset(changeOrientation: true)
+    }
+    
+    @objc func didChangeOrientationHandler() {
+        // detect if user enabled and update scale factor
+        setPreferredDisplayMode(prefersTwoUpInLandscapeForPad)
+        updateScrollDirection()
+    }
+    
+    @IBAction func shareAction() {
+        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    
+    @IBAction func dismissDocumentViewController() {
+        dismiss(animated: true) {
+            self.saveAndClose()
         }
     }
     
@@ -265,30 +521,110 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
             if isRightToLeft {
                 currentIndex = pdfDocument.pageCount - currentIndex - 1
             }
-            if let documentURL = pdfView.document?.documentURL {
-                userDeaults.set(currentIndex, forKey: documentURL.path)
-                print("saved page index: \(String(describing: currentIndex))")
+            if let documentEntity = currentEntity {
+                if let record = currentCKRecords?.first {
+                    // if another device have the same bookmark but different recordID
+                    documentEntity.uuid = UUID(uuidString: record.recordID.recordName)
+                }
+                documentEntity.pageIndex = Int64(currentIndex)
+                update(entity: documentEntity)
+                
+                print("updating entity: \(documentEntity)")
+                if let context = self.managedObjectContext {
+                    self.saveContext(context)
+                }
+            } else {
+                do {
+                    if let bookmark = try document?.fileURL.bookmarkData() {
+                        self.insertNewObject(bookmark, pageIndex: Int64(currentIndex))
+                    }
+                } catch let error as NSError {
+                    print("Set Bookmark Fails: \(error.description)")
+                }
             }
         }
 
         self.document?.close(completionHandler: nil)
     }
     
-    @objc func didChangeOrientationHandler() {
-        setScaleFactorForSizeToFit()
+    // MARK: - Save Data
+    
+    @objc
+    func insertNewObject(_ bookmark: Data, pageIndex: Int64) {
+        if let context = self.managedObjectContext {
+            let newDocument = DocumentEntity(context: context)
+            
+            if let record = currentCKRecords?.first {
+                // if the record exists in iCloud but not in CoreData
+                newDocument.uuid = UUID(uuidString: record.recordID.recordName)
+            } else {
+                newDocument.uuid = UUID()
+            }
+            newDocument.creationDate = Date()
+            newDocument.bookmarkData = bookmark
+            newDocument.pageIndex = pageIndex
+            update(entity: newDocument)
+            
+            print("saving: \(newDocument)")
+            
+            self.saveContext(context)
+        } else {
+            print("context not exist")
+        }
+    }
+
+    func update(entity: DocumentEntity) {
+        entity.modificationDate = Date()
+        entity.isHorizontalScroll = self.isHorizontalScroll
+        entity.isRightToLeft = self.isRightToLeft
+        entity.prefersTwoUpInLandscapeForPad = self.prefersTwoUpInLandscapeForPad
+        
+        // store user scale factor
+        updateUserScaleFactorAndOffset(changeOrientation: false)
+        if let scaleFactorVertical = scaleFactorVertical {
+            entity.scaleFactorVerticalPortrait = Float(scaleFactorVertical.portrait)
+            entity.scaleFactorVerticalLandscape = Float(scaleFactorVertical.landscape)
+        }
+        if let scaleFactorHorizontal = scaleFactorHorizontal {
+            entity.scaleFactorHorizontalPortrait = Float(scaleFactorHorizontal.portrait)
+            entity.scaleFactorHorizontalLandscape = Float(scaleFactorHorizontal.landscape)
+        }
+        
+        if let offsetPortrait = offsetPortrait {
+            entity.offsetPortrait = offsetPortrait as NSObject
+        }
+        if let offsetLandscape = offsetLandscape {
+            entity.offsetLandscape = offsetLandscape as NSObject
+        }
+        
     }
     
-    @IBAction func dismissDocumentViewController() {
-        dismiss(animated: true) {
-            self.saveAndClose()
+    func saveContext(_ context: NSManagedObjectContext) {
+        // Save the context.
+        do {
+            try context.save()
+        } catch {
+            // Replace this implementation with code to handle the error appropriately.
+            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            let nserror = error as NSError
+            fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
         }
     }
     
-    @IBAction func shareAction() {
-        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
-        self.present(activityVC, animated: true, completion: nil)
+}
+
+extension PDFView {
+    var scrollView: UIScrollView? {
+        for view in self.subviews {
+            if let scrollView = view as? UIScrollView {
+                return scrollView
+            }
+        }
+        return nil
     }
-    
+}
+
+extension DocumentViewController: UIPopoverPresentationControllerDelegate {
     // MARK: - PopoverTableViewController Presentation
 
     // iOS Popover presentation Segue
@@ -299,10 +635,26 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
+                var height = 289
                 if !isEncrypted {
-                    // 201 - 44 = 157
-                    popopverVC.preferredContentSize = CGSize(width: 300, height: 157)
+                    // 289 - 44 = 245
+                    height -= 44
                 }
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    height -= 44
+                }
+                
+                popopverVC.preferredContentSize = CGSize(width: 300, height: height)
+
+            }
+        } else if (segue.identifier == "Container") {
+            if let containerVC: ContainerViewController = segue.destination as? ContainerViewController {
+                containerVC.pdfDocument = pdfView.document
+                containerVC.displayBox = pdfView.displayBox
+                if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
+                    containerVC.currentIndex = document.index(for: currentPage)
+                }
+                containerVC.delegate = self
             }
         }
     }

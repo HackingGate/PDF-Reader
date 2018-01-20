@@ -1,0 +1,36 @@
+
+/* Class = "UILabel"; text = "Page"; ObjectID = "FJw-Gx-9U7"; */
+"FJw-Gx-9U7.text" = "Page";
+
+/* Class = "UIBarButtonItem"; title = " "; ObjectID = "HEo-Mk-C1l"; */
+"HEo-Mk-C1l.title" = " ";
+
+/* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
+"IgN-wB-cSg.text" = "一部機能が利用できない場合があります";
+
+/* Class = "UILabel"; text = "Two pages mode"; ObjectID = "Nb4-pk-auH"; */
+"Nb4-pk-auH.text" = "ダブルページモード";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
+"P85-Tx-Jdt.text" = "Label";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
+"V6z-zU-NJK.text" = "Title";
+
+/* Class = "UILabel"; text = "Scroll Direction"; ObjectID = "c6G-KP-IC3"; */
+"c6G-KP-IC3.text" = "スクロール方向";
+
+/* Class = "UILabel"; text = "For Arabic and vertical CJK"; ObjectID = "e71-mL-mL8"; */
+"e71-mL-mL8.text" = "縦書きやアラビア語のため";
+
+/* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
+"fOs-we-IUy.text" = "右から左へ表示";
+
+/* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
+"nNe-pC-STL.text" = "この書類は保護されているため";
+
+/* Class = "UILabel"; text = "Vertical"; ObjectID = "p96-se-Myf"; */
+"p96-se-Myf.text" = "縦方向";
+
+/* Class = "UILabel"; text = "One page in landscape"; ObjectID = "xRC-KL-XPa"; */
+"xRC-KL-XPa.text" = "横向きでシングルページを表示";
