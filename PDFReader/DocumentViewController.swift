@@ -17,7 +17,7 @@ protocol SettingsDelegate {
     func writing(vertically: Bool, rightToLeft: Bool) -> Void
 }
 
-class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate, UISearchBarDelegate {
+class DocumentViewController: UIViewController, UIPopoverPresentationControllerDelegate, SettingsDelegate {
     
     @IBOutlet weak var pdfView: PDFView!
     
@@ -73,10 +73,7 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         navigationController?.hidesBarsOnTap = true
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
 
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.delegate = self
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
+        setUpSearch()
         
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
@@ -216,18 +213,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         setNeedsUpdateOfHomeIndicatorAutoHidden()
     }
     
-    func updateSearchController() {
-        if let navigationController = navigationController, let searchController = navigationItem.searchController {
-            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden
-            
-            if navigationController.isNavigationBarHidden {
-                self.additionalSafeAreaInsets.top = -64 // fixed by a magic num
-            }
-            else {
-                self.additionalSafeAreaInsets.top = 0
-            }
-        }
-    }
     
     func getScaleFactorForSizeToFit() {
         let frame = pdfView.frame
@@ -299,17 +284,6 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         }
     }
     
-    // MARK: - UISearchBarDelegate
-
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if (searchBar.text != nil) {
-            let selection = PDFSelection.init(document: self.pdfView.document!)
-            if let selection = pdfView.document?.findString(searchBar.text!, fromSelection: selection, withOptions: .regularExpression) {
-                pdfView.setCurrentSelection(selection, animate: true)
-            }
-        }
-    }
-
     @IBAction func shareAction() {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
@@ -339,4 +313,38 @@ class DocumentViewController: UIViewController, UIPopoverPresentationControllerD
         return .none
     }
     
+}
+
+// MARK: - UISearch
+
+extension DocumentViewController: UISearchBarDelegate {
+    
+    func setUpSearch() {
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+    }
+    
+    func updateSearchController() {
+        if let navigationController = navigationController, let searchController = navigationItem.searchController {
+            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden
+            
+            if navigationController.isNavigationBarHidden {
+                self.additionalSafeAreaInsets.top = -64 // fixed by a magic num
+            }
+            else {
+                self.additionalSafeAreaInsets.top = 0
+            }
+        }
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if (searchBar.text != nil) {
+            let selection = PDFSelection.init(document: self.pdfView.document!)
+            if let selection = pdfView.document?.findString(searchBar.text!, fromSelection: selection, withOptions: .regularExpression) {
+                pdfView.setCurrentSelection(selection, animate: true)
+            }
+        }
+    }
 }
