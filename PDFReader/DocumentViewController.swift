@@ -57,6 +57,7 @@ class DocumentViewController: UIViewController {
     @IBOutlet weak var pdfView: PDFView!
     
     var document: Document?
+    var searchBarText: String?
     
     // data
     var managedObjectContext: NSManagedObjectContext? = nil
@@ -181,6 +182,7 @@ class DocumentViewController: UIViewController {
             view.backgroundColor = presentingViewController?.view.backgroundColor
             view.tintColor = presentingViewController?.view.tintColor
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
+            navigationController?.toolbar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
         }
     }
@@ -280,7 +282,8 @@ class DocumentViewController: UIViewController {
     
     func setPDFThumbnailView() {
         if let margins = navigationController?.toolbar.safeAreaLayoutGuide {
-            let pdfThumbnailView = PDFThumbnailView.init()
+            let pdfThumbnailView = PDFThumbnailView()
+            pdfThumbnailView.tag = 1
             pdfThumbnailView.pdfView = pdfView
             pdfThumbnailView.layoutMode = .horizontal
             pdfThumbnailView.translatesAutoresizingMaskIntoConstraints = false
@@ -503,6 +506,16 @@ class DocumentViewController: UIViewController {
         updateScrollDirection()
     }
     
+    // MARK: - IBAction
+
+    @IBAction func searchPrevious(_ sender: UIBarButtonItem) {
+        searchText(withOptions: .backwards)
+    }
+    
+    @IBAction func searchNext(_ sender: UIBarButtonItem) {
+        searchText(withOptions: .regularExpression)
+    }
+    
     @IBAction func shareAction() {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
@@ -669,11 +682,13 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
 
 // MARK: - UISearch
 
-extension DocumentViewController: UISearchBarDelegate {
+extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegate {
     
     func setUpSearch() {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
+        searchController.delegate = self
+        searchController.dimsBackgroundDuringPresentation = false
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
     }
@@ -691,12 +706,60 @@ extension DocumentViewController: UISearchBarDelegate {
         }
     }
     
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if (searchBar.text != nil) {
-            let selection = PDFSelection.init(document: self.pdfView.document!)
-            if let selection = pdfView.document?.findString(searchBar.text!, fromSelection: selection, withOptions: .regularExpression) {
-                pdfView.setCurrentSelection(selection, animate: true)
+    func searchText(withOptions options: NSString.CompareOptions) {
+        if let text = searchBarText {
+            if pdfView.currentSelection == nil, let currentPage = pdfView.currentPage {
+                // a workaround to search text from current page
+                let selection = currentPage.selection(for: currentPage.bounds(for: pdfView.displayBox))
+                pdfView.setCurrentSelection(selection, animate: false)
+            }
+            if let newSelection = pdfView.document?.findString(text, fromSelection: pdfView.currentSelection, withOptions: options) {
+                pdfView.go(to: newSelection)
+                pdfView.setCurrentSelection(newSelection, animate: true)
+            } else {
+                // for workaround: clear selected if no real search results returned
+                pdfView.clearSelection()
             }
         }
     }
+    
+    // UISearchBarDelegate
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchBarText = searchBar.text
+        if isPageExchangedForRTL {
+            searchText(withOptions: .backwards)
+        } else {
+            searchText(withOptions: .regularExpression)
+        }
+    }
+    
+    // UISearchControllerDelegate
+    
+    func willPresentSearchController(_ searchController: UISearchController) {
+        if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
+            pdfThumbnailView.isHidden = true
+        }
+        if let items = navigationController?.toolbar.items {
+            for item in items {
+                item.isEnabled = true
+                item.tintColor = view.tintColor
+            }
+        }
+        navigationController?.hidesBarsOnTap = false
+    }
+    
+    func willDismissSearchController(_ searchController: UISearchController) {
+        if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
+            pdfThumbnailView.isHidden = false
+        }
+        if let items = navigationController?.toolbar.items {
+            for item in items {
+                item.isEnabled = false
+                item.tintColor = .clear
+            }
+        }
+        navigationController?.hidesBarsOnTap = true
+    }
+
 }
