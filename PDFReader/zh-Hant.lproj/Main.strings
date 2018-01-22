@@ -32,5 +32,5 @@
 /* Class = "UILabel"; text = "Vertical"; ObjectID = "p96-se-Myf"; */
 "p96-se-Myf.text" = "垂直";
 
-/* Class = "UILabel"; text = "One page in landscape"; ObjectID = "xRC-KL-XPa"; */
+/* Class = "UILabel"; text = "Single page in landscape"; ObjectID = "xRC-KL-XPa"; */
 "xRC-KL-XPa.text" = "橫向時單頁";
