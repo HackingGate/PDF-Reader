@@ -9,7 +9,7 @@
 "IgN-wB-cSg.text" = "一部機能が利用できない場合があります";
 
 /* Class = "UILabel"; text = "Two pages mode"; ObjectID = "Nb4-pk-auH"; */
-"Nb4-pk-auH.text" = "ダブルページモード";
+"Nb4-pk-auH.text" = "2ページモード";
 
 /* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
 "P85-Tx-Jdt.text" = "Label";
@@ -32,5 +32,5 @@
 /* Class = "UILabel"; text = "Vertical"; ObjectID = "p96-se-Myf"; */
 "p96-se-Myf.text" = "縦方向";
 
-/* Class = "UILabel"; text = "One page in landscape"; ObjectID = "xRC-KL-XPa"; */
+/* Class = "UILabel"; text = "Single page in landscape"; ObjectID = "xRC-KL-XPa"; */
 "xRC-KL-XPa.text" = "横向きでシングルページを表示";

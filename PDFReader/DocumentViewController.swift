@@ -63,7 +63,14 @@ class DocumentViewController: UIViewController {
     var managedObjectContext: NSManagedObjectContext? = nil
     var pageIndex: Int64 = 0
     var currentEntity: DocumentEntity? = nil
-    var currentCKRecords: [CKRecord]? = nil
+    var currentCKRecords: [CKRecord]? {
+        didSet {
+            if didMoveToLastViewedPage {
+                checkForNewerRecords()
+            }
+        }
+    }
+    var didMoveToLastViewedPage = false
     
     // scaleFactor
     struct ScaleFactor {
@@ -460,6 +467,7 @@ class DocumentViewController: UIViewController {
                 pdfView.scrollView?.contentOffset = currentOffset
             }
         }
+        didMoveToLastViewedPage = true
     }
     
     // call after moveToLastViewedPage()

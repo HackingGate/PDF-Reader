@@ -10,7 +10,7 @@
 "Horizontal" = "水平";
 "Vertical" = "垂直";
 "Two pages in landscape" = "横屏时双页";
-"One page in landscape" = "横屏时单页";
+"Single page in landscape" = "横屏时单页";
 
 //  DocumentViewController.swift
 "Found iCloud Data" = "找到iCloud数据";

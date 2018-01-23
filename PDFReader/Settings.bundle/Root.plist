@@ -6,6 +6,16 @@
 	<string>Root</string>
 	<key>PreferenceSpecifiers</key>
 	<array>
+        <dict>
+            <key>DefaultValue</key>
+            <string></string>
+            <key>Key</key>
+            <string>SNAppVersion</string>
+            <key>Title</key>
+            <string>Version</string>
+            <key>Type</key>
+            <string>PSTitleValueSpecifier</string>
+        </dict>
 		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
@@ -17,9 +27,9 @@
 			<integer>0</integer>
 			<key>Titles</key>
 			<array>
-				<string>white</string>
-				<string>light</string>
-				<string>dark</string>
+				<string>White theme Blue tint</string>
+				<string>Light theme Gray tint</string>
+				<string>Dark theme Orange tint</string>
 			</array>
 			<key>Values</key>
 			<array>

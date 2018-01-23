@@ -10,7 +10,7 @@
 "Horizontal" = "Horizontal";
 "Vertical" = "Vertical";
 "Two pages in landscape" = "Two pages in landscape";
-"One page in landscape" = "One page in landscape";
+"Single page in landscape" = "Single page in landscape";
 
 //  DocumentViewController.swift
 "Found iCloud Data" = "Found iCloud Data";
