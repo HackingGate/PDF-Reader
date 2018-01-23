@@ -155,6 +155,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                                 // there's already a currentEntity
                                 let context = fetchedResultsController.managedObjectContext
                                 context.delete(documentEntity)
+                                self.saveContext(context)
                             } else {
                                 currentEntity = documentEntity
                             }
@@ -167,6 +168,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                         let context = fetchedResultsController.managedObjectContext
                         print("deleting: \(documentEntity)")
                         context.delete(documentEntity)
+                        self.saveContext(context)
                     }
                 }
             }
