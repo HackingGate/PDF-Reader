@@ -91,7 +91,6 @@ class DocumentViewController: UIViewController {
     var isHorizontalScroll = false
     var isRightToLeft = false
     var isEncrypted = false
-//    var allowsDocumentAssembly = false
     var isPageExchangedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
     var prefersTwoUpInLandscapeForPad = false // default value
     
@@ -111,7 +110,6 @@ class DocumentViewController: UIViewController {
                 guard let pdfURL: URL = (self.document?.fileURL) else { return }
                 guard let document = PDFDocument(url: pdfURL) else { return }
                 
-//                self.allowsDocumentAssembly = document.allowsDocumentAssembly
                 self.isEncrypted = document.isEncrypted
                 
                 self.pdfView.document = document

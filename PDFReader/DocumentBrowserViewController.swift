@@ -28,10 +28,6 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
 
         delegate = self
         
-        if !UserDefaults.standard.bool(forKey: "deleteInvalidateCKRecords") {
-            deleteInvalidateCKRecords()
-        }
-        
         allowsDocumentCreation = false
         allowsPickingMultipleItems = false
         
@@ -155,6 +151,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                                 // there's already a currentEntity
                                 let context = fetchedResultsController.managedObjectContext
                                 context.delete(documentEntity)
+                                self.saveContext(context)
                             } else {
                                 currentEntity = documentEntity
                             }
@@ -167,6 +164,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                         let context = fetchedResultsController.managedObjectContext
                         print("deleting: \(documentEntity)")
                         context.delete(documentEntity)
+                        self.saveContext(context)
                     }
                 }
             }
@@ -181,31 +179,6 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         privateCloudDatabase.perform(query, inZoneWith: nil, completionHandler: { (records: [CKRecord]?, error: Error?) in
             completionHandler(records, error)
         })
-    }
-    
-    func deleteInvalidateCKRecords() {
-        let predicate = NSPredicate(value: true)
-        let query = CKQuery(recordType: "Document", predicate: predicate)
-        privateCloudDatabase.perform(query, inZoneWith: nil) { (records: [CKRecord]?, error: Error?) in
-            if let error = error {
-                print(error)
-            } else if let records = records {
-                for record in records {
-                    var recordIDsToDelete: [CKRecordID] = []
-                    if (record.object(forKey: "shortPath") == nil) {
-                        recordIDsToDelete.insert(record.recordID, at: 0)
-                    }
-                    
-                    let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: recordIDsToDelete)
-                    operation.modifyRecordsCompletionBlock = {
-                        (savedRecords: [CKRecord]?, deletedRecordIDs: [CKRecordID]?, error: Error?) in
-                        UserDefaults.standard.set(true, forKey: "deleteInvalidateCKRecords")
-                    }
-                    
-                    self.privateCloudDatabase.add(operation)
-                }
-            }
-        }
     }
     
     // MARK: - Fetched results controller
