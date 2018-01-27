@@ -18,6 +18,7 @@ protocol SettingsDelegate {
     var allowsDocumentAssembly: Bool { get }
     var prefersTwoUpInLandscapeForPad: Bool { get }
     var displayMode: PDFDisplayMode { get }
+    var isFindOnPageEnabled: Bool { get set }
     func updateScrollDirection() -> Void
     func goToPage(page: PDFPage) -> Void
     func selectOutline(outline: PDFOutline) -> Void
@@ -57,7 +58,19 @@ class DocumentViewController: UIViewController {
     @IBOutlet weak var pdfView: PDFView!
     
     var document: Document?
+    
+    // search
     var searchBarText: String?
+    var isFindOnPageEnabled = false {
+        willSet {
+            self.enableSearch(newValue)
+        }
+    }
+    var searchController: UISearchController {
+        get {
+            return setUpSearch()
+        }
+    }
     
     // data
     var managedObjectContext: NSManagedObjectContext? = nil
@@ -138,13 +151,12 @@ class DocumentViewController: UIViewController {
     override func viewDidLoad() {
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
 
-        setUpSearch()
-        
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = false
         pdfView.displayBox = .cropBox
         if let documentEntity = self.currentEntity {
             prefersTwoUpInLandscapeForPad = documentEntity.prefersTwoUpInLandscapeForPad
+            isFindOnPageEnabled = documentEntity.isFindOnPage
         }
         if prefersTwoUpInLandscapeForPad && UIDevice.current.userInterfaceIdiom == .pad && UIApplication.shared.statusBarOrientation.isLandscape {
             pdfView.displayMode = .twoUpContinuous
@@ -316,7 +328,11 @@ class DocumentViewController: UIViewController {
     }
     
     override var prefersStatusBarHidden: Bool {
-        return navigationController?.isNavigationBarHidden == true && navigationItem.searchController?.isActive == false && navigationItem.searchController?.isBeingDismissed == false || super.prefersStatusBarHidden
+        if isFindOnPageEnabled {
+            return navigationController?.isNavigationBarHidden == true && navigationItem.searchController?.isActive == false && navigationItem.searchController?.isBeingDismissed == false || super.prefersStatusBarHidden
+        } else {
+            return navigationController?.isNavigationBarHidden == true || super.prefersStatusBarHidden
+        }
     }
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
@@ -597,6 +613,7 @@ class DocumentViewController: UIViewController {
         entity.isHorizontalScroll = self.isHorizontalScroll
         entity.isRightToLeft = self.isRightToLeft
         entity.prefersTwoUpInLandscapeForPad = self.prefersTwoUpInLandscapeForPad
+        entity.isFindOnPage = isFindOnPageEnabled
         
         // store user scale factor
         updateUserScaleFactorAndOffset(changeOrientation: false)
@@ -654,9 +671,8 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
-                var height = 289
+                var height = 333
                 if !isEncrypted {
-                    // 289 - 44 = 245
                     height -= 44
                 }
                 if UIDevice.current.userInterfaceIdiom != .pad {
@@ -690,24 +706,34 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
 
 extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegate {
     
-    func setUpSearch() {
+    func setUpSearch() -> UISearchController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
         searchController.delegate = self
         searchController.dimsBackgroundDuringPresentation = false
-        navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
+        return searchController
     }
     
     func updateSearchController() {
         if let navigationController = navigationController, let searchController = navigationItem.searchController {
-            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden
+            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden || !isFindOnPageEnabled
             
-            if navigationController.isNavigationBarHidden {
+            if navigationController.isNavigationBarHidden && isFindOnPageEnabled {
                 self.additionalSafeAreaInsets.top = -64 // fixed by a magic num
-            }
-            else {
+            } else {
                 self.additionalSafeAreaInsets.top = 0
+            }
+        }
+    }
+    
+    func enableSearch(_ enable: Bool) {
+        if let navigationController = navigationController, !navigationController.isNavigationBarHidden {
+            // interact when nav is not hidden
+            if enable {
+                navigationItem.searchController = searchController
+            } else {
+                navigationItem.searchController = nil
             }
         }
     }

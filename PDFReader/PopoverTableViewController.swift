@@ -22,6 +22,7 @@ class PopoverTableViewController: UITableViewController {
     @IBOutlet weak var twoUpSwitch: UISwitch!
     @IBOutlet weak var twoUpDetailLabel: UILabel!
     @IBOutlet weak var rightToLeftSwitch: UISwitch!
+    @IBOutlet weak var findOnPageSwitch: UISwitch!
     
     override func viewWillAppear(_ animated: Bool) {
         updateInterface()
@@ -80,6 +81,7 @@ class PopoverTableViewController: UITableViewController {
         updateTwoUp()
         updateRightToLeft()
         updateScrollDirection()
+        updateFindOnPage()
     }
     
     @objc func updateBrightness() {
@@ -119,6 +121,10 @@ class PopoverTableViewController: UITableViewController {
         } else if delegate.displayMode == .twoUpContinuous {
             rightToLeftSwitch.isEnabled = true
         }
+    }
+    
+    func updateFindOnPage() {
+        findOnPageSwitch.isOn = delegate.isFindOnPageEnabled
     }
     
     // MARK: Actions
@@ -180,6 +186,10 @@ class PopoverTableViewController: UITableViewController {
         updateScrollDirection()
     }
     
+    @IBAction func findOnPageSwitchValueChanged(_ sender: UISwitch) {
+        delegate.isFindOnPageEnabled = sender.isOn
+    }
+    
     @objc func didChangeOrientationHandler() {
         updateRightToLeft()
         updateScrollDirection()
@@ -191,7 +201,7 @@ class PopoverTableViewController: UITableViewController {
         if !delegate.isEncrypted && indexPath.row == 3 {
             return 0
         }
-        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 4 {
+        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 5 {
             return 0
         }
         return super.tableView(tableView, heightForRowAt: indexPath)
