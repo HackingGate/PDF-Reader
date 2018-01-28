@@ -201,6 +201,12 @@ class DocumentViewController: UIViewController {
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
             navigationController?.toolbar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
+            if navigationItem.searchController?.isActive == true, let items = navigationController?.toolbar.items {
+                for item in items {
+                    item.isEnabled = true
+                    item.tintColor = view.tintColor
+                }
+            }
         }
     }
     
@@ -531,11 +537,11 @@ class DocumentViewController: UIViewController {
     // MARK: - IBAction
 
     @IBAction func searchPrevious(_ sender: UIBarButtonItem) {
-        searchText(withOptions: .backwards)
+        searchText(withOptions: [.regularExpression, .backwards])
     }
     
     @IBAction func searchNext(_ sender: UIBarButtonItem) {
-        searchText(withOptions: .regularExpression)
+        searchText(withOptions: [.regularExpression])
     }
     
     @IBAction func shareAction() {
@@ -747,6 +753,21 @@ extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegat
             }
             if let newSelection = pdfView.document?.findString(text, fromSelection: pdfView.currentSelection, withOptions: options) {
                 pdfView.go(to: newSelection)
+                if let page = newSelection.pages.first {
+                    
+                    let selectionBounds = newSelection.bounds(for: page)
+                    let selectionBoundsInView = pdfView.convert(selectionBounds, from: page)
+                    
+                    if let scrollView = pdfView.scrollView {
+                        if selectionBoundsInView.origin.y < pdfView.safeAreaInsets.top {
+                            let offsetNeedToFix = pdfView.safeAreaInsets.top - selectionBoundsInView.origin.y
+                            scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - offsetNeedToFix)
+                        } else if selectionBoundsInView.origin.y + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
+                            let offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom)
+                            scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + offsetNeedToFix)
+                        }
+                    }
+                }
                 pdfView.setCurrentSelection(newSelection, animate: true)
             } else {
                 // for workaround: clear selected if no real search results returned
@@ -759,11 +780,7 @@ extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegat
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         searchBarText = searchBar.text
-        if isPageExchangedForRTL {
-            searchText(withOptions: .backwards)
-        } else {
-            searchText(withOptions: .regularExpression)
-        }
+        searchText(withOptions: [.regularExpression])
     }
     
     // UISearchControllerDelegate
