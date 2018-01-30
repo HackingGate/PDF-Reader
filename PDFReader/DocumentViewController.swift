@@ -250,6 +250,8 @@ class DocumentViewController: UIViewController {
                     }
                     pdfView.displayDirection = .vertical
                 }
+                pdfView.scrollView?.showsHorizontalScrollIndicator = pdfView.displayDirection == .horizontal
+                pdfView.scrollView?.showsVerticalScrollIndicator = pdfView.displayDirection == .vertical
             }
             
             // reset document to update interface
