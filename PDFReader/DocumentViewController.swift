@@ -95,6 +95,7 @@ class DocumentViewController: UIViewController {
     var scaleFactorForSizeToFit: ScaleFactor?
     var scaleFactorVertical: ScaleFactor?
     var scaleFactorHorizontal: ScaleFactor?
+    var zoomedIn = false
     
     // offset
     var offsetPortrait: CGPoint?
@@ -149,6 +150,10 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapGestureRecognizerHandler(_:)))
+        doubleTapGesture.numberOfTapsRequired = 2
+        pdfView.addGestureRecognizer(doubleTapGesture)
+        navigationController?.barHideOnTapGestureRecognizer.require(toFail: doubleTapGesture)
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
 
         pdfView.autoScales = true
@@ -267,6 +272,8 @@ class DocumentViewController: UIViewController {
                     }
                     pdfView.displayDirection = .vertical
                 }
+                pdfView.scrollView?.showsHorizontalScrollIndicator = pdfView.displayDirection == .horizontal
+                pdfView.scrollView?.showsVerticalScrollIndicator = pdfView.displayDirection == .vertical
             }
             
             // reset document to update interface
@@ -347,6 +354,102 @@ class DocumentViewController: UIViewController {
     
     override func prefersHomeIndicatorAutoHidden() -> Bool {
         return navigationController?.isToolbarHidden == true
+    }
+    
+    @objc func doubleTapGestureRecognizerHandler(_ sender: UITapGestureRecognizer) {
+        print(sender.location(in: pdfView))
+        
+        if pdfView.scaleFactor == pdfView.maxScaleFactor {
+            zoomedIn = true
+        }
+        if !zoomedIn {
+            updateUserScaleFactorAndOffset(changeOrientation: false)
+        }
+        var scaleFactor: CGFloat?
+        if let scaleFactorVertical = scaleFactorVertical, let scaleFactorHorizontal = scaleFactorHorizontal {
+            if UIApplication.shared.statusBarOrientation.isPortrait {
+                if pdfView.displayDirection == .vertical, pdfView.scaleFactor != scaleFactorVertical.portrait {
+                    scaleFactor = scaleFactorVertical.portrait
+                } else if pdfView.displayDirection == .horizontal, pdfView.scaleFactor != scaleFactorHorizontal.portrait {
+                    scaleFactor = scaleFactorHorizontal.portrait
+                }
+            } else if UIApplication.shared.statusBarOrientation.isLandscape {
+                if pdfView.displayDirection == .vertical, pdfView.scaleFactor != scaleFactorVertical.landscape {
+                    scaleFactor = scaleFactorVertical.landscape
+                } else if pdfView.displayDirection == .horizontal, pdfView.scaleFactor != scaleFactorHorizontal.landscape {
+                    scaleFactor = scaleFactorHorizontal.landscape
+                }
+            }
+        }
+        if let scaleFactor = scaleFactor {
+            // zoom out
+            pdfView.scrollView?.setZoomScale(scaleFactor, animated: true)
+            zoomedIn = false
+            return
+        }
+        
+        if let page = pdfView.page(for: sender.location(in: pdfView), nearest: false) {
+            // tap point in page space
+            let pagePoint = pdfView.convert(sender.location(in: pdfView), to: page)
+            if let scrollView = pdfView.scrollView {
+                
+                // normal zoom in
+                let locationInView = sender.location(in: pdfView)
+                let boundsInView = CGRect(x: locationInView.x - 64, y: locationInView.y - 64, width: 128, height: 128)
+                let boundsInPage = pdfView.convert(boundsInView, to: page)
+                var boundsInScroll = scrollView.convert(boundsInView, from: pdfView)
+                
+                if let selection = page.selectionForLine(at: pagePoint), selection.pages.first == page, let string = selection.string, string.count > 1 {
+                    // zoom in to fit text
+                    // selection bounds in page space
+                    let boundsInPage = selection.bounds(for: page)
+                    // selection bounds in view space
+                    let boundsInView = pdfView.convert(boundsInPage, from: page)
+                    // selection bounds in scroll space
+                    boundsInScroll = scrollView.convert(boundsInView, from: pdfView)
+                }
+                
+                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
+                    let safeAreaWidth = self.pdfView.frame.width - self.pdfView.safeAreaInsets.left - self.pdfView.safeAreaInsets.right
+                    let safeAreaHeight = self.pdfView.frame.height - self.pdfView.safeAreaInsets.top - self.pdfView.safeAreaInsets.bottom
+                    
+                    // + 10 to not override scroll indicator
+                    let widthMultiplier = safeAreaWidth / (boundsInScroll.size.width + 20)
+                    let heightMultiplier = safeAreaHeight / (boundsInScroll.size.height + 20)
+                    if widthMultiplier <= heightMultiplier {
+                        scrollView.setZoomScale(scrollView.zoomScale * widthMultiplier, animated: false)
+                    } else {
+                        scrollView.setZoomScale(scrollView.zoomScale * heightMultiplier, animated: false)
+                    }
+                    
+                    // recalculate
+                    if let selection = page.selectionForLine(at: pagePoint), selection.pages.first == page, let string = selection.string, string.count > 1 {
+                        // zoom in to fit text
+                        // selection bounds in page space
+                        let boundsInPage = selection.bounds(for: page)
+                        // selection bounds in view space
+                        let boundsInView = self.pdfView.convert(boundsInPage, from: page)
+                        // selection bounds in scroll space
+                        boundsInScroll = scrollView.convert(boundsInView, from: self.pdfView)
+                    } else {
+                        // normal zoom in
+                        // location bounds in view space
+                        let boundsInView = self.pdfView.convert(boundsInPage, from: page)
+                        // location bounds in scroll space
+                        boundsInScroll = scrollView.convert(boundsInView, from: self.pdfView)
+                    }
+                    
+                    // if navigation bar or tool bar is not hidden
+                    let diffYToFix = (self.pdfView.safeAreaInsets.top - self.pdfView.safeAreaInsets.bottom) / 2
+                    
+                    let offset = CGPoint(x: boundsInScroll.midX - self.pdfView.center.x, y: boundsInScroll.midY - self.pdfView.frame.height / 2 - diffYToFix)
+                    scrollView.setContentOffset(offset, animated: false)
+                }, completion: { (successful) in
+                    self.zoomedIn = successful
+                })
+                
+            }
+        }
     }
     
     @objc func barHideOnTapGestureRecognizerHandler() {
@@ -663,6 +766,25 @@ extension PDFView {
             }
         }
         return nil
+    }
+}
+
+extension DocumentViewController {
+    // MARK: - Custom Menus
+    
+    @objc func _lookup(_ sender: UIMenuController) {
+        if let term = pdfView.currentSelection?.string {
+            let referenceLibraryVC = UIReferenceLibraryViewController(term: term)
+            self.present(referenceLibraryVC, animated: true, completion: nil)
+        }
+    }
+    
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        print(action)
+        if action == #selector(_lookup(_:)) {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
     }
 }
 
