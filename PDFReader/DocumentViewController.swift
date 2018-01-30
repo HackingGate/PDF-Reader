@@ -704,6 +704,25 @@ class DocumentViewController: UIViewController {
     
 }
 
+extension DocumentViewController {
+    // MARK: - Custom Menus
+    
+    @objc func _lookup(_ sender: UIMenuController) {
+        if let term = pdfView.currentSelection?.string {
+            let referenceLibraryVC = UIReferenceLibraryViewController(term: term)
+            self.present(referenceLibraryVC, animated: true, completion: nil)
+        }
+    }
+    
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        print(action)
+        if action == #selector(_lookup(_:)) {
+            return true
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+}
+
 extension DocumentViewController: UIPopoverPresentationControllerDelegate {
     // MARK: - PopoverTableViewController Presentation
 
