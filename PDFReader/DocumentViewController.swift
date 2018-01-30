@@ -774,6 +774,9 @@ extension DocumentViewController {
     
     @objc func _lookup(_ sender: UIMenuController) {
         if let term = pdfView.currentSelection?.string {
+            if let searchController = navigationItem.searchController, searchController.isActive {
+                searchController.isActive = false
+            }
             let referenceLibraryVC = UIReferenceLibraryViewController(term: term)
             self.present(referenceLibraryVC, animated: true, completion: nil)
         }
