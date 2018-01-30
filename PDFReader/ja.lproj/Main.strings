@@ -26,6 +26,9 @@
 /* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
 "fOs-we-IUy.text" = "右から左へ表示";
 
+/* Class = "UILabel"; text = "Show search bar"; ObjectID = "lqS-U0-eSb"; */
+"lqS-U0-eSb.text" = "検索バーを表示";
+
 /* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
 "nNe-pC-STL.text" = "この書類は保護されているため";
 
@@ -34,3 +37,6 @@
 
 /* Class = "UILabel"; text = "Single page in landscape"; ObjectID = "xRC-KL-XPa"; */
 "xRC-KL-XPa.text" = "横向きでシングルページを表示";
+
+/* Class = "UILabel"; text = "Find on Page"; ObjectID = "yfD-uT-Kie"; */
+"yfD-uT-Kie.text" = "ページ内検索";

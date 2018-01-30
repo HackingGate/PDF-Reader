@@ -26,6 +26,9 @@
 /* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
 "fOs-we-IUy.text" = "从右至左显示";
 
+/* Class = "UILabel"; text = "Show search bar"; ObjectID = "lqS-U0-eSb"; */
+"lqS-U0-eSb.text" = "显示查找栏";
+
 /* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
 "nNe-pC-STL.text" = "此文件受到保护";
 
@@ -34,3 +37,6 @@
 
 /* Class = "UILabel"; text = "Single page in landscape"; ObjectID = "xRC-KL-XPa"; */
 "xRC-KL-XPa.text" = "横屏时单页";
+
+/* Class = "UILabel"; text = "Find on Page"; ObjectID = "yfD-uT-Kie"; */
+"yfD-uT-Kie.text" = "在页面内查找";
