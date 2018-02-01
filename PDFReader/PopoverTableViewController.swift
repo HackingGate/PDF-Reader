@@ -7,10 +7,13 @@
 //
 
 import UIKit
+import PDFKit
 
 class PopoverTableViewController: UITableViewController {
     
     var delegate: SettingsDelegate!
+    var pdfDocument: PDFDocument?
+    var displayBox: PDFDisplayBox = .cropBox
 
     @IBOutlet weak var brightnessSlider: UISlider!
     @IBOutlet weak var whiteStyleButton: UIButton!
@@ -64,6 +67,7 @@ class PopoverTableViewController: UITableViewController {
         darkStyleButton.tintColor = .clear
         presentingViewController?.view.tintColor = presentingViewController?.presentingViewController?.view.tintColor
         view.tintColor = presentingViewController?.view.tintColor
+        presentedViewController?.view.tintColor = presentingViewController?.view.tintColor
         let styleRawValue = UserDefaults.standard.integer(forKey: (presentingViewController?.presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey)
         if styleRawValue == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.white.rawValue {
 //            popoverPresentationController?.backgroundColor = .white
@@ -201,10 +205,32 @@ class PopoverTableViewController: UITableViewController {
         if !delegate.isEncrypted && indexPath.row == 3 {
             return 0
         }
-        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 5 {
+        if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 6 {
             return 0
         }
         return super.tableView(tableView, heightForRowAt: indexPath)
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 4 {
+            // search
+            let storyBoard = UIStoryboard(name: "Main", bundle: nil)
+            if let searchResultsTVC = storyBoard.instantiateViewController(withIdentifier: "SearchResults") as? SearchResultsTableViewController {
+                self.presentedViewController?.dismiss(animated: true, completion: nil)
+                searchResultsTVC.delegate = delegate
+                searchResultsTVC.pdfDocument = pdfDocument
+                searchResultsTVC.displayBox = displayBox
+                
+                let searchController =  UISearchController(searchResultsController: searchResultsTVC)
+                searchController.dimsBackgroundDuringPresentation = true
+                searchController.view.tintColor = view.tintColor
+                searchController.searchResultsUpdater = searchResultsTVC
+                searchController.searchBar.delegate = searchResultsTVC
+                
+                self.present(searchController, animated: true, completion: nil)
+            }
+            
+        }
     }
 }
 

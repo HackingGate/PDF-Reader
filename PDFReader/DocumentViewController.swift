@@ -21,6 +21,9 @@ protocol SettingsDelegate {
     var isFindOnPageEnabled: Bool { get set }
     func updateScrollDirection() -> Void
     func goToPage(page: PDFPage) -> Void
+    func goToSelection(_ selection: PDFSelection) -> Void
+    func setCurrentSelection(_ selection: PDFSelection, animate: Bool) -> Void
+    func fullTextSearch(string: String) -> Void
     func selectOutline(outline: PDFOutline) -> Void
     func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) -> Void
 }
@@ -44,6 +47,29 @@ extension DocumentViewController: SettingsDelegate {
     
     func goToPage(page: PDFPage) {
         pdfView.go(to: page)
+    }
+    
+    func goToSelection(_ selection: PDFSelection) {
+        pdfView.go(to: selection)
+        if let page = selection.pages.first {
+            
+            let selectionBounds = selection.bounds(for: page)
+            let selectionBoundsInView = pdfView.convert(selectionBounds, from: page)
+            
+            if let scrollView = pdfView.scrollView {
+                if selectionBoundsInView.origin.y < pdfView.safeAreaInsets.top {
+                    let offsetNeedToFix = pdfView.safeAreaInsets.top - selectionBoundsInView.origin.y
+                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - offsetNeedToFix)
+                } else if selectionBoundsInView.origin.y + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
+                    let offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom)
+                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + offsetNeedToFix)
+                }
+            }
+        }
+    }
+    
+    func setCurrentSelection(_ selection: PDFSelection, animate: Bool) {
+        pdfView.setCurrentSelection(selection, animate: true)
     }
     
     func selectOutline(outline: PDFOutline) {
@@ -802,7 +828,9 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
-                var height = 333
+                popopverVC.pdfDocument = pdfView.document
+                popopverVC.displayBox = pdfView.displayBox
+                var height = 377
                 if !isEncrypted {
                     height -= 44
                 }
@@ -836,7 +864,13 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
 // MARK: - UISearch
 
 extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegate {
+    // full text search
+    func fullTextSearch(string: String) {
+        pdfView.document?.cancelFindString()
+        pdfView.document?.beginFindString(string, withOptions: [.regularExpression, .caseInsensitive])
+    }
     
+    // on page search
     func setUpSearch() -> UISearchController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
@@ -877,23 +911,8 @@ extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegat
                 pdfView.setCurrentSelection(selection, animate: false)
             }
             if let newSelection = pdfView.document?.findString(text, fromSelection: pdfView.currentSelection, withOptions: options) {
-                pdfView.go(to: newSelection)
-                if let page = newSelection.pages.first {
-                    
-                    let selectionBounds = newSelection.bounds(for: page)
-                    let selectionBoundsInView = pdfView.convert(selectionBounds, from: page)
-                    
-                    if let scrollView = pdfView.scrollView {
-                        if selectionBoundsInView.origin.y < pdfView.safeAreaInsets.top {
-                            let offsetNeedToFix = pdfView.safeAreaInsets.top - selectionBoundsInView.origin.y
-                            scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - offsetNeedToFix)
-                        } else if selectionBoundsInView.origin.y + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
-                            let offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom)
-                            scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + offsetNeedToFix)
-                        }
-                    }
-                }
-                pdfView.setCurrentSelection(newSelection, animate: true)
+                self.goToSelection(newSelection)
+                self.setCurrentSelection(newSelection, animate: true)
             } else {
                 // for workaround: clear selected if no real search results returned
                 pdfView.clearSelection()

@@ -23,6 +23,7 @@
 		76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */; };
 		76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */; };
 		76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */; };
+		76E88B8720215D190077920B /* SearchResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E88B8620215D190077920B /* SearchResultsTableViewController.swift */; };
 		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -54,6 +55,7 @@
 		76B2398120036BE300DE621B /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PDFReader.xcdatamodel; sourceTree = "<group>"; };
 		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
+		76E88B8620215D190077920B /* SearchResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsTableViewController.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -108,6 +110,7 @@
 				7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */,
 				76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */,
 				76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */,
+				76E88B8620215D190077920B /* SearchResultsTableViewController.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
@@ -230,6 +233,7 @@
 				76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */,
 				76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
+				76E88B8720215D190077920B /* SearchResultsTableViewController.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
 				76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */,
 				76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */,
