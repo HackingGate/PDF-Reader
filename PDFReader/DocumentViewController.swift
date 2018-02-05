@@ -413,7 +413,7 @@ class DocumentViewController: UIViewController {
                     let safeAreaWidth = self.pdfView.frame.width - self.pdfView.safeAreaInsets.left - self.pdfView.safeAreaInsets.right
                     let safeAreaHeight = self.pdfView.frame.height - self.pdfView.safeAreaInsets.top - self.pdfView.safeAreaInsets.bottom
                     
-                    // + 10 to not override scroll indicator
+                    // + 10 to not overlap scroll indicator
                     let widthMultiplier = safeAreaWidth / (boundsInScroll.size.width + 20)
                     let heightMultiplier = safeAreaHeight / (boundsInScroll.size.height + 20)
                     if widthMultiplier <= heightMultiplier {
