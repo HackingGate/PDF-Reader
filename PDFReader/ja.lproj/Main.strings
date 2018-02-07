@@ -1,9 +1,15 @@
 
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "AYx-Qk-dHD"; */
+"AYx-Qk-dHD.text" = "Subtitle";
+
 /* Class = "UILabel"; text = "Page"; ObjectID = "FJw-Gx-9U7"; */
 "FJw-Gx-9U7.text" = "Page";
 
 /* Class = "UIBarButtonItem"; title = " "; ObjectID = "HEo-Mk-C1l"; */
 "HEo-Mk-C1l.title" = " ";
+
+/* Class = "UILabel"; text = "Full-text search"; ObjectID = "INT-C5-5vD"; */
+"INT-C5-5vD.text" = "全文検索";
 
 /* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
 "IgN-wB-cSg.text" = "一部機能が利用できない場合があります";
@@ -17,6 +23,9 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
 "V6z-zU-NJK.text" = "Title";
 
+/* Class = "UILabel"; text = "Search text within this document"; ObjectID = "aDz-lu-4Lc"; */
+"aDz-lu-4Lc.text" = "この書類から特定の文字列を検索する";
+
 /* Class = "UILabel"; text = "Scroll Direction"; ObjectID = "c6G-KP-IC3"; */
 "c6G-KP-IC3.text" = "スクロール方向";
 
@@ -25,6 +34,9 @@
 
 /* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
 "fOs-we-IUy.text" = "右から左へ表示";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "gy0-EG-D34"; */
+"gy0-EG-D34.text" = "Title";
 
 /* Class = "UILabel"; text = "Show search bar"; ObjectID = "lqS-U0-eSb"; */
 "lqS-U0-eSb.text" = "検索バーを表示";
