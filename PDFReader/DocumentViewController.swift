@@ -737,7 +737,8 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
-                var height = 289
+                let width = popopverVC.preferredContentSize.width
+                var height = popopverVC.preferredContentSize.height
                 if !isEncrypted {
                     // 289 - 44 = 245
                     height -= 44
@@ -746,7 +747,7 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                     height -= 44
                 }
                 
-                popopverVC.preferredContentSize = CGSize(width: 300, height: height)
+                popopverVC.preferredContentSize = CGSize(width: width, height: height)
 
             }
         } else if (segue.identifier == "Container") {
