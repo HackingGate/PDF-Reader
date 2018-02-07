@@ -137,7 +137,7 @@ class DocumentViewController: UIViewController {
     var isHorizontalScroll = false
     var isRightToLeft = false
     var isEncrypted = false
-    var isPageExchangedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
+    var isViewTransformedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
     var prefersTwoUpInLandscapeForPad = false // default value
     
     override func viewWillAppear(_ animated: Bool) {
@@ -165,14 +165,14 @@ class DocumentViewController: UIViewController {
                 self.setMinScaleFactorForSizeToFit()
                 self.setScaleFactorForUser()
                 
+                self.setPDFThumbnailView()
+                
                 if let documentEntity = self.currentEntity {
                     self.isHorizontalScroll = documentEntity.isHorizontalScroll
                     self.isRightToLeft = documentEntity.isRightToLeft
                     self.updateScrollDirection()
                 }
                 self.moveToLastViewedOffset()
-
-                self.setPDFThumbnailView()
                 
                 self.checkForNewerRecords()
             } else {
@@ -268,11 +268,11 @@ class DocumentViewController: UIViewController {
         // experimental feature
         if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
             if pdfView.displayMode == .singlePageContinuous && allowsDocumentAssembly {
-                if isRightToLeft != isPageExchangedForRTL {
+                if isRightToLeft != isViewTransformedForRTL {
                     if pdfView.displaysRTL {
                         pdfView.displaysRTL = false
                     }
-                    exchangePageForRTL(isRightToLeft)
+                    transformViewForRTL(isRightToLeft)
                 }
                 if isRightToLeft {
                     // single page RTL use horizontal scroll
@@ -282,8 +282,8 @@ class DocumentViewController: UIViewController {
                 }
             } else if pdfView.displayMode == .twoUpContinuous {
                 if isRightToLeft != pdfView.displaysRTL  {
-                    if isPageExchangedForRTL {
-                        exchangePageForRTL(false)
+                    if isViewTransformedForRTL {
+                        transformViewForRTL(false)
                     }
                     pdfView.displaysRTL = isRightToLeft
                 }
@@ -299,8 +299,8 @@ class DocumentViewController: UIViewController {
                 if isHorizontalScroll {
                     pdfView.displayDirection = .horizontal
                 } else {
-                    if isPageExchangedForRTL {
-                        exchangePageForRTL(false)
+                    if isViewTransformedForRTL {
+                        transformViewForRTL(false)
                     }
                     pdfView.displayDirection = .vertical
                 }
@@ -318,28 +318,25 @@ class DocumentViewController: UIViewController {
         setScaleFactorForUser()
     }
     
-    func exchangePageForRTL(_ exchange: Bool) {
-        if exchange != isPageExchangedForRTL, let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
-            let currentIndex: Int = document.index(for: currentPage)
-            print("currentIndex: \(currentIndex)")
+    func transformViewForRTL(_ transformForRTL: Bool) {
+        if transformForRTL != isViewTransformedForRTL, let scrollView = pdfView.scrollView, let document = pdfView.document {
             
-            // ページ交換ファンクションを利用して、降順ソートして置き換える。
-            let pageCount: Int = document.pageCount
+            scrollView.transform = CGAffineTransform(rotationAngle: transformForRTL ? .pi : 0)
+            
+            if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
+                pdfThumbnailView.transform = CGAffineTransform(rotationAngle: transformForRTL ? .pi : 0)
+            }
+
+            let pageCount = document.pageCount
             
             print("pageCount: \(pageCount)")
-            for i in 0..<pageCount/2 {
-                print("exchangePage at: \(i), withPageAt: \(pageCount-i-1)")
-                document.exchangePage(at: i, withPageAt: pageCount-i-1)
+            for i in 0..<pageCount {
+                document.page(at: i)?.rotation = transformForRTL ? 180 : 0
             }
-            if currentIndex != pageCount - currentIndex - 1 {
-                if let pdfPage = document.page(at: pageCount - currentIndex - 1) {
-                    print("go to: \(pageCount - currentIndex - 1)")
-                    pdfView.go(to: pdfPage)
-                }
-            }
+            
         }
         
-        isPageExchangedForRTL = exchange
+        isViewTransformedForRTL = transformForRTL
     }
     
     func setPDFThumbnailView() {
@@ -696,10 +693,7 @@ class DocumentViewController: UIViewController {
     @objc func saveAndClose() {
         guard let pdfDocument = pdfView.document else { return }
         if let currentPage = pdfView.currentPage {
-            var currentIndex = pdfDocument.index(for: currentPage)
-            if isRightToLeft {
-                currentIndex = pdfDocument.pageCount - currentIndex - 1
-            }
+            let currentIndex = pdfDocument.index(for: currentPage)
             if let documentEntity = currentEntity {
                 if let record = currentCKRecords?.first {
                     // if another device have the same bookmark but different recordID
@@ -855,6 +849,7 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
             if let containerVC: ContainerViewController = segue.destination as? ContainerViewController {
                 containerVC.pdfDocument = pdfView.document
                 containerVC.displayBox = pdfView.displayBox
+                containerVC.transformForRTL = isViewTransformedForRTL
                 if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
                     containerVC.currentIndex = document.index(for: currentPage)
                 }

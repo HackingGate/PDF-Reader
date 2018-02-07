@@ -18,6 +18,7 @@ class ContainerViewController: UIViewController {
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
     var displayBox: PDFDisplayBox = .cropBox
+    var transformForRTL: Bool = false
     var currentIndex: Int = 0
     
     @IBAction func segmentControlValueChanged(_ sender: UISegmentedControl) {
@@ -53,6 +54,7 @@ class ContainerViewController: UIViewController {
             if let thumbnailCollectionVC: ThumbnailCollectionViewController = segue.destination as? ThumbnailCollectionViewController {
                 thumbnailCollectionVC.pdfDocument = pdfDocument
                 thumbnailCollectionVC.displayBox = displayBox
+                thumbnailCollectionVC.transformForRTL = transformForRTL
                 thumbnailCollectionVC.currentIndex = currentIndex
                 thumbnailCollectionVC.delegate = delegate
             }

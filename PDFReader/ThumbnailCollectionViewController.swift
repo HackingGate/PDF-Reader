@@ -16,6 +16,7 @@ class ThumbnailCollectionViewController: UICollectionViewController {
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
     var displayBox: PDFDisplayBox = .cropBox
+    var transformForRTL: Bool = false
     var isWidthGreaterThanHeight: Bool = false
     var currentIndex: Int = 0
     var onceOnly = false
@@ -121,6 +122,8 @@ class ThumbnailCollectionViewController: UICollectionViewController {
                 }
             }
         }
+        
+        imageView?.transform = CGAffineTransform(rotationAngle: transformForRTL ? .pi : 0)
 
         cell.layer.shadowOffset = CGSize(width: 1, height: 1)
         cell.layer.shadowColor = UIColor.black.cgColor
