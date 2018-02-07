@@ -839,7 +839,8 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.delegate = self
                 popopverVC.pdfDocument = pdfView.document
                 popopverVC.displayBox = pdfView.displayBox
-                var height = 377
+                let width = popopverVC.preferredContentSize.width
+                var height = popopverVC.preferredContentSize.height
                 if !isEncrypted {
                     height -= 44
                 }
@@ -847,7 +848,7 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                     height -= 44
                 }
                 
-                popopverVC.preferredContentSize = CGSize(width: 300, height: height)
+                popopverVC.preferredContentSize = CGSize(width: width, height: height)
 
             }
         } else if (segue.identifier == "Container") {
