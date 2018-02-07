@@ -579,7 +579,10 @@ class DocumentViewController: UIViewController {
                 alertController.addAction(cancelAction)
                 alertController.addAction(defaultAction)
                 
-                present(alertController, animated: true, completion: nil)
+                // fix crash 'NSInternalInconsistencyException', reason: 'accessing _cachedSystemAnimationFence requires the main thread'
+                DispatchQueue.main.async {
+                    self.present(alertController, animated: true, completion: nil)
+                }
             }
         }
     }
