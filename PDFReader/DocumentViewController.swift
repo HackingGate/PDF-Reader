@@ -95,12 +95,12 @@ class DocumentViewController: UIViewController {
     var searchBarText: String?
     var isFindOnPageEnabled = false {
         willSet {
-            self.enableSearch(newValue)
+            self.setSearchEnabled(newValue)
         }
     }
     var searchController: UISearchController {
         get {
-            return setUpSearch()
+            return createSearchController()
         }
     }
     
@@ -880,7 +880,7 @@ extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegat
     }
     
     // on page search
-    func setUpSearch() -> UISearchController {
+    func createSearchController() -> UISearchController {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
         searchController.delegate = self
@@ -901,13 +901,16 @@ extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegat
         }
     }
     
-    func enableSearch(_ enable: Bool) {
+    func setSearchEnabled(_ enable: Bool) {
         if let navigationController = navigationController, !navigationController.isNavigationBarHidden {
             // interact when nav is not hidden
             if enable {
                 navigationItem.searchController = searchController
             } else {
                 navigationItem.searchController = nil
+                // workaround to update UI
+                navigationController.setNavigationBarHidden(true, animated: false)
+                navigationController.setNavigationBarHidden(false, animated: false)
             }
         }
     }
