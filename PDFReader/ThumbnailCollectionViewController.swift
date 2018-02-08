@@ -29,8 +29,7 @@ class ThumbnailCollectionViewController: UICollectionViewController {
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
-
-        // Do any additional setup after loading the view.
+        collectionView?.semanticContentAttribute = delegate.isRightToLeft ? .forceRightToLeft : .forceLeftToRight
         
         let page0 = pdfDocument?.page(at: 0)
         let page1 = pdfDocument?.page(at: 1)
