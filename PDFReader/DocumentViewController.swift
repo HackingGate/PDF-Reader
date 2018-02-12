@@ -169,7 +169,7 @@ class DocumentViewController: UIViewController {
                            object: nil)
         center.addObserver(self,
                            selector: #selector(willChangeOrientationHandler),
-                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           name: .UIApplicationWillChangeStatusBarOrientation,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),
