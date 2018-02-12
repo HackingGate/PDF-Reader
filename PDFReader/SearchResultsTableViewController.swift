@@ -165,6 +165,14 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
 }
 
 extension SearchResultsTableViewController: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text.contains(" ") {
+            // fix crash
+            return false
+        }
+        return true
+    }
+    
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == currentSearchText {
             tableView.dataSource = self
