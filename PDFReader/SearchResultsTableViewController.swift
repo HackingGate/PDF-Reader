@@ -43,14 +43,14 @@ class SearchResultsTableViewController: UITableViewController {
     func updateStatusLabel(showResult: Bool) {
         if showResult {
             if searchResults.count > 1 {
-                statusLabel.text = "\(searchResults.count) matches found"
+                statusLabel.text = String(format: NSLocalizedString("%d matches found", comment: "matches found"), searchResults.count)
             } else if searchResults.count == 1 {
-                statusLabel.text = "1 match found"
+                statusLabel.text = NSLocalizedString("1 match found", comment: "1 match")
             } else {
-                statusLabel.text = "No matches found"
+                statusLabel.text = NSLocalizedString("No matches found", comment: "no match")
             }
         } else {
-            statusLabel.text = "Tap Search to start"
+            statusLabel.text = ""
         }
     }
 
@@ -105,7 +105,7 @@ class SearchResultsTableViewController: UITableViewController {
                 textLabel.text = "\(outlineLabel) "
             }
             if let pageLabel = page.label {
-                textLabel.text?.append(contentsOf: "Page \(pageLabel)")
+                textLabel.text?.append(contentsOf: String(format: NSLocalizedString("Page %@", comment: "page index"), pageLabel))
             }
         }
         
@@ -152,7 +152,7 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
     }
     
     func documentDidBeginPageFind(_ notification: Notification) {
-        statusLabel.text = "Searching..."
+        statusLabel.text = NSLocalizedString("Searching...", comment: "searching")
         if let userInfo = notification.userInfo, let index = userInfo["PDFDocumentPageIndex"] as? Int, let pageCount = pdfDocument?.pageCount {
             progressView.progress = Float(index+1) / Float(pageCount)
         }
