@@ -224,7 +224,6 @@ class PopoverTableViewController: UITableViewController {
                 let searchController =  UISearchController(searchResultsController: searchResultsTVC)
                 searchController.dimsBackgroundDuringPresentation = true
                 searchController.view.tintColor = view.tintColor
-                searchController.searchResultsUpdater = searchResultsTVC
                 searchController.searchBar.delegate = searchResultsTVC
                 
                 self.present(searchController, animated: true, completion: nil)

@@ -50,7 +50,7 @@ extension DocumentViewController: SettingsDelegate {
     }
     
     func goToSelection(_ selection: PDFSelection) {
-        pdfView.go(to: selection)
+        pdfView.go(to: selection) // stops scrolling
         if let page = selection.pages.first {
             
             let selectionBounds = selection.bounds(for: page)
@@ -220,7 +220,7 @@ class DocumentViewController: UIViewController {
                            object: nil)
         center.addObserver(self,
                            selector: #selector(willChangeOrientationHandler),
-                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           name: .UIApplicationWillChangeStatusBarOrientation,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),

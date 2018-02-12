@@ -18,3 +18,10 @@
 "Last Viewed Page:" = "Last Viewed Page:";
 "Move" = "Move";
 "Cancel" = "Cancel";
+
+//  SearchResultsTableViewController.swift
+"%d matches found" = "%d matches found";
+"1 match found" = "1 match found";
+"No matches found" = "No matches found";
+"Page %@" = "Page %@";
+"Searching..." = "Searching...";

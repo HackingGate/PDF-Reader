@@ -18,3 +18,10 @@
 "Last Viewed Page:" = "上次閱讀的最後一頁：";
 "Move" = "移動";
 "Cancel" = "取消";
+
+//  SearchResultsTableViewController.swift
+"%d matches found" = "找到%d個配對";
+"1 match found" = "找到1個配對";
+"No matches found" = "沒有找到配對";
+"Page %@" = "頁面 %@";
+"Searching..." = "搜尋中...";
