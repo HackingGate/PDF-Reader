@@ -11,10 +11,15 @@ import PDFKit
 
 class SearchResultsTableViewController: UITableViewController {
     
+    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet var footerView: UIView!
+    @IBOutlet weak var statusLabel: UILabel!
+    
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
     var displayBox: PDFDisplayBox = .cropBox
     var searchResults = [PDFSelection]()
+    var currentSearchText = ""
     
     override func viewWillAppear(_ animated: Bool) {
         if let presentingViewController = presentingViewController as? PopoverTableViewController {
@@ -32,6 +37,21 @@ class SearchResultsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         pdfDocument?.delegate = self
+        updateStatusLabel(showResult: false)
+    }
+    
+    func updateStatusLabel(showResult: Bool) {
+        if showResult {
+            if searchResults.count > 1 {
+                statusLabel.text = "\(searchResults.count) matches found"
+            } else if searchResults.count == 1 {
+                statusLabel.text = "1 match found"
+            } else {
+                statusLabel.text = "No matches found"
+            }
+        } else {
+            statusLabel.text = "Tap Search to start"
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,6 +65,20 @@ class SearchResultsTableViewController: UITableViewController {
         return 1
     }
 
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if section == 0 {
+            return footerView.bounds.height
+        }
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if section == 0 {
+            return footerView
+        }
+        return nil
+    }
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return searchResults.count
     }
@@ -92,6 +126,12 @@ class SearchResultsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selection = searchResults[indexPath.row]
+        
+        if UIDevice.current.userInterfaceIdiom != .pad {
+            self.dismiss(animated: false, completion: nil)
+            self.presentingViewController?.dismiss(animated: false, completion: nil)
+        }
+        
         delegate.goToSelection(selection)
         delegate.setCurrentSelection(selection, animate: true)
     }
@@ -102,20 +142,51 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
     func didMatchString(_ instance: PDFSelection) {
         if instance.string != nil && instance.pages.count != 0 {
             searchResults.append(instance)
-            tableView.reloadData()
+            if tableView.dataSource != nil {
+                tableView.beginUpdates()
+                let indexPath = IndexPath(row: searchResults.count-1, section: 0)
+                tableView.insertRows(at: [indexPath], with: .none)
+                tableView.endUpdates()
+            }
         }
     }
+    
+    func documentDidBeginPageFind(_ notification: Notification) {
+        statusLabel.text = "Searching..."
+        if let userInfo = notification.userInfo, let index = userInfo["PDFDocumentPageIndex"] as? Int, let pageCount = pdfDocument?.pageCount {
+            progressView.progress = Float(index+1) / Float(pageCount)
+        }
+    }
+    
+    func documentDidEndDocumentFind(_ notification: Notification) {
+        updateStatusLabel(showResult: true)
+    }
+    
 }
 
 extension SearchResultsTableViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        delegate.fullTextSearch(string: searchText)
+        if searchText == currentSearchText {
+            tableView.dataSource = self
+            tableView.reloadData()
+            updateStatusLabel(showResult: true)
+        } else {
+            tableView.dataSource = nil
+            tableView.reloadData()
+            updateStatusLabel(showResult: false)
+        }
     }
-}
-
-extension SearchResultsTableViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        if searchBar.text == currentSearchText {
+            return
+        }
+        tableView.dataSource = self
         searchResults.removeAll()
         tableView.reloadData()
+        if let searchText = searchBar.text {
+            currentSearchText = searchText
+            delegate.fullTextSearch(string: currentSearchText)
+        }
     }
 }
