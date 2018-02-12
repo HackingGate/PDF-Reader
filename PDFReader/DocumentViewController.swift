@@ -50,25 +50,30 @@ extension DocumentViewController: SettingsDelegate {
     }
     
     func goToSelection(_ selection: PDFSelection) {
+        pdfView.go(to: selection)
         if let page = selection.pages.first {
             
             let selectionBounds = selection.bounds(for: page)
             let selectionBoundsInView = pdfView.convert(selectionBounds, from: page)
             
             if let scrollView = pdfView.scrollView {
-                if selectionBoundsInView.origin.y - 10 < pdfView.safeAreaInsets.top {
-                    let offsetNeedToFix = pdfView.safeAreaInsets.top - selectionBoundsInView.origin.y + 10
+                let inset: CGFloat = 10
+                
+                if selectionBoundsInView.origin.y - inset < pdfView.safeAreaInsets.top {
+                    let offsetNeedToFix = pdfView.safeAreaInsets.top - selectionBoundsInView.origin.y + inset
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - offsetNeedToFix)
-                } else if selectionBoundsInView.origin.y + 10 + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
-                    let offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom) + 10
+                } else if selectionBoundsInView.origin.y + inset + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
+                    var offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom) + inset
+                    if isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + offsetNeedToFix)
                 }
-                if selectionBoundsInView.origin.x - 10 < pdfView.safeAreaInsets.left {
-                    let offsetNeedToFix = pdfView.safeAreaInsets.left - selectionBoundsInView.origin.x + 10
+                if selectionBoundsInView.origin.x - inset < pdfView.safeAreaInsets.left {
+                    var offsetNeedToFix = pdfView.safeAreaInsets.left - selectionBoundsInView.origin.x + inset
+                    if isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x - offsetNeedToFix, y: scrollView.contentOffset.y)
-                } else if selectionBoundsInView.origin.x + 10 + selectionBoundsInView.width > pdfView.frame.size.width - pdfView.safeAreaInsets.right {
-                    let offsetNeedToFix = (selectionBoundsInView.origin.x + selectionBoundsInView.width) - (pdfView.frame.size.width - pdfView.safeAreaInsets.right) + 10
-                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + offsetNeedToFix, y: scrollView.contentOffset.y)
+                } else if selectionBoundsInView.origin.x + inset + selectionBoundsInView.width > pdfView.frame.size.width - pdfView.safeAreaInsets.right {
+                    let offsetNeedToFix = (selectionBoundsInView.origin.x + selectionBoundsInView.width) - (pdfView.frame.size.width - pdfView.safeAreaInsets.right) + inset
+                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x - offsetNeedToFix, y: scrollView.contentOffset.y)
                 }
             }
         }
