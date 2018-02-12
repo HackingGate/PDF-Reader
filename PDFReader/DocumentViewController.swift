@@ -50,6 +50,7 @@ extension DocumentViewController: SettingsDelegate {
     }
     
     func goToSelection(_ selection: PDFSelection) {
+        pdfView.go(to: selection) // stops scrolling
         if let page = selection.pages.first {
             
             let selectionBounds = selection.bounds(for: page)
