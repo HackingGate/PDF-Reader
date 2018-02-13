@@ -676,12 +676,20 @@ class DocumentViewController: UIViewController {
     
     // MARK: - IBAction
 
-    @IBAction func searchPrevious(_ sender: UIBarButtonItem) {
-        searchText(withOptions: [.regularExpression, .backwards])
+    @IBAction func searchLeft(_ sender: UIBarButtonItem) {
+        if isRightToLeft {
+            searchText(withOptions: [.regularExpression])
+        } else {
+            searchText(withOptions: [.regularExpression, .backwards])
+        }
     }
     
-    @IBAction func searchNext(_ sender: UIBarButtonItem) {
-        searchText(withOptions: [.regularExpression])
+    @IBAction func searchRight(_ sender: UIBarButtonItem) {
+        if isRightToLeft {
+            searchText(withOptions: [.regularExpression, .backwards])
+        } else {
+            searchText(withOptions: [.regularExpression])
+        }
     }
     
     @IBAction func shareAction() {
