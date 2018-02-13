@@ -23,5 +23,5 @@
 "%d matches found" = "找到 %d 个匹配";
 "1 match found" = "找到 1 个匹配";
 "No matches found" = "没有找到匹配";
-"Page %@" = "页 %@";
+"Page %@" = "第%@页";
 "Searching..." = "正在搜索...";
