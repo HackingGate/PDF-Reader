@@ -20,8 +20,8 @@
 "Cancel" = "取消";
 
 //  SearchResultsTableViewController.swift
-"%d matches found" = "搵到%d個配對";
-"1 match found" = "搵到1個配對";
-"No matches found" = "未搵到配對";
-"Page %@" = "頁 %@";
+"%d matches found" = "搵到 %d 個匹配";
+"1 match found" = "搵到 1 個匹配";
+"No matches found" = "未搵到匹配";
+"Page %@" = "第%@頁";
 "Searching..." = "搵緊...";
