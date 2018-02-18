@@ -183,6 +183,8 @@ class DocumentViewController: UIViewController {
     }
     
     override func viewDidLoad() {
+        enableCustomMenus()
+        
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapGestureRecognizerHandler(_:)))
         doubleTapGesture.numberOfTapsRequired = 2
         pdfView.addGestureRecognizer(doubleTapGesture)
@@ -808,7 +810,12 @@ extension PDFView {
 extension DocumentViewController {
     // MARK: - Custom Menus
     
-    @objc func _lookup(_ sender: UIMenuController) {
+    func enableCustomMenus() {
+        let define = UIMenuItem(title: NSLocalizedString("Define", comment: "define"), action: #selector(define(_:)))
+        UIMenuController.shared.menuItems = [define]
+    }
+    
+    @objc func define(_ sender: UIMenuController) {
         if let term = pdfView.currentSelection?.string {
             if let searchController = navigationItem.searchController, searchController.isActive {
                 searchController.isActive = false
@@ -816,14 +823,6 @@ extension DocumentViewController {
             let referenceLibraryVC = UIReferenceLibraryViewController(term: term)
             self.present(referenceLibraryVC, animated: true, completion: nil)
         }
-    }
-    
-    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        print(action)
-        if action == #selector(_lookup(_:)) {
-            return true
-        }
-        return super.canPerformAction(action, withSender: sender)
     }
 }
 
