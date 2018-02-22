@@ -37,20 +37,15 @@ class SearchResultsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         pdfDocument?.delegate = self
-        updateStatusLabel(showResult: false)
     }
     
-    func updateStatusLabel(showResult: Bool) {
-        if showResult {
-            if searchResults.count > 1 {
-                statusLabel.text = String(format: NSLocalizedString("%d matches found", comment: "matches found"), searchResults.count)
-            } else if searchResults.count == 1 {
-                statusLabel.text = NSLocalizedString("1 match found", comment: "1 match")
-            } else {
-                statusLabel.text = NSLocalizedString("No matches found", comment: "no match")
-            }
+    func updateStatusLabel() {
+        if searchResults.count > 1 {
+            statusLabel.text = String(format: NSLocalizedString("%d matches found", comment: "matches found"), searchResults.count)
+        } else if searchResults.count == 1 {
+            statusLabel.text = NSLocalizedString("1 match found", comment: "1 match")
         } else {
-            statusLabel.text = ""
+            statusLabel.text = NSLocalizedString("No matches found", comment: "no match")
         }
     }
 
@@ -159,7 +154,7 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
     }
     
     func documentDidEndDocumentFind(_ notification: Notification) {
-        updateStatusLabel(showResult: true)
+        updateStatusLabel()
     }
     
 }
@@ -175,18 +170,6 @@ extension SearchResultsTableViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == currentSearchText {
-            tableView.dataSource = self
-            tableView.reloadData()
-            updateStatusLabel(showResult: true)
-        } else {
-            tableView.dataSource = nil
-            tableView.reloadData()
-            updateStatusLabel(showResult: false)
-        }
-    }
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        if searchBar.text == currentSearchText {
             return
         }
         tableView.dataSource = self
