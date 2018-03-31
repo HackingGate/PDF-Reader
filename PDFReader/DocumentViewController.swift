@@ -129,6 +129,7 @@ class DocumentViewController: UIViewController {
         var landscape: CGFloat
         // devide by 2 for two up mode
     }
+    // different form pdfView.scaleFactorForSizeToFit, the scaleFactorForSizeToFit use superArea not safeArea
     var scaleFactorForSizeToFit: ScaleFactor?
     var scaleFactorVertical: ScaleFactor?
     var scaleFactorHorizontal: ScaleFactor?
@@ -510,7 +511,10 @@ class DocumentViewController: UIViewController {
         if pdfView.displayDirection == .vertical {
             let frame = view.frame
             let aspectRatio = frame.size.width / frame.size.height
-            var scaleFactor = pdfView.scaleFactorForSizeToFit
+            // if it is iPhoneX, the pdfView.scaleFactorForSizeToFit is already optimized for save area
+            let divider = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+            // the scaleFactor defines the super area scale factor
+            var scaleFactor = pdfView.scaleFactorForSizeToFit / divider
             if pdfView.displayMode == .twoUpContinuous {
                 scaleFactor *= 2
             }
@@ -551,6 +555,7 @@ class DocumentViewController: UIViewController {
     
     func setScaleFactorForUser() {
         var scaleFactor: ScaleFactor?
+        // if user had opened this PDF before, the stored scaleFactor is already optimized for safeArea.
         if pdfView.displayDirection == .vertical {
             scaleFactor = scaleFactorVertical
         } else if pdfView.displayDirection == .horizontal {
@@ -566,12 +571,10 @@ class DocumentViewController: UIViewController {
                     pdfView.scaleFactor = scaleFactor.portrait / 2
                 }
             } else if UIApplication.shared.statusBarOrientation.isLandscape {
-                // set scaleFactor to safe area for iPhone X and later
-                let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
                 if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.scaleFactor = scaleFactor.landscape * multiplier
+                    pdfView.scaleFactor = scaleFactor.landscape
                 } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.scaleFactor = scaleFactor.landscape / 2 * multiplier
+                    pdfView.scaleFactor = scaleFactor.landscape / 2
                 }
             }
         }
