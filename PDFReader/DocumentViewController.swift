@@ -273,7 +273,6 @@ class DocumentViewController: UIViewController {
     func updateScrollDirection() {
         updateUserScaleFactorAndOffset(changeOrientation: false)
         
-        // experimental feature
         if let currentPage = pdfView.currentPage {
             if pdfView.displayMode == .singlePageContinuous && allowsDocumentAssembly {
                 if isRightToLeft != isViewTransformedForRTL {
