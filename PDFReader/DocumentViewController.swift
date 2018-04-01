@@ -147,7 +147,7 @@ class DocumentViewController: UIViewController {
         
         
         pdfView.autoScales = true
-        pdfView.displaysPageBreaks = false
+        pdfView.displaysPageBreaks = true
         pdfView.displayBox = .cropBox
         if let documentEntity = self.currentEntity {
             prefersTwoUpInLandscapeForPad = documentEntity.prefersTwoUpInLandscapeForPad
@@ -183,16 +183,18 @@ class DocumentViewController: UIViewController {
     @objc func updateInterface() {
         if presentingViewController != nil {
             // use same UI style as DocumentBrowserViewController
+            view.backgroundColor = presentingViewController?.view.backgroundColor
+            view.tintColor = presentingViewController?.view.tintColor
+            navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
             if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
                 navigationController?.navigationBar.barStyle = .black
                 navigationController?.toolbar.barStyle = .black
+                // use true black background to protect OLED screen
+                view.backgroundColor = .black
             } else {
                 navigationController?.navigationBar.barStyle = .default
                 navigationController?.toolbar.barStyle = .default
             }
-            view.backgroundColor = presentingViewController?.view.backgroundColor
-            view.tintColor = presentingViewController?.view.tintColor
-            navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
         }
     }
     
