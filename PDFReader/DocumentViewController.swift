@@ -55,6 +55,9 @@ extension DocumentViewController: SettingsDelegate {
 class DocumentViewController: UIViewController {
     
     @IBOutlet weak var pdfView: PDFView!
+    @IBOutlet weak var blurEffectView: UIVisualEffectView!
+    @IBOutlet weak var pageLabel: UILabel!
+    var blurDismissTimer = Timer()
     
     var document: Document?
     
@@ -138,6 +141,8 @@ class DocumentViewController: UIViewController {
     
     override func viewDidLoad() {
         enableCustomMenus()
+        blurEffectView.layer.masksToBounds = true
+        blurEffectView.layer.cornerRadius = 6
         
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapGestureRecognizerHandler(_:)))
         doubleTapGesture.numberOfTapsRequired = 2
@@ -177,6 +182,10 @@ class DocumentViewController: UIViewController {
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),
                            name: .UIApplicationDidChangeStatusBarOrientation,
+                           object: nil)
+        center.addObserver(self,
+                           selector: #selector(didChangePageHandler),
+                           name: .PDFViewPageChanged,
                            object: nil)
     }
     
@@ -600,6 +609,27 @@ class DocumentViewController: UIViewController {
         // detect if user enabled and update scale factor
         setPreferredDisplayMode(prefersTwoUpInLandscapeForPad)
         updateScrollDirection()
+    }
+    
+    @objc func didChangePageHandler() {
+        guard let pdfDocument = pdfView.document else { return }
+        guard let currentPage = pdfView.currentPage else { return }
+        let currentIndex = pdfDocument.index(for: currentPage)
+        // currentIndex starts from 0
+        pageLabel.text = "\(currentIndex+1) / \(pdfDocument.pageCount)"
+        
+        blurEffectView.alpha = 1.0
+        blurEffectView.isHidden = false
+        blurDismissTimer.invalidate()
+        blurDismissTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(hidePageLabel), userInfo: nil, repeats: false)
+    }
+    
+    @objc func hidePageLabel() {
+        UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveEaseOut], animations: {
+            self.blurEffectView.alpha = 0.0
+        }) { (completed) in
+            self.blurEffectView.isHidden = true
+        }
     }
     
     @IBAction func shareAction() {
