@@ -93,6 +93,9 @@ extension DocumentViewController: SettingsDelegate {
 class DocumentViewController: UIViewController {
     
     @IBOutlet weak var pdfView: PDFView!
+    @IBOutlet weak var blurEffectView: UIVisualEffectView!
+    @IBOutlet weak var pageLabel: UILabel!
+    var blurDismissTimer = Timer()
     
     var document: Document?
     
@@ -189,6 +192,8 @@ class DocumentViewController: UIViewController {
     
     override func viewDidLoad() {
         enableCustomMenus()
+        blurEffectView.layer.masksToBounds = true
+        blurEffectView.layer.cornerRadius = 6
         
         let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(doubleTapGestureRecognizerHandler(_:)))
         doubleTapGesture.numberOfTapsRequired = 2
@@ -197,7 +202,7 @@ class DocumentViewController: UIViewController {
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
 
         pdfView.autoScales = true
-        pdfView.displaysPageBreaks = false
+        pdfView.displaysPageBreaks = true
         pdfView.displayBox = .cropBox
         if let documentEntity = self.currentEntity {
             prefersTwoUpInLandscapeForPad = documentEntity.prefersTwoUpInLandscapeForPad
@@ -229,23 +234,30 @@ class DocumentViewController: UIViewController {
                            selector: #selector(didChangeOrientationHandler),
                            name: .UIApplicationDidChangeStatusBarOrientation,
                            object: nil)
+        center.addObserver(self,
+                           selector: #selector(didChangePageHandler),
+                           name: .PDFViewPageChanged,
+                           object: nil)
     }
     
     @objc func updateInterface() {
         if presentingViewController != nil {
             // use same UI style as DocumentBrowserViewController
-            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
-                navigationController?.navigationBar.barStyle = .black
-                navigationController?.toolbar.barStyle = .black
-            } else {
-                navigationController?.navigationBar.barStyle = .default
-                navigationController?.toolbar.barStyle = .default
-            }
             view.backgroundColor = presentingViewController?.view.backgroundColor
             view.tintColor = presentingViewController?.view.tintColor
             navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
             navigationController?.toolbar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
+            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
+                navigationController?.navigationBar.barStyle = .black
+                navigationController?.toolbar.barStyle = .black
+                // use true black background to protect OLED screen
+                view.backgroundColor = .black
+            } else {
+                navigationController?.navigationBar.barStyle = .default
+                navigationController?.toolbar.barStyle = .default
+            }
+            
             if navigationItem.searchController?.isActive == true, let items = navigationController?.toolbar.items {
                 for item in items {
                     item.isEnabled = true
@@ -676,6 +688,27 @@ class DocumentViewController: UIViewController {
         updateScrollDirection()
     }
     
+    @objc func didChangePageHandler() {
+        guard let pdfDocument = pdfView.document else { return }
+        guard let currentPage = pdfView.currentPage else { return }
+        let currentIndex = pdfDocument.index(for: currentPage)
+        // currentIndex starts from 0
+        pageLabel.text = "\(currentIndex+1) / \(pdfDocument.pageCount)"
+        
+        blurEffectView.alpha = 1.0
+        blurEffectView.isHidden = false
+        blurDismissTimer.invalidate()
+        blurDismissTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(hidePageLabel), userInfo: nil, repeats: false)
+    }
+    
+    @objc func hidePageLabel() {
+        UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveEaseOut], animations: {
+            self.blurEffectView.alpha = 0.0
+        }) { (completed) in
+            self.blurEffectView.isHidden = true
+        }
+    }
+
     // MARK: - IBAction
 
     @IBAction func searchLeft(_ sender: UIBarButtonItem) {
