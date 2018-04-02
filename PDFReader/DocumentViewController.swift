@@ -660,7 +660,7 @@ class DocumentViewController: UIViewController {
                 if let modifiedByDevice = record["modifiedByDevice"] as? String {
                     message += "\n\(NSLocalizedString("Device:", comment: "")) \(modifiedByDevice)"
                 }
-                message += "\n\(NSLocalizedString("Last Viewed Page:", comment: "")) \(cloudPageIndex)"
+                message += "\n\(NSLocalizedString("Last Viewed Page:", comment: "")) \(cloudPageIndex.intValue + 1)"
                 
                 let alertController: UIAlertController = UIAlertController(title: NSLocalizedString("Found iCloud Data", comment: ""), message: message, preferredStyle: .alert)
                 
