@@ -552,7 +552,15 @@ class DocumentViewController: UIViewController {
                 }
             } else if UIApplication.shared.statusBarOrientation.isLandscape {
                 // set minScaleFactor to safe area for iPhone X and later
-                let multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+                var multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
+                // hard code
+                if navigationController?.isNavigationBarHidden == true && UIScreen.main.nativeBounds.height == 2436 && UIScreen.main.nativeBounds.width == 1125 {
+                    if pdfView.frame.width == 375.0 {
+                        // to fix iPhone X
+                        multiplier = (375.0 - 44.0) / 375.0
+                    }
+                }
+
                 if pdfView.displayMode == .singlePageContinuous {
                     pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape * multiplier
                 } else if pdfView.displayMode == .twoUpContinuous {
