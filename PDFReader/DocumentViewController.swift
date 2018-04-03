@@ -351,6 +351,9 @@ class DocumentViewController: UIViewController {
                 document.page(at: i)?.rotation = transformForRTL ? 180 : 0
             }
             
+            // if transfrom view for RTL, the thumbnail does not update 
+            pdfView.document = nil
+            pdfView.document = document
         }
         
         isViewTransformedForRTL = transformForRTL
