@@ -24,7 +24,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
         guard documentsURL.count != 0 else { return }
         
-        let fileName = "PDF Reader - Hightlighted Features.pdf"
+        let fileName = "Quick Start Guide.pdf"
         guard let bundlePDFURL = Bundle.main.resourceURL?.appendingPathComponent(fileName) else { return }
         guard let pdfURL = documentsURL.first?.appendingPathComponent(fileName) else { return }
         
