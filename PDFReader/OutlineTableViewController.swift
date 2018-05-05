@@ -25,19 +25,16 @@ class OutlineTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         if let outline = outlineRoot {
-            for i in 0..<outline.numberOfChildren {
-                if let outline = outline.child(at: i) {
-                    outlineArray.add(outline)
-                    for i in 0..<outline.numberOfChildren {
-                        if let outline = outline.child(at: i) {
-                            outlineArray.add(outline)
-                            for i in 0..<outline.numberOfChildren {
-                                if let outline = outline.child(at: i) {
-                                    outlineArray.add(outline)
-                                }
-                            }
-                        }
-                    }
+            addChild(outline: outline)
+        }
+    }
+    
+    func addChild(outline: PDFOutline) {
+        for i in 0..<outline.numberOfChildren {
+            if let outlineChild = outline.child(at: i) {
+                outlineArray.add(outlineChild)
+                if outlineChild.numberOfChildren > 0 {
+                    addChild(outline: outlineChild)
                 }
             }
         }
@@ -64,9 +61,24 @@ class OutlineTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "OutlineCell", for: indexPath) as! OutlineTableViewCell
         if let outline = outlineArray[indexPath.row] as? PDFOutline {
             cell.titleLabel.text = outline.label
-            cell.pageLabel.text = outline.destination?.page?.label
+            
+            if let page = outline.destination?.page, let index = delegate.pageIndex(page: page) {
+                cell.pageLabel.text = String(index + 1)
+            }
             cell.titleTrailing.constant = cell.pageLabel.intrinsicContentSize.width + cell.pageLabel.layoutMargins.right + 16
             
+            var leadingConstant: CGFloat = 0
+            var parent = outline.parent
+            while parent != nil && parent != outlineRoot {
+                leadingConstant += 16
+                parent = parent?.parent
+            }
+            cell.titleLeading.constant = leadingConstant
+            if leadingConstant > 0 {
+                cell.titleLabel.font = UIFont.systemFont(ofSize: 14)
+            } else {
+                cell.titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
+            }
         }
         return cell
     }
