@@ -1,20 +1,21 @@
 //
-//  SearchResultsTableViewController.swift
+//  SearchViewController.swift
 //  PDFReader
 //
-//  Created by ERU on 2018/01/31.
-//  Copyright © 2018年 Hacking Gate. All rights reserved.
+//  Created by ERU on 2018/05/07.
+//  Copyright © 2018 Hacking Gate. All rights reserved.
 //
 
 import UIKit
 import PDFKit
 
-class SearchResultsTableViewController: UITableViewController {
+class SearchViewController: UITableViewController {
     
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet var footerView: UIView!
     @IBOutlet weak var statusLabel: UILabel!
-    
+    var searchBar = UISearchBar()
+
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
     var displayBox: PDFDisplayBox = .cropBox
@@ -22,21 +23,24 @@ class SearchResultsTableViewController: UITableViewController {
     var currentSearchText = ""
     
     override func viewWillAppear(_ animated: Bool) {
-        if let presentingViewController = presentingViewController as? PopoverTableViewController {
-            presentingViewController.preferredContentSize = CGSize(width: presentingViewController.preferredContentSize.width, height: presentingViewController.preferredContentSize.height + 300)
-        }
+        super.viewWillAppear(animated)
+        searchBar.becomeFirstResponder()
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        if let presentingViewController = presentingViewController as? PopoverTableViewController {
-            presentingViewController.preferredContentSize = CGSize(width: presentingViewController.preferredContentSize.width, height: presentingViewController.preferredContentSize.height - 300)
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        searchBar.delegate = self
+        searchBar.showsCancelButton = true
+        navigationItem.titleView = searchBar
+                
+        self.tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
         
-        pdfDocument?.delegate = self
+        tableView.removeObserver(self, forKeyPath: "contentSize")
     }
     
     func updateStatusLabel() {
@@ -130,10 +134,14 @@ class SearchResultsTableViewController: UITableViewController {
         delegate.goToSelection(selection)
         delegate.setCurrentSelection(selection, animate: true)
     }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        self.preferredContentSize = tableView.contentSize
+    }
 
 }
 
-extension SearchResultsTableViewController: PDFDocumentDelegate {
+extension SearchViewController: PDFDocumentDelegate {
     func didMatchString(_ instance: PDFSelection) {
         if instance.string != nil && instance.pages.count != 0 {
             searchResults.append(instance)
@@ -159,7 +167,30 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
     
 }
 
-extension SearchResultsTableViewController: UISearchBarDelegate {
+extension SearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        if let cancelButton = searchBar.value(forKey: "cancelButton") as? UIButton {
+            cancelButton.isEnabled = true
+        }
+        if searchBar.text == currentSearchText {
+            return
+        }
+        pdfDocument?.cancelFindString()
+        searchResults.removeAll()
+        tableView.reloadData()
+        if let searchText = searchBar.text {
+            currentSearchText = searchText
+            delegate.fullTextSearch(string: currentSearchText)
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        pdfDocument?.cancelFindString()
+        searchBar.resignFirstResponder()
+        dismiss(animated: true, completion: nil)
+    }
+    
     func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if text.contains(" ") {
             // fix crash
@@ -172,12 +203,12 @@ extension SearchResultsTableViewController: UISearchBarDelegate {
         if searchText == currentSearchText {
             return
         }
-        tableView.dataSource = self
+        currentSearchText = ""
+        pdfDocument?.cancelFindString()
         searchResults.removeAll()
         tableView.reloadData()
-        if let searchText = searchBar.text {
-            currentSearchText = searchText
-            delegate.fullTextSearch(string: currentSearchText)
-        }
+        statusLabel.text = nil
+        progressView.progress = 0.0
     }
+    
 }
