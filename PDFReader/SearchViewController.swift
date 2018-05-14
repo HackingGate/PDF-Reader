@@ -14,6 +14,8 @@ class SearchViewController: UITableViewController {
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet var footerView: UIView!
     @IBOutlet weak var statusLabel: UILabel!
+    @IBOutlet weak var searchWeb: UIBarButtonItem!
+    @IBOutlet weak var searchWikipedia: UIBarButtonItem!
     var searchBar = UISearchBar()
 
     var delegate: SettingsDelegate!
@@ -25,6 +27,16 @@ class SearchViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         searchBar.becomeFirstResponder()
+        
+        if let string = searchResults.first?.string {
+            currentSearchText = string
+            searchBar.text = string
+            searchWeb.isEnabled = true
+            searchWikipedia.isEnabled = true
+        } else {
+            searchWeb.isEnabled = false
+            searchWikipedia.isEnabled = false
+        }
     }
     
     override func viewDidLoad() {
@@ -33,7 +45,7 @@ class SearchViewController: UITableViewController {
         searchBar.delegate = self
         searchBar.showsCancelButton = true
         navigationItem.titleView = searchBar
-                
+        
         self.tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
     }
     
@@ -139,6 +151,20 @@ class SearchViewController: UITableViewController {
         self.preferredContentSize = tableView.contentSize
     }
 
+    // MARK: - IB Actions
+    
+    @IBAction func searchWeb(_ sender: UIBarButtonItem) {
+        if let text = searchBar.text, let searchURL = URL(string: "x-web-search://?\(text)") {
+            UIApplication.shared.open(searchURL, options: [:], completionHandler: nil)
+        }
+    }
+    
+    @IBAction func searchWikipedia(_ sender: UIBarButtonItem) {
+        if let text = searchBar.text, let wikiURL = URL(string: "https://wikipedia.org/wiki/\(text)") {
+            UIApplication.shared.open(wikiURL, options: [:], completionHandler: nil)
+        }
+    }
+
 }
 
 extension SearchViewController: PDFDocumentDelegate {
@@ -200,6 +226,13 @@ extension SearchViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count > 0 {
+            searchWeb.isEnabled = true
+            searchWikipedia.isEnabled = true
+        } else {
+            searchWeb.isEnabled = false
+            searchWikipedia.isEnabled = false
+        }
         if searchText == currentSearchText {
             return
         }

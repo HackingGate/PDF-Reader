@@ -279,25 +279,25 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                        <view key="tableHeaderView" contentMode="scaleToFill" id="Tmc-hX-gLF">
+                        <view key="tableHeaderView" contentMode="scaleToFill" misplaced="YES" id="Tmc-hX-gLF">
                             <rect key="frame" x="0.0" y="0.0" width="300" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="CXs-UX-bBw">
-                                    <rect key="frame" x="39" y="8" width="222" height="29"/>
+                                    <rect key="frame" x="39" y="8" width="222" height="31"/>
                                     <connections>
                                         <action selector="sliderValueChanged:" destination="8tg-0g-KWr" eventType="valueChanged" id="VJs-zC-AP7"/>
                                     </connections>
                                 </slider>
                                 <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sunlight_small" translatesAutoresizingMaskIntoConstraints="NO" id="81t-ML-jPN">
-                                    <rect key="frame" x="8" y="9.5" width="25" height="25"/>
+                                    <rect key="frame" x="8" y="-12.5" width="25" height="25"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="25" id="PT9-Mb-hGU"/>
                                         <constraint firstAttribute="width" constant="25" id="vXs-av-zwF"/>
                                     </constraints>
                                 </imageView>
                                 <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="sunlight_large" translatesAutoresizingMaskIntoConstraints="NO" id="X0U-Nl-N4j">
-                                    <rect key="frame" x="267" y="9.5" width="25" height="25"/>
+                                    <rect key="frame" x="267" y="-12.5" width="25" height="25"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="25" id="Ylg-pb-fZn"/>
                                         <constraint firstAttribute="height" constant="25" id="v1b-yn-seo"/>
@@ -315,18 +315,18 @@
                                 <constraint firstItem="X0U-Nl-N4j" firstAttribute="centerY" secondItem="Tmc-hX-gLF" secondAttribute="centerY" id="zlM-Vn-DAb"/>
                             </constraints>
                         </view>
-                        <view key="tableFooterView" contentMode="scaleToFill" id="4ed-Po-wbE">
+                        <view key="tableFooterView" contentMode="scaleToFill" misplaced="YES" id="4ed-Po-wbE">
                             <rect key="frame" x="0.0" y="289" width="300" height="44"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Scroll Direction" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c6G-KP-IC3">
-                                    <rect key="frame" x="15" y="4.5" width="116.5" height="21"/>
+                                    <rect key="frame" x="15" y="-17.5" width="116.5" height="21"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Vertical" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="p96-se-Myf">
-                                    <rect key="frame" x="15" y="25.5" width="43" height="14.5"/>
+                                    <rect key="frame" x="15" y="3.5" width="43" height="14.5"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                     <nil key="textColor"/>
                                     <nil key="highlightedColor"/>
@@ -644,10 +644,26 @@
                             <outlet property="delegate" destination="osH-OS-biq" id="Rqu-CI-U8w"/>
                         </connections>
                     </tableView>
+                    <toolbarItems>
+                        <barButtonItem title="Search Web" id="1vr-F8-lKX">
+                            <connections>
+                                <action selector="searchWeb:" destination="osH-OS-biq" id="Cow-kJ-dSk"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem style="plain" systemItem="flexibleSpace" id="BdA-GX-q9C"/>
+                        <barButtonItem title="Search Wikipedia" id="Ne2-xq-TMD">
+                            <connections>
+                                <action selector="searchWikipedia:" destination="osH-OS-biq" id="ZUf-TA-LEw"/>
+                            </connections>
+                        </barButtonItem>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" title="Root View Controller" id="AW8-u4-D2u"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="footerView" destination="uK8-dO-EYe" id="wJC-g6-RZG"/>
                         <outlet property="progressView" destination="FOc-z4-yJw" id="ZVv-HB-Aro"/>
+                        <outlet property="searchWeb" destination="1vr-F8-lKX" id="BbX-Z8-DPn"/>
+                        <outlet property="searchWikipedia" destination="Ne2-xq-TMD" id="EYR-Vy-QoG"/>
                         <outlet property="statusLabel" destination="X65-rz-pIZ" id="RwD-QX-iWF"/>
                     </connections>
                 </tableViewController>
@@ -656,7 +672,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X65-rz-pIZ">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Type keyword then tap Search" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X65-rz-pIZ">
                             <rect key="frame" x="4" y="6" width="367" height="34"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <nil key="textColor"/>
@@ -698,11 +714,15 @@
         <!--Navigation Controller-->
         <scene sceneID="cCb-Ib-Mgy">
             <objects>
-                <navigationController storyboardIdentifier="SearchNavigationController" id="0AO-z1-gqF" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="SearchNavigationController" toolbarHidden="NO" id="0AO-z1-gqF" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Zqs-OA-IYz">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="fMR-9i-AOA">
+                        <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="osH-OS-biq" kind="relationship" relationship="rootViewController" id="ISg-Kf-c9O"/>
                     </connections>
