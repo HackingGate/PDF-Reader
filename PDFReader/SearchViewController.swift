@@ -148,7 +148,7 @@ class SearchViewController: UITableViewController {
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        self.preferredContentSize = tableView.contentSize
+        navigationController?.preferredContentSize = tableView.contentSize
     }
 
     // MARK: - IB Actions

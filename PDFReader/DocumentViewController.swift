@@ -268,15 +268,16 @@ class DocumentViewController: UIViewController {
             
             // for search
             guard let searchNC = searchNavigationController else { return }
+            guard let searchVC = searchNC.topViewController as? SearchViewController else { return }
             searchNC.navigationBar.tintColor = view.tintColor
             searchNC.toolbar.tintColor = view.tintColor
-            searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
-            searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
-            if let searchVC = searchNC.topViewController as? SearchViewController {
+            if navigationController.navigationBar.barStyle != .black {
+                searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
+                searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
                 searchVC.view.backgroundColor = view.backgroundColor
-                searchVC.searchBar.tintColor = view.tintColor
                 searchVC.searchBar.barStyle = searchNC.navigationBar.barStyle
             }
+            searchVC.searchBar.tintColor = view.tintColor
         }
     }
     
@@ -928,11 +929,13 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 let navigationController = navigationController {
                 searchNC.navigationBar.tintColor = presentingViewController?.view.tintColor
                 searchNC.toolbar.tintColor = presentingViewController?.view.tintColor
-                searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
-                searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
-                searchVC.view.backgroundColor = presentingViewController?.view.backgroundColor
+                if navigationController.navigationBar.barStyle != .black {
+                    searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
+                    searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
+                    searchVC.view.backgroundColor = presentingViewController?.view.backgroundColor
+                    searchVC.searchBar.barStyle = searchNC.navigationBar.barStyle
+                }
                 searchVC.searchBar.tintColor = presentingViewController?.view.tintColor
-                searchVC.searchBar.barStyle = searchNC.navigationBar.barStyle
                 searchNavigationController = searchNC
                 
                 // because searchVC is in a navigationController, viewDidLoad() will proceeded before here.
