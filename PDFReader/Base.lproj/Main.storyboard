@@ -766,8 +766,8 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V6z-zU-NJK">
-                                            <rect key="frame" x="16" y="15" width="41.5" height="10"/>
-                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                            <rect key="frame" x="16" y="15" width="34.5" height="10"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="16"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -792,6 +792,7 @@
                                 <connections>
                                     <outlet property="pageLabel" destination="FJw-Gx-9U7" id="aM7-TY-BsN"/>
                                     <outlet property="titleLabel" destination="V6z-zU-NJK" id="iIe-tQ-dhq"/>
+                                    <outlet property="titleLeading" destination="vGZ-Kz-0eL" id="raI-jC-tsk"/>
                                     <outlet property="titleTrailing" destination="bA1-rk-V2D" id="lDA-Er-zDV"/>
                                 </connections>
                             </tableViewCell>

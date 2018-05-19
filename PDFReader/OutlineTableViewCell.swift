@@ -13,6 +13,7 @@ class OutlineTableViewCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var pageLabel: UILabel!
     @IBOutlet weak var titleTrailing: NSLayoutConstraint!
+    @IBOutlet weak var titleLeading: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()

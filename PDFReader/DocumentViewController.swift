@@ -20,6 +20,7 @@ protocol SettingsDelegate {
     var displayMode: PDFDisplayMode { get }
     var isFindOnPageEnabled: Bool { get set }
     func updateScrollDirection() -> Void
+    func pageIndex(page: PDFPage) -> Int?
     func goToPage(page: PDFPage) -> Void
     func goToSelection(_ selection: PDFSelection) -> Void
     func setCurrentSelection(_ selection: PDFSelection, animate: Bool) -> Void
@@ -43,6 +44,11 @@ extension DocumentViewController: SettingsDelegate {
         get {
             return pdfView.displayMode
         }
+    }
+    
+    func pageIndex(page: PDFPage) -> Int? {
+        guard let pdfDocument = pdfView.document else { return nil }
+        return pdfDocument.index(for: page)
     }
     
     func goToPage(page: PDFPage) {
