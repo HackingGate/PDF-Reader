@@ -71,9 +71,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                            name: .UIApplicationWillEnterForeground,
                            object: nil)
 
-        // Specify the allowed content types of your application via the Info.plist.
-        
-        // Do any additional setup after loading the view, typically from a nib.
+        // add Settings bar button item
+        let settingsItem = UIBarButtonItem(image: #imageLiteral(resourceName: "settings"), style: .plain, target: self, action: #selector(gotoSettings))
+        additionalLeadingNavigationBarButtonItems = [settingsItem]
     }
     
     @objc func updateInterface() {
@@ -86,6 +86,13 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         } else if browserUserInterfaceStyle == .dark {
             view.tintColor = .orange
         }
+    }
+    
+    // MARK: Actions
+    
+    @objc func gotoSettings() {
+        guard let settingsURL = URL(string: UIApplicationOpenSettingsURLString) else { return }
+        UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
     }
     
     // MARK: UIDocumentBrowserViewControllerDelegate
