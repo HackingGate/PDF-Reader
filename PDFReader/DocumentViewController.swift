@@ -758,10 +758,12 @@ class DocumentViewController: UIViewController {
         }
     }
     
+    /*
     @IBAction func shareAction() {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
     }
+     */
     
     @IBAction func dismissDocumentViewController() {
         dismiss(animated: true) {

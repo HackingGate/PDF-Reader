@@ -111,21 +111,16 @@
                             </barButtonItem>
                         </leftBarButtonItems>
                         <rightBarButtonItems>
-                            <barButtonItem systemItem="action" id="FiZ-kK-kgU">
+                            <barButtonItem systemItem="search" id="s1P-bt-3KK">
                                 <connections>
-                                    <action selector="shareAction" destination="M2k-L8-Olo" id="2zb-K5-rQm"/>
+                                    <segue destination="0AO-z1-gqF" kind="popoverPresentation" identifier="SearchViewController" popoverAnchorBarButtonItem="s1P-bt-3KK" id="Gt5-g6-1xa">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem image="settings_item" landscapeImage="settings_item-Compact" id="Xpt-fS-fwP">
                                 <connections>
                                     <segue destination="8tg-0g-KWr" kind="popoverPresentation" identifier="PopoverSettings" popoverAnchorBarButtonItem="Xpt-fS-fwP" id="DAF-4f-UPr">
-                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                    </segue>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem systemItem="search" id="s1P-bt-3KK">
-                                <connections>
-                                    <segue destination="0AO-z1-gqF" kind="popoverPresentation" identifier="SearchViewController" popoverAnchorBarButtonItem="s1P-bt-3KK" id="Gt5-g6-1xa">
                                         <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                                     </segue>
                                 </connections>
