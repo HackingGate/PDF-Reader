@@ -1,20 +1,23 @@
 //
-//  SearchResultsTableViewController.swift
+//  SearchViewController.swift
 //  PDFReader
 //
-//  Created by ERU on 2018/01/31.
-//  Copyright © 2018年 Hacking Gate. All rights reserved.
+//  Created by ERU on 2018/05/07.
+//  Copyright © 2018 Hacking Gate. All rights reserved.
 //
 
 import UIKit
 import PDFKit
 
-class SearchResultsTableViewController: UITableViewController {
+class SearchViewController: UITableViewController {
     
     @IBOutlet weak var progressView: UIProgressView!
     @IBOutlet var footerView: UIView!
     @IBOutlet weak var statusLabel: UILabel!
-    
+    @IBOutlet weak var searchWeb: UIBarButtonItem!
+    @IBOutlet weak var searchWikipedia: UIBarButtonItem!
+    var searchBar = UISearchBar()
+
     var delegate: SettingsDelegate!
     var pdfDocument: PDFDocument?
     var displayBox: PDFDisplayBox = .cropBox
@@ -22,21 +25,34 @@ class SearchResultsTableViewController: UITableViewController {
     var currentSearchText = ""
     
     override func viewWillAppear(_ animated: Bool) {
-        if let presentingViewController = presentingViewController as? PopoverTableViewController {
-            presentingViewController.preferredContentSize = CGSize(width: presentingViewController.preferredContentSize.width, height: presentingViewController.preferredContentSize.height + 300)
+        super.viewWillAppear(animated)
+        searchBar.becomeFirstResponder()
+        
+        if let string = searchResults.first?.string {
+            currentSearchText = string
+            searchBar.text = string
+            searchWeb.isEnabled = true
+            searchWikipedia.isEnabled = true
+        } else {
+            searchWeb.isEnabled = false
+            searchWikipedia.isEnabled = false
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        if let presentingViewController = presentingViewController as? PopoverTableViewController {
-            presentingViewController.preferredContentSize = CGSize(width: presentingViewController.preferredContentSize.width, height: presentingViewController.preferredContentSize.height - 300)
-        }
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        searchBar.delegate = self
+        searchBar.showsCancelButton = true
+        navigationItem.titleView = searchBar
         
-        pdfDocument?.delegate = self
+        self.tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        tableView.removeObserver(self, forKeyPath: "contentSize")
     }
     
     func updateStatusLabel() {
@@ -88,19 +104,27 @@ class SearchResultsTableViewController: UITableViewController {
         let rect = page.bounds(for: displayBox)
         let aspectRatio = rect.width / rect.height
         
-        let width: CGFloat = 50.0
-        let height = width / aspectRatio
-        
-        cell.imageView?.image = page.thumbnail(of: CGSize(width: width, height: height), for: displayBox)
+        if let imageView = cell.viewWithTag(1) as? UIImageView {
+            let width: CGFloat = imageView.frame.width // must be same as IB width
+            let height = width / aspectRatio
+            imageView.image = page.thumbnail(of: CGSize(width: width, height: height), for: displayBox)
+        }
         
         // title text
-        if let textLabel = cell.textLabel {
+        if let textLabel = cell.viewWithTag(2) as? UILabel {
+            // no workaround found for iOS 11.2 and later, comment out
+            /*
             textLabel.text = ""
             if let outlineLabel = pdfDocument?.outlineItem(for: selection)?.label {
                 textLabel.text = "\(outlineLabel) "
             }
             if let pageLabel = page.label {
                 textLabel.text?.append(contentsOf: String(format: NSLocalizedString("Page %@", comment: "page index"), pageLabel))
+            }
+             */
+            if let currentIndex = pdfDocument?.index(for: page) {
+                textLabel.text = String(currentIndex+1)
+                print(textLabel.constraints.debugDescription)
             }
         }
         
@@ -114,7 +138,9 @@ class SearchResultsTableViewController: UITableViewController {
         let attrstr = NSMutableAttributedString(string: extendSelection.string!)
         attrstr.addAttribute(.backgroundColor, value: UIColor.yellow, range: range)
         
-        cell.detailTextLabel?.attributedText = attrstr
+        if let detailTextLabel = cell.viewWithTag(3) as? UILabel {
+            detailTextLabel.attributedText = attrstr
+        }
 
         return cell
     }
@@ -122,18 +148,39 @@ class SearchResultsTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selection = searchResults[indexPath.row]
         
+        delegate.goToSelection(selection)
+
         if UIDevice.current.userInterfaceIdiom != .pad {
-            self.dismiss(animated: false, completion: nil)
-            self.presentingViewController?.dismiss(animated: false, completion: nil)
+            self.dismiss(animated: true) {
+                self.delegate.setCurrentSelection(selection, animate: true)
+            }
+        } else {
+            delegate.setCurrentSelection(selection, animate: true)
         }
         
-        delegate.goToSelection(selection)
-        delegate.setCurrentSelection(selection, animate: true)
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        navigationController?.preferredContentSize = tableView.contentSize
+    }
+
+    // MARK: - IB Actions
+    
+    @IBAction func searchWeb(_ sender: UIBarButtonItem) {
+        if let text = searchBar.text, let searchURL = URL(string: "x-web-search://?\(text)") {
+            UIApplication.shared.open(searchURL, options: [:], completionHandler: nil)
+        }
+    }
+    
+    @IBAction func searchWikipedia(_ sender: UIBarButtonItem) {
+        if let text = searchBar.text, let wikiURL = URL(string: "https://wikipedia.org/wiki/\(text)") {
+            UIApplication.shared.open(wikiURL, options: [:], completionHandler: nil)
+        }
     }
 
 }
 
-extension SearchResultsTableViewController: PDFDocumentDelegate {
+extension SearchViewController: PDFDocumentDelegate {
     func didMatchString(_ instance: PDFSelection) {
         if instance.string != nil && instance.pages.count != 0 {
             searchResults.append(instance)
@@ -159,7 +206,30 @@ extension SearchResultsTableViewController: PDFDocumentDelegate {
     
 }
 
-extension SearchResultsTableViewController: UISearchBarDelegate {
+extension SearchViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        if let cancelButton = searchBar.value(forKey: "cancelButton") as? UIButton {
+            cancelButton.isEnabled = true
+        }
+        if searchBar.text == currentSearchText {
+            return
+        }
+        pdfDocument?.cancelFindString()
+        searchResults.removeAll()
+        tableView.reloadData()
+        if let searchText = searchBar.text {
+            currentSearchText = searchText
+            delegate.fullTextSearch(string: currentSearchText)
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        pdfDocument?.cancelFindString()
+        searchBar.resignFirstResponder()
+        dismiss(animated: true, completion: nil)
+    }
+    
     func searchBar(_ searchBar: UISearchBar, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         if text.contains(" ") {
             // fix crash
@@ -169,15 +239,22 @@ extension SearchResultsTableViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText.count > 0 {
+            searchWeb.isEnabled = true
+            searchWikipedia.isEnabled = true
+        } else {
+            searchWeb.isEnabled = false
+            searchWikipedia.isEnabled = false
+        }
         if searchText == currentSearchText {
             return
         }
-        tableView.dataSource = self
+        currentSearchText = ""
+        pdfDocument?.cancelFindString()
         searchResults.removeAll()
         tableView.reloadData()
-        if let searchText = searchBar.text {
-            currentSearchText = searchText
-            delegate.fullTextSearch(string: currentSearchText)
-        }
+        statusLabel.text = nil
+        progressView.progress = 0.0
     }
+    
 }
