@@ -104,19 +104,27 @@ class SearchViewController: UITableViewController {
         let rect = page.bounds(for: displayBox)
         let aspectRatio = rect.width / rect.height
         
-        let width: CGFloat = 50.0
-        let height = width / aspectRatio
-        
-        cell.imageView?.image = page.thumbnail(of: CGSize(width: width, height: height), for: displayBox)
+        if let imageView = cell.viewWithTag(1) as? UIImageView {
+            let width: CGFloat = imageView.frame.width // must be same as IB width
+            let height = width / aspectRatio
+            imageView.image = page.thumbnail(of: CGSize(width: width, height: height), for: displayBox)
+        }
         
         // title text
-        if let textLabel = cell.textLabel {
+        if let textLabel = cell.viewWithTag(2) as? UILabel {
+            // no workaround found for iOS 11.2 and later, comment out
+            /*
             textLabel.text = ""
             if let outlineLabel = pdfDocument?.outlineItem(for: selection)?.label {
                 textLabel.text = "\(outlineLabel) "
             }
             if let pageLabel = page.label {
                 textLabel.text?.append(contentsOf: String(format: NSLocalizedString("Page %@", comment: "page index"), pageLabel))
+            }
+             */
+            if let currentIndex = pdfDocument?.index(for: page) {
+                textLabel.text = String(currentIndex+1)
+                print(textLabel.constraints.debugDescription)
             }
         }
         
@@ -130,7 +138,9 @@ class SearchViewController: UITableViewController {
         let attrstr = NSMutableAttributedString(string: extendSelection.string!)
         attrstr.addAttribute(.backgroundColor, value: UIColor.yellow, range: range)
         
-        cell.detailTextLabel?.attributedText = attrstr
+        if let detailTextLabel = cell.viewWithTag(3) as? UILabel {
+            detailTextLabel.attributedText = attrstr
+        }
 
         return cell
     }
@@ -138,13 +148,16 @@ class SearchViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selection = searchResults[indexPath.row]
         
+        delegate.goToSelection(selection)
+
         if UIDevice.current.userInterfaceIdiom != .pad {
-            self.dismiss(animated: false, completion: nil)
-            self.presentingViewController?.dismiss(animated: false, completion: nil)
+            self.dismiss(animated: true) {
+                self.delegate.setCurrentSelection(selection, animate: true)
+            }
+        } else {
+            delegate.setCurrentSelection(selection, animate: true)
         }
         
-        delegate.goToSelection(selection)
-        delegate.setCurrentSelection(selection, animate: true)
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
