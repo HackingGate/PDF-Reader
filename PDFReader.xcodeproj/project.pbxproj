@@ -53,6 +53,7 @@
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		767D57D320A08F6E001556B7 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		768BC58820B1369100D044EF /* AlternateIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AlternateIcons.xcassets; sourceTree = "<group>"; };
 		76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewCell.swift; sourceTree = "<group>"; };
 		76B2397C20035B8500DE621B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76B2397E20035F5100DE621B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -118,6 +119,7 @@
 				767D57D320A08F6E001556B7 /* SearchViewController.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
+				768BC58820B1369100D044EF /* AlternateIcons.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
 				766439F61F7C92D600DAF771 /* Info.plist */,
 				767C12C71F9CEC87000CE311 /* Settings.bundle */,
@@ -218,12 +220,13 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/PDFReader/AlternateIcons.xcassets",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Add a Run Script in Build Phase and put in the content of this script\n\nPLISTBUDDY=\"/usr/libexec/PlistBuddy\"\nINFO_PLIST=\"$CODESIGNING_FOLDER_PATH/Info.plist\"\nSETTINGS_PLIST=\"$CODESIGNING_FOLDER_PATH/Settings.bundle/Root.plist\"\nVERSION_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleShortVersionString\\\" \\\"$INFO_PLIST\\\"`\"\nBUILD_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleVersion\\\" \\\"$INFO_PLIST\\\"`\"\nVERSION=\"$VERSION_NUMBER ($BUILD_NUMBER)\"\n\n$PLISTBUDDY -c \"Set :PreferenceSpecifiers:0:DefaultValue '$VERSION'\" \"$SETTINGS_PLIST\"";
+			shellScript = "#!/bin/bash\n\n# Add a Run Script in Build Phase and put in the content of this script\n\nPLISTBUDDY=\"/usr/libexec/PlistBuddy\"\nINFO_PLIST=\"$CODESIGNING_FOLDER_PATH/Info.plist\"\nSETTINGS_PLIST=\"$CODESIGNING_FOLDER_PATH/Settings.bundle/Root.plist\"\nVERSION_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleShortVersionString\\\" \\\"$INFO_PLIST\\\"`\"\nBUILD_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleVersion\\\" \\\"$INFO_PLIST\\\"`\"\nVERSION=\"$VERSION_NUMBER ($BUILD_NUMBER)\"\n\n$PLISTBUDDY -c \"Set :PreferenceSpecifiers:0:DefaultValue '$VERSION'\" \"$SETTINGS_PLIST\"\n\n\n# iOS alternate app icons from Asset Catalogs\n# https://github.com/alexaubry/alternate-icons#demo\n\nembed-alternate-icons";
 		};
 /* End PBXShellScriptBuildPhase section */
 
