@@ -167,13 +167,17 @@ class SearchViewController: UITableViewController {
     // MARK: - IB Actions
     
     @IBAction func searchWeb(_ sender: UIBarButtonItem) {
-        if let text = searchBar.text, let searchURL = URL(string: "x-web-search://?\(text)") {
+        if let text = searchBar.text,
+            let searchURLString: String = "x-web-search://?\(text)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let searchURL = URL(string: searchURLString) {
             UIApplication.shared.open(searchURL, options: [:], completionHandler: nil)
         }
     }
     
     @IBAction func searchWikipedia(_ sender: UIBarButtonItem) {
-        if let text = searchBar.text, let wikiURL = URL(string: "https://wikipedia.org/wiki/\(text)") {
+        if let text = searchBar.text,
+            let wikiURLString = "https://wikipedia.org/wiki/\(text)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+            let wikiURL = URL(string: wikiURLString){
             UIApplication.shared.open(wikiURL, options: [:], completionHandler: nil)
         }
     }
