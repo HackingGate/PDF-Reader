@@ -66,7 +66,10 @@ class ContainerViewController: UIViewController {
         }
     }
     
-
+    @IBAction func shareAction(_ sender: UIBarButtonItem) {
+        delegate.share()
+    }
+    
     /*
     // MARK: - Navigation
 

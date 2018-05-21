@@ -27,6 +27,7 @@ protocol SettingsDelegate {
     func fullTextSearch(string: String) -> Void
     func selectOutline(outline: PDFOutline) -> Void
     func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) -> Void
+    func share() -> Void
 }
 
 extension DocumentViewController: SettingsDelegate {
@@ -94,6 +95,12 @@ extension DocumentViewController: SettingsDelegate {
             pdfView.go(to: action.destination)
         }
     }
+    
+    func share() {
+        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    
 }
 
 class DocumentViewController: UIViewController {

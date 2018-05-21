@@ -254,6 +254,11 @@
                                 <action selector="segmentControlValueChanged:" destination="q1f-iy-oJP" eventType="valueChanged" id="DMo-Bt-fwd"/>
                             </connections>
                         </segmentedControl>
+                        <barButtonItem key="rightBarButtonItem" systemItem="action" id="WJt-j1-PHO">
+                            <connections>
+                                <action selector="shareAction:" destination="q1f-iy-oJP" id="fFQ-CC-BDv"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="collectionContainer" destination="16M-kS-KBS" id="MUR-RE-jz9"/>
