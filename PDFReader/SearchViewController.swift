@@ -44,6 +44,7 @@ class SearchViewController: UITableViewController {
 
         searchBar.delegate = self
         searchBar.showsCancelButton = true
+        searchBar.placeholder = NSLocalizedString("Type a word", comment: "") 
         navigationItem.titleView = searchBar
         
         self.tableView.addObserver(self, forKeyPath: "contentSize", options: .new, context: nil)
