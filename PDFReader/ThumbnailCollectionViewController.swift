@@ -153,7 +153,7 @@ extension ThumbnailCollectionViewController: UICollectionViewDelegateFlowLayout 
         
         if UIApplication.shared.statusBarOrientation.isPortrait {
             // 3 items per line or 2 when width greater than height
-            width = (collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 48 : 64)) / (isWidthGreaterThanHeight ? 2 : 3)
+            width = (collectionView.frame.size.width - (isWidthGreaterThanHeight ? 48 : 64)) / (isWidthGreaterThanHeight ? 2 : 3)
         } else {
             // 4 items per line or 3 when width greater than height
             width = (collectionViewSafeAreaWidth - (isWidthGreaterThanHeight ? 64 : 80)) / (isWidthGreaterThanHeight ? 3 : 4)
