@@ -27,6 +27,7 @@ protocol SettingsDelegate {
     func fullTextSearch(string: String) -> Void
     func selectOutline(outline: PDFOutline) -> Void
     func setPreferredDisplayMode(_ twoUpInLandscapeForPad: Bool) -> Void
+    func share() -> Void
 }
 
 extension DocumentViewController: SettingsDelegate {
@@ -94,6 +95,12 @@ extension DocumentViewController: SettingsDelegate {
             pdfView.go(to: action.destination)
         }
     }
+    
+    func share() {
+        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
+        self.present(activityVC, animated: true, completion: nil)
+    }
+    
 }
 
 class DocumentViewController: UIViewController {
@@ -117,6 +124,7 @@ class DocumentViewController: UIViewController {
             return createSearchController()
         }
     }
+    var searchNavigationController: UINavigationController?
     
     // data
     var managedObjectContext: NSManagedObjectContext? = nil
@@ -247,29 +255,42 @@ class DocumentViewController: UIViewController {
     }
     
     @objc func updateInterface() {
-        if presentingViewController != nil {
+        if presentingViewController != nil, let navigationController = navigationController {
             // use same UI style as DocumentBrowserViewController
             view.backgroundColor = presentingViewController?.view.backgroundColor
             view.tintColor = presentingViewController?.view.tintColor
-            navigationController?.navigationBar.tintColor = presentingViewController?.view.tintColor
-            navigationController?.toolbar.tintColor = presentingViewController?.view.tintColor
+            navigationController.navigationBar.tintColor = presentingViewController?.view.tintColor
+            navigationController.toolbar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
             if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
-                navigationController?.navigationBar.barStyle = .black
-                navigationController?.toolbar.barStyle = .black
+                navigationController.navigationBar.barStyle = .black
+                navigationController.toolbar.barStyle = .black
                 // use true black background to protect OLED screen
                 view.backgroundColor = .black
             } else {
-                navigationController?.navigationBar.barStyle = .default
-                navigationController?.toolbar.barStyle = .default
+                navigationController.navigationBar.barStyle = .default
+                navigationController.toolbar.barStyle = .default
             }
             
-            if navigationItem.searchController?.isActive == true, let items = navigationController?.toolbar.items {
+            if navigationItem.searchController?.isActive == true, let items = navigationController.toolbar.items {
                 for item in items {
                     item.isEnabled = true
                     item.tintColor = view.tintColor
                 }
             }
+            
+            // for search
+            guard let searchNC = searchNavigationController else { return }
+            guard let searchVC = searchNC.topViewController as? SearchViewController else { return }
+            searchNC.navigationBar.tintColor = view.tintColor
+            searchNC.toolbar.tintColor = view.tintColor
+            if navigationController.navigationBar.barStyle != .black {
+                searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
+                searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
+                searchVC.view.backgroundColor = view.backgroundColor
+                searchVC.searchBar.barStyle = searchNC.navigationBar.barStyle
+            }
+            searchVC.searchBar.tintColor = view.tintColor
         }
     }
     
@@ -744,10 +765,12 @@ class DocumentViewController: UIViewController {
         }
     }
     
+    /*
     @IBAction func shareAction() {
         let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
         self.present(activityVC, animated: true, completion: nil)
     }
+     */
     
     @IBAction func dismissDocumentViewController() {
         dismiss(animated: true) {
@@ -893,8 +916,6 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 popopverVC.modalPresentationStyle = .popover
                 popopverVC.popoverPresentationController?.delegate = self
                 popopverVC.delegate = self
-                popopverVC.pdfDocument = pdfView.document
-                popopverVC.displayBox = pdfView.displayBox
                 let width = popopverVC.preferredContentSize.width
                 var height = popopverVC.preferredContentSize.height
                 if !isEncrypted {
@@ -903,8 +924,6 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 if UIDevice.current.userInterfaceIdiom != .pad {
                     height -= 44
                 }
-                // temporary disable Full-text search
-                height -= 44
                 // temporary disable Find on Page
                 height -= 44
                 
@@ -921,6 +940,32 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 }
                 containerVC.delegate = self
             }
+        } else if (segue.identifier == "SearchViewController") {
+            if let searchNC = segue.destination as? UINavigationController,
+                let searchVC = searchNC.topViewController as? SearchViewController,
+                let navigationController = navigationController {
+                searchNC.navigationBar.tintColor = presentingViewController?.view.tintColor
+                searchNC.toolbar.tintColor = presentingViewController?.view.tintColor
+                if navigationController.navigationBar.barStyle != .black {
+                    searchNC.navigationBar.barStyle = navigationController.navigationBar.barStyle
+                    searchNC.toolbar.barStyle = navigationController.toolbar.barStyle
+                    searchVC.view.backgroundColor = presentingViewController?.view.backgroundColor
+                    searchVC.searchBar.barStyle = searchNC.navigationBar.barStyle
+                }
+                searchVC.searchBar.tintColor = presentingViewController?.view.tintColor
+                searchNavigationController = searchNC
+                
+                // because searchVC is in a navigationController, viewDidLoad() will proceeded before here.
+                searchVC.delegate = self
+                searchVC.pdfDocument = pdfView.document
+                searchVC.pdfDocument?.delegate = searchVC
+                searchVC.displayBox = pdfView.displayBox
+                
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    searchNC.modalPresentationStyle = .popover
+                    searchNC.popoverPresentationController?.delegate = self
+                }
+            }
         }
     }
     
@@ -932,101 +977,3 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
     
 }
 
-// MARK: - UISearch
-
-extension DocumentViewController: UISearchBarDelegate, UISearchControllerDelegate {
-    // full text search
-    func fullTextSearch(string: String) {
-        pdfView.document?.cancelFindString()
-        pdfView.document?.beginFindString(string, withOptions: [.regularExpression, .caseInsensitive])
-    }
-    
-    // on page search
-    func createSearchController() -> UISearchController {
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.delegate = self
-        searchController.delegate = self
-        searchController.dimsBackgroundDuringPresentation = false
-        navigationItem.hidesSearchBarWhenScrolling = false
-        return searchController
-    }
-    
-    func updateSearchController() {
-        if let navigationController = navigationController, let searchController = navigationItem.searchController {
-            searchController.searchBar.superview?.isHidden = navigationController.isNavigationBarHidden || !isFindOnPageEnabled
-            
-            if navigationController.isNavigationBarHidden && isFindOnPageEnabled {
-                self.additionalSafeAreaInsets.top = -64 // fixed by a magic num
-            } else {
-                self.additionalSafeAreaInsets.top = 0
-            }
-        }
-    }
-    
-    func setSearchEnabled(_ enable: Bool) {
-        if let navigationController = navigationController, !navigationController.isNavigationBarHidden {
-            // interact when nav is not hidden
-            if enable {
-                navigationItem.searchController = searchController
-            } else {
-                navigationItem.searchController = nil
-                // workaround to update UI
-                navigationController.setNavigationBarHidden(true, animated: false)
-                navigationController.setNavigationBarHidden(false, animated: false)
-            }
-        }
-    }
-    
-    func searchText(withOptions options: NSString.CompareOptions) {
-        if let text = searchBarText {
-            if pdfView.currentSelection == nil, let currentPage = pdfView.currentPage {
-                // a workaround to search text from current page
-                let selection = currentPage.selection(for: currentPage.bounds(for: pdfView.displayBox))
-                pdfView.setCurrentSelection(selection, animate: false)
-            }
-            if let newSelection = pdfView.document?.findString(text, fromSelection: pdfView.currentSelection, withOptions: options) {
-                self.goToSelection(newSelection)
-                self.setCurrentSelection(newSelection, animate: true)
-            } else {
-                // for workaround: clear selected if no real search results returned
-                pdfView.clearSelection()
-            }
-        }
-    }
-    
-    // UISearchBarDelegate
-    
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        searchBarText = searchBar.text
-        searchText(withOptions: [.regularExpression])
-    }
-    
-    // UISearchControllerDelegate
-    
-    func willPresentSearchController(_ searchController: UISearchController) {
-        if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
-            pdfThumbnailView.isHidden = true
-        }
-        if let items = navigationController?.toolbar.items {
-            for item in items {
-                item.isEnabled = true
-                item.tintColor = view.tintColor
-            }
-        }
-        navigationController?.hidesBarsOnTap = false
-    }
-    
-    func willDismissSearchController(_ searchController: UISearchController) {
-        if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
-            pdfThumbnailView.isHidden = false
-        }
-        if let items = navigationController?.toolbar.items {
-            for item in items {
-                item.isEnabled = false
-                item.tintColor = .clear
-            }
-        }
-        navigationController?.hidesBarsOnTap = true
-    }
-
-}

@@ -20,11 +20,12 @@
 		766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */; };
 		766D15901FFCCFA500A57C18 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 766D15921FFCCFA500A57C18 /* Localizable.strings */; };
 		767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 767C12C71F9CEC87000CE311 /* Settings.bundle */; };
+		767D57D420A08F6E001556B7 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767D57D320A08F6E001556B7 /* SearchViewController.swift */; };
 		7684DC131FF07F2F00B36E26 /* PaddingLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */; };
 		76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */; };
 		76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */; };
 		76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */; };
-		76E88B8720215D190077920B /* SearchResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E88B8620215D190077920B /* SearchResultsTableViewController.swift */; };
+		76E72E7B20A3281800350EF4 /* SearchExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E72E7A20A3281800350EF4 /* SearchExtension.swift */; };
 		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,10 @@
 		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
 		7654260A2001CB8400D2FB72 /* PDFReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDFReader.entitlements; sourceTree = "<group>"; };
 		7654260C2001CB8600D2FB72 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		766221E820AFF39900B84B2F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
+		766221EA20AFF41300B84B2F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
+		766221EC20AFF41C00B84B2F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		766221EE20AFF42500B84B2F /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		766439E31F7C92D600DAF771 /* PDFReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PDFReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		766439E61F7C92D600DAF771 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowserViewController.swift; sourceTree = "<group>"; };
@@ -46,18 +51,16 @@
 		766D15931FFCCFAE00A57C18 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		766D15941FFCCFB100A57C18 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		767C12C71F9CEC87000CE311 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		76809B402010F4EA00819E8A /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
-		76809B422010F4EA00819E8A /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
-		76809B442010F4EB00819E8A /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
-		76809B462010F4EC00819E8A /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
+		767D57D320A08F6E001556B7 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaddingLabel.swift; sourceTree = "<group>"; };
+		768BC58820B1369100D044EF /* AlternateIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AlternateIcons.xcassets; sourceTree = "<group>"; };
 		76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewCell.swift; sourceTree = "<group>"; };
 		76B2397C20035B8500DE621B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76B2397E20035F5100DE621B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76B2398120036BE300DE621B /* yue-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "yue-Hant"; path = "yue-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		76C185F51FFF67D200F83A1B /* PDFReader.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PDFReader.xcdatamodel; sourceTree = "<group>"; };
 		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
-		76E88B8620215D190077920B /* SearchResultsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsTableViewController.swift; sourceTree = "<group>"; };
+		76E72E7A20A3281800350EF4 /* SearchExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchExtension.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,6 +108,7 @@
 				766439E61F7C92D600DAF771 /* AppDelegate.swift */,
 				766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */,
 				766439EA1F7C92D600DAF771 /* DocumentViewController.swift */,
+				76E72E7A20A3281800350EF4 /* SearchExtension.swift */,
 				766439EC1F7C92D600DAF771 /* Document.swift */,
 				763764D11FC3125500B41B05 /* PopoverTableViewController.swift */,
 				7629A3521FF11A7F007402FB /* ContainerViewController.swift */,
@@ -112,9 +116,10 @@
 				7684DC121FF07F2F00B36E26 /* PaddingLabel.swift */,
 				76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */,
 				76A4F6001FFB240E00F2CE11 /* OutlineTableViewCell.swift */,
-				76E88B8620215D190077920B /* SearchResultsTableViewController.swift */,
+				767D57D320A08F6E001556B7 /* SearchViewController.swift */,
 				766439EE1F7C92D600DAF771 /* Main.storyboard */,
 				766439F11F7C92D600DAF771 /* Assets.xcassets */,
+				768BC58820B1369100D044EF /* AlternateIcons.xcassets */,
 				766439F31F7C92D600DAF771 /* LaunchScreen.storyboard */,
 				766439F61F7C92D600DAF771 /* Info.plist */,
 				767C12C71F9CEC87000CE311 /* Settings.bundle */,
@@ -215,12 +220,13 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/PDFReader/AlternateIcons.xcassets",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\n\n# Add a Run Script in Build Phase and put in the content of this script\n\nPLISTBUDDY=\"/usr/libexec/PlistBuddy\"\nINFO_PLIST=\"$CODESIGNING_FOLDER_PATH/Info.plist\"\nSETTINGS_PLIST=\"$CODESIGNING_FOLDER_PATH/Settings.bundle/Root.plist\"\nVERSION_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleShortVersionString\\\" \\\"$INFO_PLIST\\\"`\"\nBUILD_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleVersion\\\" \\\"$INFO_PLIST\\\"`\"\nVERSION=\"$VERSION_NUMBER ($BUILD_NUMBER)\"\n\n$PLISTBUDDY -c \"Set :PreferenceSpecifiers:0:DefaultValue '$VERSION'\" \"$SETTINGS_PLIST\"";
+			shellScript = "#!/bin/bash\n\n# Add a Run Script in Build Phase and put in the content of this script\n\nPLISTBUDDY=\"/usr/libexec/PlistBuddy\"\nINFO_PLIST=\"$CODESIGNING_FOLDER_PATH/Info.plist\"\nSETTINGS_PLIST=\"$CODESIGNING_FOLDER_PATH/Settings.bundle/Root.plist\"\nVERSION_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleShortVersionString\\\" \\\"$INFO_PLIST\\\"`\"\nBUILD_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleVersion\\\" \\\"$INFO_PLIST\\\"`\"\nVERSION=\"$VERSION_NUMBER ($BUILD_NUMBER)\"\n\n$PLISTBUDDY -c \"Set :PreferenceSpecifiers:0:DefaultValue '$VERSION'\" \"$SETTINGS_PLIST\"\n\n\n# iOS alternate app icons from Asset Catalogs\n# https://github.com/alexaubry/alternate-icons#demo\n\nembed-alternate-icons";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -237,7 +243,8 @@
 				76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */,
 				76A4F6011FFB240E00F2CE11 /* OutlineTableViewCell.swift in Sources */,
 				766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */,
-				76E88B8720215D190077920B /* SearchResultsTableViewController.swift in Sources */,
+				767D57D420A08F6E001556B7 /* SearchViewController.swift in Sources */,
+				76E72E7B20A3281800350EF4 /* SearchExtension.swift in Sources */,
 				766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */,
 				76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */,
 				76C185F61FFF67D200F83A1B /* PDFReader.xcdatamodeld in Sources */,
@@ -251,10 +258,10 @@
 			isa = PBXVariantGroup;
 			children = (
 				766439EF1F7C92D600DAF771 /* Base */,
-				76809B402010F4EA00819E8A /* ja */,
-				76809B422010F4EA00819E8A /* zh-Hant */,
-				76809B442010F4EB00819E8A /* zh-Hans */,
-				76809B462010F4EC00819E8A /* yue-Hant */,
+				766221E820AFF39900B84B2F /* ja */,
+				766221EA20AFF41300B84B2F /* zh-Hant */,
+				766221EC20AFF41C00B84B2F /* zh-Hans */,
+				766221EE20AFF42500B84B2F /* yue-Hant */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";

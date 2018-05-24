@@ -19,10 +19,11 @@
 "Move" = "Move";
 "Cancel" = "Cancel";
 
-//  SearchResultsTableViewController.swift
+//  SearchViewController.swift
 "%d matches found" = "%d matches found";
 "1 match found" = "1 match found";
 "No matches found" = "No matches found";
 "Page %@" = "Page %@";
 "Searching..." = "Searching...";
 "Define" = "Define";
+"Type a word" = "Type a word";

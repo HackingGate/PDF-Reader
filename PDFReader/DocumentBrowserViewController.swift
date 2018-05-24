@@ -71,21 +71,61 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                            name: .UIApplicationWillEnterForeground,
                            object: nil)
 
-        // Specify the allowed content types of your application via the Info.plist.
-        
-        // Do any additional setup after loading the view, typically from a nib.
+        // add Settings bar button item
+        let settingsItem = UIBarButtonItem(image: #imageLiteral(resourceName: "settings"), style: .plain, target: self, action: #selector(gotoSettings))
+        additionalLeadingNavigationBarButtonItems = [settingsItem]
     }
+    
+    // MARK: Functions
     
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
         browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
         if browserUserInterfaceStyle == .white {
             view.tintColor = UIButton(type: .system).titleColor(for: .normal)
+            changeIcon(to: nil)
         } else if browserUserInterfaceStyle == .light {
             view.tintColor = .darkGray
+            self.changeIcon(to: "AppIcon-LightGray")
         } else if browserUserInterfaceStyle == .dark {
             view.tintColor = .orange
+            self.changeIcon(to: "AppIcon-DarkOrange")
         }
+    }
+    
+    @objc func gotoSettings() {
+        guard let settingsURL = URL(string: UIApplicationOpenSettingsURLString) else { return }
+        UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+    }
+    
+    func changeIcon(to iconName: String?) {
+        guard UIApplication.shared.supportsAlternateIcons else { return }
+        if let alternateIconName = UIApplication.shared.alternateIconName {
+            if alternateIconName == iconName {
+                return
+            }
+        } else {
+            // default icon
+            if iconName == nil {
+                return
+            }
+        }
+        delay(0.1) {
+            UIApplication.shared.setAlternateIconName(iconName, completionHandler: { (error) in
+                if let error = error {
+                    print("App icon failed to change due to \(error.localizedDescription)")
+                    self.changeIcon(to: iconName)
+                } else {
+                    print("App icon changed successfully")
+                }
+            })
+        }
+    }
+    
+    // https://stackoverflow.com/a/44151450/4063462
+    func delay(_ delay:Double, closure:@escaping ()->()) {
+        let when = DispatchTime.now() + delay
+        DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
     }
     
     // MARK: UIDocumentBrowserViewControllerDelegate

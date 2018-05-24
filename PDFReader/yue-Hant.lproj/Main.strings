@@ -1,6 +1,9 @@
 
-/* Class = "UILabel"; text = "Subtitle"; ObjectID = "AYx-Qk-dHD"; */
-"AYx-Qk-dHD.text" = "Subtitle";
+/* Class = "UIBarButtonItem"; title = "Search Web"; ObjectID = "1vr-F8-lKX"; */
+"1vr-F8-lKX.title" = "搵網頁";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "AW8-u4-D2u"; */
+"AW8-u4-D2u.title" = "Root View Controller";
 
 /* Class = "UILabel"; text = "Page"; ObjectID = "FJw-Gx-9U7"; */
 "FJw-Gx-9U7.text" = "Page";
@@ -8,23 +11,29 @@
 /* Class = "UIBarButtonItem"; title = " "; ObjectID = "HEo-Mk-C1l"; */
 "HEo-Mk-C1l.title" = " ";
 
-/* Class = "UILabel"; text = "Full-text search"; ObjectID = "INT-C5-5vD"; */
-"INT-C5-5vD.text" = "全文檢索";
-
 /* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
 "IgN-wB-cSg.text" = "某D功能可能冇法使用";
 
 /* Class = "UILabel"; text = "Two pages mode"; ObjectID = "Nb4-pk-auH"; */
 "Nb4-pk-auH.text" = "雙頁模式";
 
+/* Class = "UIBarButtonItem"; title = "Search Wikipedia"; ObjectID = "Ne2-xq-TMD"; */
+"Ne2-xq-TMD.title" = "搵Wikipedia";
+
+/* Class = "UILabel"; text = "0 / 0"; ObjectID = "OEl-Mt-vTk"; */
+"OEl-Mt-vTk.text" = "0 / 0";
+
 /* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
 "P85-Tx-Jdt.text" = "Label";
 
+/* Class = "UILabel"; text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."; ObjectID = "RaR-H5-NeR"; */
+"RaR-H5-NeR.text" = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "UGd-ZX-Vxs"; */
+"UGd-ZX-Vxs.text" = "1";
+
 /* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
 "V6z-zU-NJK.text" = "Title";
-
-/* Class = "UILabel"; text = "Search text within this document"; ObjectID = "aDz-lu-4Lc"; */
-"aDz-lu-4Lc.text" = "由呢份檔案搜尋特定字串";
 
 /* Class = "UILabel"; text = "Scroll Direction"; ObjectID = "c6G-KP-IC3"; */
 "c6G-KP-IC3.text" = "滾動方向";
@@ -34,9 +43,6 @@
 
 /* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
 "fOs-we-IUy.text" = "由右至左顯示";
-
-/* Class = "UILabel"; text = "Title"; ObjectID = "gy0-EG-D34"; */
-"gy0-EG-D34.text" = "Title";
 
 /* Class = "UILabel"; text = "Show search bar"; ObjectID = "lqS-U0-eSb"; */
 "lqS-U0-eSb.text" = "顯示搜尋欄";

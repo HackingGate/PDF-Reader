@@ -19,10 +19,11 @@
 "Move" = "移動";
 "Cancel" = "取消";
 
-//  SearchResultsTableViewController.swift
+//  SearchViewController.swift
 "%d matches found" = "搵到 %d 個匹配";
 "1 match found" = "搵到 1 個匹配";
 "No matches found" = "未搵到匹配";
 "Page %@" = "第%@頁";
 "Searching..." = "搵緊...";
 "Define" = "定義";
+"Type a word" = "打入文字";

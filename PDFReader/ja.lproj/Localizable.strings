@@ -19,10 +19,11 @@
 "Move" = "移動";
 "Cancel" = "キャンセル";
 
-//  SearchResultsTableViewController.swift
+//  SearchViewController.swift
 "%d matches found" = "一致する項目が%d件見つかりました";
 "1 match found" = "一致する項目が1件見つかりました";
 "No matches found" = "一致する項目が見つかりませんでした";
 "Page %@" = "ページ %@";
 "Searching..." = "検索中...";
 "Define" = "定義";
+"Type a word" = "語句を挿入";
