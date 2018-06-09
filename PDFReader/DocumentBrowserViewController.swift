@@ -12,7 +12,7 @@ import CloudKit
 
 class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocumentBrowserViewControllerDelegate, NSFetchedResultsControllerDelegate {
     
-    let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
+    static let browserUserInterfaceStyleKey = "browserUserInterfaceStyle"
     let defaultBrowserUserInterfaceStyle: UIDocumentBrowserViewController.BrowserUserInterfaceStyle = .white
     var managedObjectContext: NSManagedObjectContext? = nil
     var fetchedResults: [DocumentEntity]?
@@ -60,7 +60,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         // get Settings.bundle
         var appDefaults = Dictionary<String, AnyObject>()
-        appDefaults[browserUserInterfaceStyleKey] = defaultBrowserUserInterfaceStyle.rawValue as NSNumber
+        appDefaults[DocumentBrowserViewController.browserUserInterfaceStyleKey] = defaultBrowserUserInterfaceStyle.rawValue as NSNumber
         
         UserDefaults.standard.register(defaults: appDefaults)
         updateInterface()
@@ -80,7 +80,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     @objc func updateInterface() {
         UserDefaults.standard.synchronize()
-        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
+        browserUserInterfaceStyle = UIDocumentBrowserViewController.BrowserUserInterfaceStyle(rawValue: UInt(UserDefaults.standard.integer(forKey: DocumentBrowserViewController.browserUserInterfaceStyleKey))) ?? defaultBrowserUserInterfaceStyle
         if browserUserInterfaceStyle == .white {
             view.tintColor = UIButton(type: .system).titleColor(for: .normal)
             changeIcon(to: nil)
