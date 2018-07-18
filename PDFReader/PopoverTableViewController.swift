@@ -68,7 +68,7 @@ class PopoverTableViewController: UITableViewController {
         presentingViewController?.view.tintColor = presentingViewController?.presentingViewController?.view.tintColor
         view.tintColor = presentingViewController?.view.tintColor
         presentedViewController?.view.tintColor = presentingViewController?.view.tintColor
-        let styleRawValue = UserDefaults.standard.integer(forKey: (presentingViewController?.presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey)
+        let styleRawValue = UserDefaults.standard.integer(forKey: DocumentBrowserViewController.browserUserInterfaceStyleKey)
         if styleRawValue == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.white.rawValue {
 //            popoverPresentationController?.backgroundColor = .white
             whiteStyleButton.tintColor = view.tintColor
@@ -144,11 +144,11 @@ class PopoverTableViewController: UITableViewController {
         sender.tintColor = view.tintColor
         switch sender.tag {
         case 1:
-            UserDefaults.standard.set(0, forKey: (presentingViewController?.presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey)
+            UserDefaults.standard.set(0, forKey: (DocumentBrowserViewController.browserUserInterfaceStyleKey))
         case 2:
-            UserDefaults.standard.set(1, forKey: (presentingViewController?.presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey)
+            UserDefaults.standard.set(1, forKey: (DocumentBrowserViewController.browserUserInterfaceStyleKey))
         case 3:
-            UserDefaults.standard.set(2, forKey: (presentingViewController?.presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey)
+            UserDefaults.standard.set(2, forKey: (DocumentBrowserViewController.browserUserInterfaceStyleKey))
         default: break
         }
         

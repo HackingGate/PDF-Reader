@@ -262,7 +262,7 @@ class DocumentViewController: UIViewController {
             navigationController.navigationBar.tintColor = presentingViewController?.view.tintColor
             navigationController.toolbar.tintColor = presentingViewController?.view.tintColor
             navigationItem.searchController?.searchBar.tintColor = presentingViewController?.view.tintColor
-            if UserDefaults.standard.integer(forKey: (presentingViewController as! DocumentBrowserViewController).browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
+            if UserDefaults.standard.integer(forKey: DocumentBrowserViewController.browserUserInterfaceStyleKey) == UIDocumentBrowserViewController.BrowserUserInterfaceStyle.dark.rawValue {
                 navigationController.navigationBar.barStyle = .black
                 navigationController.toolbar.barStyle = .black
                 // use true black background to protect OLED screen

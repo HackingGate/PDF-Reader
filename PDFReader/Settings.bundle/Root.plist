@@ -6,16 +6,16 @@
 	<string>Root</string>
 	<key>PreferenceSpecifiers</key>
 	<array>
-        <dict>
-            <key>DefaultValue</key>
-            <string></string>
-            <key>Key</key>
-            <string>SNAppVersion</string>
-            <key>Title</key>
-            <string>Version</string>
-            <key>Type</key>
-            <string>PSTitleValueSpecifier</string>
-        </dict>
+		<dict>
+			<key>DefaultValue</key>
+			<string></string>
+			<key>Key</key>
+			<string>SNAppVersion</string>
+			<key>Title</key>
+			<string>Version</string>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+		</dict>
 		<dict>
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
@@ -37,6 +37,14 @@
 				<integer>1</integer>
 				<integer>2</integer>
 			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>
+			<key>Title</key>
+			<string>License</string>
+			<key>File</key>
+			<string>LicensePlist</string>
 		</dict>
 	</array>
 </dict>

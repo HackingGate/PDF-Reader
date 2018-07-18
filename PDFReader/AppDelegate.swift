@@ -53,16 +53,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Reveal / import the document at the URL
         guard let documentBrowserViewController = window?.rootViewController as? DocumentBrowserViewController else { return false }
 
-        documentBrowserViewController.revealDocument(at: inputURL, importIfNeeded: true) { (revealedDocumentURL, error) in
-            if let error = error {
-                // Handle the error appropriately
-                print("Failed to reveal the document at URL \(inputURL) with error: '\(error)'")
-                return
-            }
-            
-            // Present the Document View Controller for the revealed URL
-            documentBrowserViewController.presentDocument(at: revealedDocumentURL!)
-        }
+        let picker = UIDocumentPickerViewController(url: inputURL, in: .exportToService)
+        documentBrowserViewController.present(picker, animated: true, completion: nil)
 
         return true
     }
