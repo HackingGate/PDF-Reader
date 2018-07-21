@@ -18,36 +18,9 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     var fetchedResults: [DocumentEntity]?
     let privateCloudDatabase = CKContainer.default().privateCloudDatabase
     let mobileDocumentPath = "file:///private/var/mobile/Library/Mobile%20Documents/"
-
-    func copyPDFIfNeeded() {
-        let fileManager = FileManager.default
-        let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
-        guard documentsURL.count != 0 else { return }
-        
-        let fileName = "Quick Start Guide.pdf"
-        guard let bundlePDFURL = Bundle.main.resourceURL?.appendingPathComponent(fileName) else { return }
-        guard let pdfURL = documentsURL.first?.appendingPathComponent(fileName) else { return }
-        
-        if !( (try? pdfURL.checkResourceIsReachable()) ?? false) {
-            print("PDF does not exist in documents folder")
-            do {
-                try fileManager.copyItem(atPath: bundlePDFURL.path, toPath: pdfURL.path)
-            } catch let error as NSError {
-                print("Couldn't copy file to final location! Error:\(error.description)")
-            }
-        } else {
-            print("PDF file found at path: \(pdfURL.path)")
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let isFirstLaunch = UserDefaults.isFirstLaunch()
-
-        if isFirstLaunch {
-            self.copyPDFIfNeeded()
-        }
         
         if let sectionInfo = fetchedResultsController.sections?.first{
             fetchedResults = sectionInfo.objects as? [DocumentEntity]
@@ -398,19 +371,5 @@ extension URL {
             shortString = String(self.absoluteString.dropFirst(basePath.count))
         }
         return shortString
-    }
-}
-
-extension UserDefaults {
-    // check for is first launch - only true on first invocation after app install, false on all further invocations
-    // Note: Store this value in AppDelegate if you have multiple places where you are checking for this flag
-    static func isFirstLaunch() -> Bool {
-        let hasBeenLaunchedBeforeFlag = "hasBeenLaunchedBeforeFlag"
-        let isFirstLaunch = !UserDefaults.standard.bool(forKey: hasBeenLaunchedBeforeFlag)
-        if (isFirstLaunch) {
-            UserDefaults.standard.set(true, forKey: hasBeenLaunchedBeforeFlag)
-            UserDefaults.standard.synchronize()
-        }
-        return isFirstLaunch
     }
 }

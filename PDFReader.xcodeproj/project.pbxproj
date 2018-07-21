@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7624F0BA209D97D6005CA8AA /* Quick Start Guide.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 7624F0B9209D97D6005CA8AA /* Quick Start Guide.pdf */; };
 		7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7629A3521FF11A7F007402FB /* ContainerViewController.swift */; };
 		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
 		7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7654260C2001CB8600D2FB72 /* CloudKit.framework */; };
@@ -30,7 +29,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		7624F0B9209D97D6005CA8AA /* Quick Start Guide.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = "Quick Start Guide.pdf"; sourceTree = "<group>"; };
 		7629A3521FF11A7F007402FB /* ContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
 		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
 		7654260A2001CB8400D2FB72 /* PDFReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDFReader.entitlements; sourceTree = "<group>"; };
@@ -125,7 +123,6 @@
 				767C12C71F9CEC87000CE311 /* Settings.bundle */,
 				766D15921FFCCFA500A57C18 /* Localizable.strings */,
 				76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */,
-				7624F0B9209D97D6005CA8AA /* Quick Start Guide.pdf */,
 			);
 			path = PDFReader;
 			sourceTree = "<group>";
@@ -204,7 +201,6 @@
 			files = (
 				766D15901FFCCFA500A57C18 /* Localizable.strings in Resources */,
 				767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */,
-				7624F0BA209D97D6005CA8AA /* Quick Start Guide.pdf in Resources */,
 				766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */,
 				766439F21F7C92D600DAF771 /* Assets.xcassets in Resources */,
 				766439F01F7C92D600DAF771 /* Main.storyboard in Resources */,
