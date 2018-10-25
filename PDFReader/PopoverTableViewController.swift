@@ -205,6 +205,10 @@ class PopoverTableViewController: UITableViewController {
         if !delegate.isEncrypted && indexPath.row == 3 {
             return 0
         }
+        if indexPath.row == 4 {
+            // temporary disable Find on Page
+            return 0
+        }
         if UIDevice.current.userInterfaceIdiom != .pad && indexPath.row == 5 {
             return 0
         }

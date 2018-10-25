@@ -924,6 +924,8 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 if UIDevice.current.userInterfaceIdiom != .pad {
                     height -= 44
                 }
+                // temporary disable Find on Page
+                height -= 44
                 
                 popopverVC.preferredContentSize = CGSize(width: width, height: height)
 
