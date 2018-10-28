@@ -42,9 +42,9 @@
 			<key>Type</key>
 			<string>PSChildPaneSpecifier</string>
 			<key>Title</key>
-			<string>License</string>
+			<string>Acknowledgements</string>
 			<key>File</key>
-			<string>LicensePlist</string>
+			<string>AcknowledgementsPlist</string>
 		</dict>
 	</array>
 </dict>
