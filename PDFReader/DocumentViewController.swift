@@ -8,6 +8,7 @@
 
 import UIKit
 import PDFKit
+import HGPDFKit
 import CoreData
 import CloudKit
 
@@ -71,12 +72,12 @@ extension DocumentViewController: SettingsDelegate {
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y - offsetNeedToFix)
                 } else if selectionBoundsInView.origin.y + inset + selectionBoundsInView.height > pdfView.frame.size.height - pdfView.safeAreaInsets.bottom {
                     var offsetNeedToFix = (selectionBoundsInView.origin.y + selectionBoundsInView.height) - (pdfView.frame.size.height - pdfView.safeAreaInsets.bottom) + inset
-                    if isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
+                    if pdfView.isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + offsetNeedToFix)
                 }
                 if selectionBoundsInView.origin.x - inset < pdfView.safeAreaInsets.left {
                     var offsetNeedToFix = pdfView.safeAreaInsets.left - selectionBoundsInView.origin.x + inset
-                    if isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
+                    if pdfView.isViewTransformedForRTL { offsetNeedToFix = -offsetNeedToFix}
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x - offsetNeedToFix, y: scrollView.contentOffset.y)
                 } else if selectionBoundsInView.origin.x + inset + selectionBoundsInView.width > pdfView.frame.size.width - pdfView.safeAreaInsets.right {
                     let offsetNeedToFix = (selectionBoundsInView.origin.x + selectionBoundsInView.width) - (pdfView.frame.size.width - pdfView.safeAreaInsets.right) + inset
@@ -139,18 +140,6 @@ class DocumentViewController: UIViewController {
     }
     var didMoveToLastViewedPage = false
     
-    // scaleFactor
-    struct ScaleFactor {
-        // store factor for single mode
-        var portrait: CGFloat
-        var landscape: CGFloat
-        // devide by 2 for two up mode
-    }
-    // different form pdfView.scaleFactorForSizeToFit, the scaleFactorForSizeToFit use superArea not safeArea
-    var scaleFactorForSizeToFit: ScaleFactor?
-    var scaleFactorVertical: ScaleFactor?
-    var scaleFactorHorizontal: ScaleFactor?
-    var zoomedIn = false
     
     // offset
     var offsetPortrait: CGPoint?
@@ -160,7 +149,6 @@ class DocumentViewController: UIViewController {
     var isHorizontalScroll = false
     var isRightToLeft = false
     var isEncrypted = false
-    var isViewTransformedForRTL = false // if allowsDocumentAssembly is false, then the value should always be false
     var prefersTwoUpInLandscapeForPad = false // default value
     
     override func viewWillAppear(_ animated: Bool) {
@@ -185,8 +173,8 @@ class DocumentViewController: UIViewController {
                 
                 self.moveToLastViewedPage()
                 self.getScaleFactorForSizeToFitAndOffset()
-                self.setMinScaleFactorForSizeToFit()
-                self.setScaleFactorForUser()
+                self.pdfView.setMinScaleFactorForSizeToFit()
+                self.pdfView.setScaleFactorForUser()
                 
                 self.setPDFThumbnailView()
                 
@@ -214,7 +202,7 @@ class DocumentViewController: UIViewController {
         pdfView.addGestureRecognizer(doubleTapGesture)
         navigationController?.barHideOnTapGestureRecognizer.require(toFail: doubleTapGesture)
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
-
+        
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = true
         pdfView.displayBox = .cropBox
@@ -227,7 +215,7 @@ class DocumentViewController: UIViewController {
         } else {
             pdfView.displayMode = .singlePageContinuous
         }
-
+        
         pdfView.scrollView?.scrollsToTop = false
         pdfView.scrollView?.contentInsetAdjustmentBehavior = .scrollableAxes
         
@@ -302,23 +290,25 @@ class DocumentViewController: UIViewController {
             } else {
                 pdfView.displayMode = .singlePageContinuous
             }
-            setMinScaleFactorForSizeToFit()
+            pdfView.setMinScaleFactorForSizeToFit()
             pdfView.go(to: page) // workaround to fix
-            setScaleFactorForUser()
+            pdfView.setScaleFactorForUser()
         }
-
+        
     }
     
     func updateScrollDirection() {
         updateUserScaleFactorAndOffset(changeOrientation: false)
         
+        let thumbnailView = navigationController?.toolbar.viewWithTag(1) as? PDFThumbnailView
+        
         if let currentPage = pdfView.currentPage {
             if pdfView.displayMode == .singlePageContinuous && allowsDocumentAssembly {
-                if isRightToLeft != isViewTransformedForRTL {
+                if isRightToLeft != pdfView.isViewTransformedForRTL {
                     if pdfView.displaysRTL {
                         pdfView.displaysRTL = false
                     }
-                    transformViewForRTL(isRightToLeft)
+                    pdfView.transformViewForRTL(isRightToLeft, thumbnailView)
                 }
                 if isRightToLeft {
                     // single page RTL use horizontal scroll
@@ -328,8 +318,8 @@ class DocumentViewController: UIViewController {
                 }
             } else if pdfView.displayMode == .twoUpContinuous {
                 if isRightToLeft != pdfView.displaysRTL  {
-                    if isViewTransformedForRTL {
-                        transformViewForRTL(false)
+                    if pdfView.isViewTransformedForRTL {
+                        pdfView.transformViewForRTL(false, thumbnailView)
                     }
                     pdfView.displaysRTL = isRightToLeft
                 }
@@ -345,8 +335,8 @@ class DocumentViewController: UIViewController {
                 if isHorizontalScroll {
                     pdfView.displayDirection = .horizontal
                 } else {
-                    if isViewTransformedForRTL {
-                        transformViewForRTL(false)
+                    if pdfView.isViewTransformedForRTL {
+                        pdfView.transformViewForRTL(false, thumbnailView)
                     }
                     pdfView.displayDirection = .vertical
                 }
@@ -358,32 +348,8 @@ class DocumentViewController: UIViewController {
             pdfView.go(to: currentPage)
         }
         
-        setMinScaleFactorForSizeToFit()
-        setScaleFactorForUser()
-    }
-    
-    func transformViewForRTL(_ transformForRTL: Bool) {
-        if transformForRTL != isViewTransformedForRTL, let scrollView = pdfView.scrollView, let document = pdfView.document {
-            
-            scrollView.transform = CGAffineTransform(rotationAngle: transformForRTL ? .pi : 0)
-            
-            if let pdfThumbnailView = navigationController?.toolbar.viewWithTag(1) {
-                pdfThumbnailView.transform = CGAffineTransform(rotationAngle: transformForRTL ? .pi : 0)
-            }
-
-            let pageCount = document.pageCount
-            
-            print("pageCount: \(pageCount)")
-            for i in 0..<pageCount {
-                document.page(at: i)?.rotation = transformForRTL ? 180 : 0
-            }
-            
-            // if transfrom view for RTL, the thumbnail does not update 
-            pdfView.document = nil
-            pdfView.document = document
-        }
-        
-        isViewTransformedForRTL = transformForRTL
+        pdfView.setMinScaleFactorForSizeToFit()
+        pdfView.setScaleFactorForUser()
     }
     
     func setPDFThumbnailView() {
@@ -435,97 +401,11 @@ class DocumentViewController: UIViewController {
     @objc func doubleTapGestureRecognizerHandler(_ sender: UITapGestureRecognizer) {
         print(sender.location(in: pdfView))
         
-        if pdfView.scaleFactor == pdfView.maxScaleFactor {
-            zoomedIn = true
-        }
-        if !zoomedIn {
+        if !pdfView.isZoomedIn {
             updateUserScaleFactorAndOffset(changeOrientation: false)
         }
-        var scaleFactor: CGFloat?
-        if let scaleFactorVertical = scaleFactorVertical, let scaleFactorHorizontal = scaleFactorHorizontal {
-            if UIApplication.shared.statusBarOrientation.isPortrait {
-                if pdfView.displayDirection == .vertical, pdfView.scaleFactor != scaleFactorVertical.portrait {
-                    scaleFactor = scaleFactorVertical.portrait
-                } else if pdfView.displayDirection == .horizontal, pdfView.scaleFactor != scaleFactorHorizontal.portrait {
-                    scaleFactor = scaleFactorHorizontal.portrait
-                }
-            } else if UIApplication.shared.statusBarOrientation.isLandscape {
-                if pdfView.displayDirection == .vertical, pdfView.scaleFactor != scaleFactorVertical.landscape {
-                    scaleFactor = scaleFactorVertical.landscape
-                } else if pdfView.displayDirection == .horizontal, pdfView.scaleFactor != scaleFactorHorizontal.landscape {
-                    scaleFactor = scaleFactorHorizontal.landscape
-                }
-            }
-        }
-        if let scaleFactor = scaleFactor {
-            // zoom out
-            pdfView.scrollView?.setZoomScale(scaleFactor, animated: true)
-            zoomedIn = false
-            return
-        }
         
-        if let page = pdfView.page(for: sender.location(in: pdfView), nearest: false) {
-            // tap point in page space
-            let pagePoint = pdfView.convert(sender.location(in: pdfView), to: page)
-            if let scrollView = pdfView.scrollView {
-                
-                // normal zoom in
-                let locationInView = sender.location(in: pdfView)
-                let boundsInView = CGRect(x: locationInView.x - 64, y: locationInView.y - 64, width: 128, height: 128)
-                let boundsInPage = pdfView.convert(boundsInView, to: page)
-                var boundsInScroll = scrollView.convert(boundsInView, from: pdfView)
-                
-                if let selection = page.selectionForLine(at: pagePoint), selection.pages.first == page, let string = selection.string, string.count > 1 {
-                    // zoom in to fit text
-                    // selection bounds in page space
-                    let boundsInPage = selection.bounds(for: page)
-                    // selection bounds in view space
-                    let boundsInView = pdfView.convert(boundsInPage, from: page)
-                    // selection bounds in scroll space
-                    boundsInScroll = scrollView.convert(boundsInView, from: pdfView)
-                }
-                
-                UIView.animate(withDuration: 0.25, delay: 0, options: [.curveEaseInOut], animations: {
-                    let safeAreaWidth = self.pdfView.frame.width - self.pdfView.safeAreaInsets.left - self.pdfView.safeAreaInsets.right
-                    let safeAreaHeight = self.pdfView.frame.height - self.pdfView.safeAreaInsets.top - self.pdfView.safeAreaInsets.bottom
-                    
-                    // + 10 to not overlap scroll indicator
-                    let widthMultiplier = safeAreaWidth / (boundsInScroll.size.width + 20)
-                    let heightMultiplier = safeAreaHeight / (boundsInScroll.size.height + 20)
-                    if widthMultiplier <= heightMultiplier {
-                        scrollView.setZoomScale(scrollView.zoomScale * widthMultiplier, animated: false)
-                    } else {
-                        scrollView.setZoomScale(scrollView.zoomScale * heightMultiplier, animated: false)
-                    }
-                    
-                    // recalculate
-                    if let selection = page.selectionForLine(at: pagePoint), selection.pages.first == page, let string = selection.string, string.count > 1 {
-                        // zoom in to fit text
-                        // selection bounds in page space
-                        let boundsInPage = selection.bounds(for: page)
-                        // selection bounds in view space
-                        let boundsInView = self.pdfView.convert(boundsInPage, from: page)
-                        // selection bounds in scroll space
-                        boundsInScroll = scrollView.convert(boundsInView, from: self.pdfView)
-                    } else {
-                        // normal zoom in
-                        // location bounds in view space
-                        let boundsInView = self.pdfView.convert(boundsInPage, from: page)
-                        // location bounds in scroll space
-                        boundsInScroll = scrollView.convert(boundsInView, from: self.pdfView)
-                    }
-                    
-                    // if navigation bar or tool bar is not hidden
-                    let diffYToFix = (self.pdfView.safeAreaInsets.top - self.pdfView.safeAreaInsets.bottom) / 2
-                    
-                    let offset = CGPoint(x: boundsInScroll.midX - self.pdfView.center.x, y: boundsInScroll.midY - self.pdfView.frame.height / 2 - diffYToFix)
-                    scrollView.setContentOffset(offset, animated: false)
-                }, completion: { (successful) in
-                    self.zoomedIn = successful
-                })
-                
-            }
-        }
+        pdfView.autoZoomInOrOut(location: sender.location(in: pdfView), animated: true)
     }
     
     @objc func barHideOnTapGestureRecognizerHandler() {
@@ -537,94 +417,17 @@ class DocumentViewController: UIViewController {
     func getScaleFactorForSizeToFitAndOffset() {
         // make sure to init
         if let verticalPortrait = currentEntity?.scaleFactorVerticalPortrait, let verticalLandscape = currentEntity?.scaleFactorVerticalLandscape {
-            scaleFactorVertical = ScaleFactor(portrait: CGFloat(verticalPortrait), landscape: CGFloat(verticalLandscape))
-        } else {
-            scaleFactorVertical = ScaleFactor(portrait: 0.25, landscape: 0.25)
+            self.pdfView.hgScaleFactorVertical = HGPDFScaleFactor(portrait: CGFloat(verticalPortrait), landscape: CGFloat(verticalLandscape))
         }
         if let horizontalPortrait = currentEntity?.scaleFactorHorizontalPortrait, let horizontalLandscape = currentEntity?.scaleFactorVerticalLandscape {
-            scaleFactorHorizontal = ScaleFactor(portrait: CGFloat(horizontalPortrait), landscape: CGFloat(horizontalLandscape))
-        } else {
-            scaleFactorHorizontal = ScaleFactor(portrait: 0.25, landscape: 0.25)
+            self.pdfView.hgScaleFactorHorizontal = HGPDFScaleFactor(portrait: CGFloat(horizontalPortrait), landscape: CGFloat(horizontalLandscape))
         }
-
-        if pdfView.displayDirection == .vertical {
-            let frame = view.frame
-            let aspectRatio = frame.size.width / frame.size.height
-            // if it is iPhoneX, the pdfView.scaleFactorForSizeToFit is already optimized for save area
-            let divider = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
-            // the scaleFactor defines the super area scale factor
-            var scaleFactor = pdfView.scaleFactorForSizeToFit / divider
-            if pdfView.displayMode == .twoUpContinuous {
-                scaleFactor *= 2
-            }
-            if UIApplication.shared.statusBarOrientation.isPortrait {
-                scaleFactorForSizeToFit = ScaleFactor(portrait: scaleFactor,
-                                                      landscape: scaleFactor / aspectRatio)
-            } else if UIApplication.shared.statusBarOrientation.isLandscape {
-                scaleFactorForSizeToFit = ScaleFactor(portrait: scaleFactor / aspectRatio,
-                                                      landscape: scaleFactor)
-            }
-        }
+        
+        pdfView.getScaleFactorForSizeToFit()
         
         // offset
         offsetPortrait = currentEntity?.offsetLandscape as? CGPoint
         offsetLandscape = currentEntity?.offsetLandscape as? CGPoint
-    }
-    
-    // SizeToFit currentlly only works for vertical display direction
-    func setMinScaleFactorForSizeToFit() {
-        if pdfView.displayDirection == .vertical, let scaleFactorForSizeToFit = scaleFactorForSizeToFit {
-            if UIApplication.shared.statusBarOrientation.isPortrait {
-                if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait
-                } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.minScaleFactor = scaleFactorForSizeToFit.portrait / 2
-                }
-            } else if UIApplication.shared.statusBarOrientation.isLandscape {
-                // set minScaleFactor to safe area for iPhone X and later
-                var multiplier = (pdfView.frame.width - pdfView.safeAreaInsets.left - pdfView.safeAreaInsets.right) / pdfView.frame.width
-                // hard code
-                if navigationController?.isNavigationBarHidden == true && UIScreen.main.nativeBounds.height == 2436 && UIScreen.main.nativeBounds.width == 1125 {
-                    if pdfView.frame.width == 375.0 {
-                        // to fix iPhone X
-                        multiplier = (375.0 - 44.0) / 375.0
-                    }
-                }
-
-                if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape * multiplier
-                } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.minScaleFactor = scaleFactorForSizeToFit.landscape / 2 * multiplier
-                }
-            }
-        }
-    }
-    
-    func setScaleFactorForUser() {
-        var scaleFactor: ScaleFactor?
-        // if user had opened this PDF before, the stored scaleFactor is already optimized for safeArea.
-        if pdfView.displayDirection == .vertical {
-            scaleFactor = scaleFactorVertical
-        } else if pdfView.displayDirection == .horizontal {
-            scaleFactor = scaleFactorHorizontal
-        }
-        
-        if let scaleFactor = scaleFactor {
-            print("set scale factor: \(scaleFactor)")
-            if UIApplication.shared.statusBarOrientation.isPortrait {
-                if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.scaleFactor = scaleFactor.portrait
-                } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.scaleFactor = scaleFactor.portrait / 2
-                }
-            } else if UIApplication.shared.statusBarOrientation.isLandscape {
-                if pdfView.displayMode == .singlePageContinuous {
-                    pdfView.scaleFactor = scaleFactor.landscape
-                } else if pdfView.displayMode == .twoUpContinuous {
-                    pdfView.scaleFactor = scaleFactor.landscape / 2
-                }
-            }
-        }
     }
     
     func updateUserScaleFactorAndOffset(changeOrientation: Bool) {
@@ -632,17 +435,17 @@ class DocumentViewController: UIViewController {
         // XOR operator for bool (!=)
         if UIApplication.shared.statusBarOrientation.isPortrait != changeOrientation {
             if pdfView.displayDirection == .vertical {
-                scaleFactorVertical?.portrait = pdfView.scaleFactor
+                self.pdfView.hgScaleFactorVertical.portrait = pdfView.scaleFactor
             } else if pdfView.displayDirection == .horizontal {
-                scaleFactorHorizontal?.portrait = pdfView.scaleFactor
+                self.pdfView.hgScaleFactorHorizontal.portrait = pdfView.scaleFactor
             }
             
             offsetPortrait = pdfView.scrollView?.contentOffset
         } else if UIApplication.shared.statusBarOrientation.isLandscape != changeOrientation {
             if pdfView.displayDirection == .vertical {
-                scaleFactorVertical?.landscape = pdfView.scaleFactor
+                self.pdfView.hgScaleFactorVertical.landscape = pdfView.scaleFactor
             } else if pdfView.displayDirection == .horizontal {
-                scaleFactorHorizontal?.landscape = pdfView.scaleFactor
+                self.pdfView.hgScaleFactorHorizontal.landscape = pdfView.scaleFactor
             }
             
             offsetLandscape = pdfView.scrollView?.contentOffset
@@ -746,9 +549,9 @@ class DocumentViewController: UIViewController {
             self.blurEffectView.isHidden = true
         }
     }
-
+    
     // MARK: - IBAction
-
+    
     @IBAction func searchLeft(_ sender: UIBarButtonItem) {
         if isRightToLeft {
             searchText(withOptions: [.regularExpression])
@@ -766,10 +569,10 @@ class DocumentViewController: UIViewController {
     }
     
     /*
-    @IBAction func shareAction() {
-        let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
-        self.present(activityVC, animated: true, completion: nil)
-    }
+     @IBAction func shareAction() {
+     let activityVC = UIActivityViewController(activityItems: [document?.fileURL as Any], applicationActivities: nil)
+     self.present(activityVC, animated: true, completion: nil)
+     }
      */
     
     @IBAction func dismissDocumentViewController() {
@@ -804,7 +607,7 @@ class DocumentViewController: UIViewController {
                 }
             }
         }
-
+        
         self.document?.close(completionHandler: nil)
     }
     
@@ -833,7 +636,7 @@ class DocumentViewController: UIViewController {
             print("context not exist")
         }
     }
-
+    
     func update(entity: DocumentEntity) {
         entity.modificationDate = Date()
         entity.isHorizontalScroll = self.isHorizontalScroll
@@ -843,14 +646,12 @@ class DocumentViewController: UIViewController {
         
         // store user scale factor
         updateUserScaleFactorAndOffset(changeOrientation: false)
-        if let scaleFactorVertical = scaleFactorVertical {
-            entity.scaleFactorVerticalPortrait = Float(scaleFactorVertical.portrait)
-            entity.scaleFactorVerticalLandscape = Float(scaleFactorVertical.landscape)
-        }
-        if let scaleFactorHorizontal = scaleFactorHorizontal {
-            entity.scaleFactorHorizontalPortrait = Float(scaleFactorHorizontal.portrait)
-            entity.scaleFactorHorizontalLandscape = Float(scaleFactorHorizontal.landscape)
-        }
+        // Vertical
+        entity.scaleFactorVerticalPortrait = Float(self.pdfView.hgScaleFactorVertical.portrait)
+        entity.scaleFactorVerticalLandscape = Float(self.pdfView.hgScaleFactorVertical.landscape)
+        // Horizontal
+        entity.scaleFactorHorizontalPortrait = Float(self.pdfView.hgScaleFactorHorizontal.portrait)
+        entity.scaleFactorHorizontalLandscape = Float(self.pdfView.hgScaleFactorHorizontal.landscape)
         
         if let offsetPortrait = offsetPortrait {
             entity.offsetPortrait = offsetPortrait as NSObject
@@ -875,17 +676,6 @@ class DocumentViewController: UIViewController {
     
 }
 
-extension PDFView {
-    var scrollView: UIScrollView? {
-        for view in self.subviews {
-            if let scrollView = view as? UIScrollView {
-                return scrollView
-            }
-        }
-        return nil
-    }
-}
-
 extension DocumentViewController {
     // MARK: - Custom Menus
     
@@ -907,7 +697,7 @@ extension DocumentViewController {
 
 extension DocumentViewController: UIPopoverPresentationControllerDelegate {
     // MARK: - PopoverTableViewController Presentation
-
+    
     // iOS Popover presentation Segue
     // http://sunnycyk.com/2015/08/ios-popover-presentation-segue/
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -928,13 +718,13 @@ extension DocumentViewController: UIPopoverPresentationControllerDelegate {
                 height -= 44
                 
                 popopverVC.preferredContentSize = CGSize(width: width, height: height)
-
+                
             }
         } else if (segue.identifier == "Container") {
             if let containerVC: ContainerViewController = segue.destination as? ContainerViewController {
                 containerVC.pdfDocument = pdfView.document
                 containerVC.displayBox = pdfView.displayBox
-                containerVC.transformForRTL = isViewTransformedForRTL
+                containerVC.transformForRTL = pdfView.isViewTransformedForRTL
                 if let currentPage = pdfView.currentPage, let document: PDFDocument = pdfView.document {
                     containerVC.currentIndex = document.index(for: currentPage)
                 }

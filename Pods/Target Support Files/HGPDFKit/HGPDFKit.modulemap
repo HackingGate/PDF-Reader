@@ -1,0 +1,6 @@
+framework module HGPDFKit {
+  umbrella header "HGPDFKit-umbrella.h"
+
+  export *
+  module * { export * }
+}

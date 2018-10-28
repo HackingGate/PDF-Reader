@@ -1,0 +1,16 @@
+PODS:
+  - HGPDFKit (0.0.1)
+
+DEPENDENCIES:
+  - HGPDFKit (~> 0.0.1)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - HGPDFKit
+
+SPEC CHECKSUMS:
+  HGPDFKit: 08ae3b36f9401eaef6f942ea5547d97e5e3d45bb
+
+PODFILE CHECKSUM: 4e6743704f71974291d6f20f7e052c8886059761
+
+COCOAPODS: 1.5.3
