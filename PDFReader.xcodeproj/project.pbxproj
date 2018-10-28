@@ -241,7 +241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# iOS alternate app icons from Asset Catalogs\n# https://github.com/alexaubry/alternate-icons#demo\nembed-alternate-icons\n";
+			shellScript = "# iOS alternate app icons from Asset Catalogs\n# https://github.com/alexaubry/alternate-icons#demo\nembed-alternate-icons\n\n# Version\nPLISTBUDDY=\"/usr/libexec/PlistBuddy\"\nINFO_PLIST=\"$CODESIGNING_FOLDER_PATH/Info.plist\"\nSETTINGS_PLIST=\"$CODESIGNING_FOLDER_PATH/Settings.bundle/Root.plist\"\nVERSION_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleShortVersionString\\\" \\\"$INFO_PLIST\\\"`\"\nBUILD_NUMBER=\"`$PLISTBUDDY -c \\\"Print CFBundleVersion\\\" \\\"$INFO_PLIST\\\"`\"\nVERSION=\"$VERSION_NUMBER ($BUILD_NUMBER)\"\n\n$PLISTBUDDY -c \"Set :PreferenceSpecifiers:0:DefaultValue '$VERSION'\" \"$SETTINGS_PLIST\"\n";
 		};
 		76DD098721820D9C00F35C96 /* Integrate Reveal Server */ = {
 			isa = PBXShellScriptBuildPhase;
