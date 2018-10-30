@@ -222,19 +222,19 @@ class DocumentViewController: UIViewController {
         let center = NotificationCenter.default
         center.addObserver(self,
                            selector: #selector(updateInterface),
-                           name: .UIApplicationWillEnterForeground,
+                           name: UIApplication.willEnterForegroundNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(saveAndClose),
-                           name: .UIApplicationDidEnterBackground,
+                           name: UIApplication.didEnterBackgroundNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(willChangeOrientationHandler),
-                           name: .UIApplicationWillChangeStatusBarOrientation,
+                           name: UIApplication.willChangeStatusBarOrientationNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),
-                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           name: UIApplication.didChangeStatusBarOrientationNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangePageHandler),
@@ -370,7 +370,7 @@ class DocumentViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         if let navigationController = navigationController {
             for constraint in navigationController.navigationBar.constraints {
-                if constraint.firstAttribute == NSLayoutAttribute.height {
+                if constraint.firstAttribute == NSLayoutConstraint.Attribute.height {
                     if navigationController.navigationBar.frame.origin.y == -constraint.constant {
                         // system will return UIStatusBarStyle.default even when navigation bar style is .black
                         // a workaround to fix this
@@ -394,7 +394,7 @@ class DocumentViewController: UIViewController {
         return .slide
     }
     
-    override func prefersHomeIndicatorAutoHidden() -> Bool {
+    override var prefersHomeIndicatorAutoHidden: Bool {
         return navigationController?.isToolbarHidden == true
     }
     
@@ -506,7 +506,7 @@ class DocumentViewController: UIViewController {
                     }
                 })
                 
-                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: UIAlertActionStyle.cancel, handler: nil)
+                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: UIAlertAction.Style.cancel, handler: nil)
                 
                 alertController.addAction(cancelAction)
                 alertController.addAction(defaultAction)

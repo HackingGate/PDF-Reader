@@ -171,7 +171,7 @@ class SearchViewController: UITableViewController {
         if let text = searchBar.text,
             let searchURLString: String = "x-web-search://?\(text)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let searchURL = URL(string: searchURLString) {
-            UIApplication.shared.open(searchURL, options: [:], completionHandler: nil)
+            UIApplication.shared.open(searchURL, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
         }
     }
     
@@ -179,7 +179,7 @@ class SearchViewController: UITableViewController {
         if let text = searchBar.text,
             let wikiURLString = "https://wikipedia.org/wiki/\(text)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
             let wikiURL = URL(string: wikiURLString){
-            UIApplication.shared.open(wikiURL, options: [:], completionHandler: nil)
+            UIApplication.shared.open(wikiURL, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
         }
     }
 
@@ -262,4 +262,9 @@ extension SearchViewController: UISearchBarDelegate {
         progressView.progress = 0.0
     }
     
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

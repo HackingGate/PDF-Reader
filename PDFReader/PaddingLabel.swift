@@ -16,7 +16,7 @@ class PaddingLabel: UILabel {
     @IBInspectable var right: CGFloat = 0.0
     
     override func drawText(in rect: CGRect) {
-        let newRect = UIEdgeInsetsInsetRect(rect, UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
+        let newRect = rect.inset(by: UIEdgeInsets(top: top, left: left, bottom: bottom, right: right))
         super.drawText(in: newRect)
     }
     

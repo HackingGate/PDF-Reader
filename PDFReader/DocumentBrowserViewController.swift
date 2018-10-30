@@ -41,7 +41,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         let center = NotificationCenter.default
         center.addObserver(self,
                            selector: #selector(updateInterface),
-                           name: .UIApplicationWillEnterForeground,
+                           name: UIApplication.willEnterForegroundNotification,
                            object: nil)
 
         // add Settings bar button item
@@ -67,8 +67,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     }
     
     @objc func gotoSettings() {
-        guard let settingsURL = URL(string: UIApplicationOpenSettingsURLString) else { return }
-        UIApplication.shared.open(settingsURL, options: [:], completionHandler: nil)
+        guard let settingsURL = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(settingsURL, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
     }
     
     func changeIcon(to iconName: String?) {
@@ -169,32 +169,31 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         for documentEntity in objects {
             if let bookmarkData = documentEntity.bookmarkData {
                 do {
-                    var isStale = false
-                    if let bookmarkURL = try URL.init(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale) {
-                        print("resolved url: \(bookmarkURL)")
-                        if isStale {
-                            print("bookmark is stale")
-                            // create a new bookmark using the returned URL
-                            // https://developer.apple.com/documentation/foundation/nsurl/1572035-urlbyresolvingbookmarkdata
-                            do {
-                                documentEntity.modificationDate = Date()
-                                try documentEntity.bookmarkData = bookmarkURL.bookmarkData()
-                                if let context = self.managedObjectContext {
-                                    self.saveContext(context)
-                                }
-                            } catch let error as NSError {
-                                print("Bookmark Creation Fails: \(error.description)")
-                            }
-                        }
-                        if bookmarkURL == documentURL {
-                            if currentEntity != nil {
-                                // there's already a currentEntity
-                                let context = fetchedResultsController.managedObjectContext
-                                context.delete(documentEntity)
+                    let isStale = UnsafeMutablePointer<ObjCBool>.allocate(capacity: 0)
+                    let bookmarkURL = try NSURL(resolvingBookmarkData: bookmarkData, options: [], relativeTo: nil, bookmarkDataIsStale: isStale)
+                    print("resolved url: \(bookmarkURL)")
+                    if isStale[0].boolValue {
+                        print("bookmark is stale")
+                        // create a new bookmark using the returned URL
+                        // https://developer.apple.com/documentation/foundation/nsurl/1572035-urlbyresolvingbookmarkdata
+                        do {
+                            documentEntity.modificationDate = Date()
+                            try documentEntity.bookmarkData = bookmarkURL.bookmarkData(options: [], includingResourceValuesForKeys: [], relativeTo: nil)
+                            if let context = self.managedObjectContext {
                                 self.saveContext(context)
-                            } else {
-                                currentEntity = documentEntity
                             }
+                        } catch let error as NSError {
+                            print("Bookmark Creation Fails: \(error.description)")
+                        }
+                    }
+                    if bookmarkURL as URL == documentURL {
+                        if currentEntity != nil {
+                            // there's already a currentEntity
+                            let context = fetchedResultsController.managedObjectContext
+                            context.delete(documentEntity)
+                            self.saveContext(context)
+                        } else {
+                            currentEntity = documentEntity
                         }
                     }
                 } catch let error as NSError {
@@ -277,13 +276,13 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         
         if let bookmarkData = documentEntity.bookmarkData, let uuid = documentEntity.uuid {
             
-            let recordID = CKRecordID(recordName: uuid.uuidString)
+            let recordID = CKRecord.ID(recordName: uuid.uuidString)
             
             if type == .insert || type == .update || type == .move {
-                var isStale = false
+                let isStale = UnsafeMutablePointer<ObjCBool>.allocate(capacity: 0)
                 do {
-                    if let documentURL = try URL(resolvingBookmarkData: bookmarkData, bookmarkDataIsStale: &isStale),
-                        let shortPath = documentURL.shortMobileDocumentPath(basePath: self.mobileDocumentPath) {
+                    let documentURL = try NSURL(resolvingBookmarkData: bookmarkData, options: [], relativeTo: nil, bookmarkDataIsStale: isStale)
+                        if let shortPath = (documentURL as URL).shortMobileDocumentPath(basePath: self.mobileDocumentPath) {
                         
                         // fetch by fileURL
                         self.fetchCKRecordsFor(shortPath: shortPath, completionHandler: { (records: [CKRecord]?, error: Error?) in
@@ -299,7 +298,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                                 })
                                 for i in 1..<records.count {
                                     // delete
-                                    self.privateCloudDatabase.delete(withRecordID: records[i].recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                                    self.privateCloudDatabase.delete(withRecordID: records[i].recordID, completionHandler: { (recordID: CKRecord.ID?, error: Error?) in
                                         if let error = error {
                                             print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
                                         }
@@ -337,7 +336,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
                 }
                 
             } else if type == .delete {
-                privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecordID?, error: Error?) in
+                privateCloudDatabase.delete(withRecordID: recordID, completionHandler: { (recordID: CKRecord.ID?, error: Error?) in
                     if let error = error {
                         print("CKRecordID: \(String(describing: recordID)) delete failed: \(error)")
                     }
@@ -372,4 +371,9 @@ extension URL {
         }
         return shortString
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

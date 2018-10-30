@@ -46,15 +46,15 @@ class PopoverTableViewController: UITableViewController {
         let center = NotificationCenter.default
         center.addObserver(self,
                            selector: #selector(updateInterface),
-                           name: .UIApplicationWillEnterForeground,
+                           name: UIApplication.willEnterForegroundNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(updateBrightness),
-                           name: .UIScreenBrightnessDidChange,
+                           name: UIScreen.brightnessDidChangeNotification,
                            object: nil)
         center.addObserver(self,
                            selector: #selector(didChangeOrientationHandler),
-                           name: .UIApplicationDidChangeStatusBarOrientation,
+                           name: UIApplication.didChangeStatusBarOrientationNotification,
                            object: nil)
     }
     
@@ -153,7 +153,7 @@ class PopoverTableViewController: UITableViewController {
         }
         
         let center = NotificationCenter.default
-        center.post(name: .UIApplicationWillEnterForeground, object: nil)
+        center.post(name: UIApplication.willEnterForegroundNotification, object: nil)
     }
     
     @IBAction func directionButtonAction(_ sender: UIButton) {
