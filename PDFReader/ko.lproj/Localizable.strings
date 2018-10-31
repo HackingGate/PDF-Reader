@@ -1,0 +1,29 @@
+/* 
+  Localizable.strings
+  PDFReader
+
+  Created by ERU on 2018/10/32.
+  Copyright © 2018 HackingGate. All rights reserved.
+*/
+
+//  PopoverTableViewController.swift
+"Horizontal" = "가로";
+"Vertical" = "세로";
+"Two pages in landscape" = "가로로 2 페이지를 표시";
+"Single page in landscape" = "가로로 1 페이지를 표시";
+
+//  DocumentViewController.swift
+"Found iCloud Data" = "iCloud 데이터 발견";
+"Device:" = "장치:";
+"Last Viewed Page:" = "마지막으로 읽은 페이지:";
+"Move" = "이동";
+"Cancel" = "취소";
+
+//  SearchViewController.swift
+"%d matches found" = "%d개의 일치하는 결과 발견";
+"1 match found" = "1개의 일치하는 결과 발견";
+"No matches found" = "일치하는 결과 없음";
+"Page %@" = "페이지 %@";
+"Searching..." = "검색 중...";
+"Define" = "정의";
+"Type a word" = "단어 입력";

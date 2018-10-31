@@ -1,0 +1,60 @@
+
+/* Class = "UIBarButtonItem"; title = "Search Web"; ObjectID = "1vr-F8-lKX"; */
+"1vr-F8-lKX.title" = "웹 검색";
+
+/* Class = "UINavigationItem"; title = "Root View Controller"; ObjectID = "AW8-u4-D2u"; */
+"AW8-u4-D2u.title" = "Root View Controller";
+
+/* Class = "UILabel"; text = "Page"; ObjectID = "FJw-Gx-9U7"; */
+"FJw-Gx-9U7.text" = "페이지";
+
+/* Class = "UIBarButtonItem"; title = " "; ObjectID = "HEo-Mk-C1l"; */
+"HEo-Mk-C1l.title" = " ";
+
+/* Class = "UILabel"; text = "Some features may not be available"; ObjectID = "IgN-wB-cSg"; */
+"IgN-wB-cSg.text" = "일부 기능을 사용할 수없는 경우가 있습니다";
+
+/* Class = "UILabel"; text = "Two pages mode"; ObjectID = "Nb4-pk-auH"; */
+"Nb4-pk-auH.text" = "2 페이지 모드";
+
+/* Class = "UIBarButtonItem"; title = "Search Wikipedia"; ObjectID = "Ne2-xq-TMD"; */
+"Ne2-xq-TMD.title" = "위키백과 검색";
+
+/* Class = "UILabel"; text = "0 / 0"; ObjectID = "OEl-Mt-vTk"; */
+"OEl-Mt-vTk.text" = "0 / 0";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "P85-Tx-Jdt"; */
+"P85-Tx-Jdt.text" = "Label";
+
+/* Class = "UILabel"; text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."; ObjectID = "RaR-H5-NeR"; */
+"RaR-H5-NeR.text" = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.";
+
+/* Class = "UILabel"; text = "1"; ObjectID = "UGd-ZX-Vxs"; */
+"UGd-ZX-Vxs.text" = "1";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "V6z-zU-NJK"; */
+"V6z-zU-NJK.text" = "Title";
+
+/* Class = "UILabel"; text = "Scroll Direction"; ObjectID = "c6G-KP-IC3"; */
+"c6G-KP-IC3.text" = "스크롤 방향";
+
+/* Class = "UILabel"; text = "For Arabic and vertical CJK"; ObjectID = "e71-mL-mL8"; */
+"e71-mL-mL8.text" = "세로 또는 아랍어 위해";
+
+/* Class = "UILabel"; text = "Displays Right-to-Left"; ObjectID = "fOs-we-IUy"; */
+"fOs-we-IUy.text" = "오른쪽에서 왼쪽으로 표시";
+
+/* Class = "UILabel"; text = "Show search bar"; ObjectID = "lqS-U0-eSb"; */
+"lqS-U0-eSb.text" = "검색 창을 표시";
+
+/* Class = "UILabel"; text = "This Document is Protected"; ObjectID = "nNe-pC-STL"; */
+"nNe-pC-STL.text" = "이 문서는 보호되어 있기 때문에";
+
+/* Class = "UILabel"; text = "Vertical"; ObjectID = "p96-se-Myf"; */
+"p96-se-Myf.text" = "세로 방향";
+
+/* Class = "UILabel"; text = "Single page in landscape"; ObjectID = "xRC-KL-XPa"; */
+"xRC-KL-XPa.text" = "가로로 단일 페이지를 표시";
+
+/* Class = "UILabel"; text = "Find on Page"; ObjectID = "yfD-uT-Kie"; */
+"yfD-uT-Kie.text" = "페이지 내 검색";
