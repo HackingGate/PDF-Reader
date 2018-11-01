@@ -9,6 +9,7 @@
 //  PopoverTableViewController.swift
 "Horizontal" = "水平";
 "Vertical" = "垂直";
+"Two pages mode" = "雙頁模式";
 "Two pages in landscape" = "橫向時雙頁";
 "Single page in landscape" = "橫向時單頁";
 
@@ -20,6 +21,7 @@
 "Cancel" = "取消";
 
 //  SearchViewController.swift
+"Search" = "搜尋";
 "%d matches found" = "搵到 %d 個匹配";
 "1 match found" = "搵到 1 個匹配";
 "No matches found" = "未搵到匹配";

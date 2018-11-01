@@ -9,6 +9,7 @@
 //  PopoverTableViewController.swift
 "Horizontal" = "Horizontal";
 "Vertical" = "Vertical";
+"Two pages mode" = "Two pages mode";
 "Two pages in landscape" = "Two pages in landscape";
 "Single page in landscape" = "Single page in landscape";
 
@@ -20,6 +21,7 @@
 "Cancel" = "Cancel";
 
 //  SearchViewController.swift
+"Search" = "Search";
 "%d matches found" = "%d matches found";
 "1 match found" = "1 match found";
 "No matches found" = "No matches found";

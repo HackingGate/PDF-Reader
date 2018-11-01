@@ -47,6 +47,17 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         // add Settings bar button item
         let settingsItem = UIBarButtonItem(image: #imageLiteral(resourceName: "settings"), style: .plain, target: self, action: #selector(gotoSettings))
         additionalLeadingNavigationBarButtonItems = [settingsItem]
+        
+        // For UITest
+        #if DEBUG
+        let documentsPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+        let applePDFPath = documentsPath + "/Apple_Environmental_Responsibility_Report_2018.pdf"
+        let fileManager = FileManager.default
+        if fileManager.fileExists(atPath: applePDFPath) {
+            let testUrl = URL(fileURLWithPath: applePDFPath)
+            presentDocument(at: testUrl)
+        }
+        #endif
     }
     
     // MARK: Functions

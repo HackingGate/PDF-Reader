@@ -9,6 +9,7 @@
 //  PopoverTableViewController.swift
 "Horizontal" = "横方向";
 "Vertical" = "縦方向";
+"Two pages mode" = "2ページモード";
 "Two pages in landscape" = "横向きで2ページを表示";
 "Single page in landscape" = "横向きで単一ページを表示";
 
@@ -20,6 +21,7 @@
 "Cancel" = "キャンセル";
 
 //  SearchViewController.swift
+"Search" = "検索";
 "%d matches found" = "一致する項目が%d件見つかりました";
 "1 match found" = "一致する項目が1件見つかりました";
 "No matches found" = "一致する項目が見つかりませんでした";
