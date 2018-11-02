@@ -484,13 +484,13 @@ class DocumentViewController: UIViewController {
     
     // call after moveToLastViewedPage()
     func checkForNewerRecords() {
-        if let record = currentCKRecords?.first, let modificationDate = record["modificationDate"] as? Date, let cloudPageIndex = record["pageIndex"] as? NSNumber {
+        if let record = currentCKRecords?.first, let modificationDate = record.modificationDate, let cloudPageIndex = record["pageIndex"] as? NSNumber {
             if let currentModificationDate = currentEntity?.modificationDate {
                 if currentModificationDate > modificationDate { return }
             }
             if cloudPageIndex.int64Value != pageIndex {
                 var message = modificationDate.description(with: Locale.current)
-                if let modifiedByDevice = record["modifiedByDevice"] as? String {
+                if let modifiedByDevice = record.value(forKey: "modifiedByDevice") as? String {
                     message += "\n\(NSLocalizedString("Device:", comment: "")) \(modifiedByDevice)"
                 }
                 message += "\n\(NSLocalizedString("Last Viewed Page:", comment: "")) \(cloudPageIndex.intValue + 1)"
