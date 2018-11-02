@@ -291,8 +291,8 @@ class DocumentViewController: UIViewController {
                 pdfView.displayMode = .singlePageContinuous
             }
             pdfView.setMinScaleFactorForSizeToFit()
-            pdfView.go(to: page) // workaround to fix
             pdfView.setScaleFactorForUser()
+            pdfView.go(to: page) // workaround to fix
         }
         
     }
