@@ -11,6 +11,7 @@
 		7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7629A3521FF11A7F007402FB /* ContainerViewController.swift */; };
 		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
 		7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7654260C2001CB8600D2FB72 /* CloudKit.framework */; };
+		76556B4822D8CDDE00B3869D /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 76556B4722D8CDDE00B3869D /* README.md */; };
 		766439E71F7C92D600DAF771 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E61F7C92D600DAF771 /* AppDelegate.swift */; };
 		766439E91F7C92D600DAF771 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439E81F7C92D600DAF771 /* DocumentBrowserViewController.swift */; };
 		766439EB1F7C92D600DAF771 /* DocumentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 766439EA1F7C92D600DAF771 /* DocumentViewController.swift */; };
@@ -50,6 +51,7 @@
 		763764D11FC3125500B41B05 /* PopoverTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverTableViewController.swift; sourceTree = "<group>"; };
 		7654260A2001CB8400D2FB72 /* PDFReader.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDFReader.entitlements; sourceTree = "<group>"; };
 		7654260C2001CB8600D2FB72 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		76556B4722D8CDDE00B3869D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		766221E820AFF39900B84B2F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		766221EA20AFF41300B84B2F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Main.strings"; sourceTree = "<group>"; };
 		766221EC20AFF41C00B84B2F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 		766439DA1F7C92D600DAF771 = {
 			isa = PBXGroup;
 			children = (
+				76556B4722D8CDDE00B3869D /* README.md */,
 				766439E51F7C92D600DAF771 /* PDFReader */,
 				76655A8C2187E04B00164F81 /* PDFReaderUITests */,
 				766439E41F7C92D600DAF771 /* Products */,
@@ -282,6 +285,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				76556B4822D8CDDE00B3869D /* README.md in Resources */,
 				766D15901FFCCFA500A57C18 /* Localizable.strings in Resources */,
 				767C12C81F9CEC87000CE311 /* Settings.bundle in Resources */,
 				766439F51F7C92D600DAF771 /* LaunchScreen.storyboard in Resources */,
