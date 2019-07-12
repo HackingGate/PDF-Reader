@@ -111,29 +111,21 @@ class SearchViewController: UITableViewController {
             imageView.image = page.thumbnail(of: CGSize(width: width, height: height), for: displayBox)
         }
         
-        // title text
+        // page number
         if let pageNumberLabel = cell.viewWithTag(2) as? UILabel {
-            // no workaround found for iOS 11.2 and later, comment out
-            /*
-            textLabel.text = ""
-            if let outlineLabel = pdfDocument?.outlineItem(for: selection)?.label {
-                textLabel.text = "\(outlineLabel) "
-            }
-            if let pageLabel = page.label {
-                textLabel.text?.append(contentsOf: String(format: NSLocalizedString("Page %@", comment: "page index"), pageLabel))
-            }
-             */
             if let currentIndex = pdfDocument?.index(for: page) {
                 pageNumberLabel.text = String(currentIndex+1)
                 print(pageNumberLabel.constraints.debugDescription)
             }
         }
+        // outline label
         if let outlineLabel = cell.viewWithTag(3) as? UILabel {
             if #available(iOS 13, *),
                 let outlineLabelText = pdfDocument?.outlineItem(for: selection)?.label {
                 outlineLabel.text = outlineLabelText
                 outlineLabel.isHidden = false
             } else {
+                // Bug effect versions between iOS 11.2 and latest iOS 12
                 outlineLabel.isHidden = true
             }
         }
