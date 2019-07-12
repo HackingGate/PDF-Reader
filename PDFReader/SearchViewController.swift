@@ -112,7 +112,7 @@ class SearchViewController: UITableViewController {
         }
         
         // title text
-        if let textLabel = cell.viewWithTag(2) as? UILabel {
+        if let pageNumberLabel = cell.viewWithTag(2) as? UILabel {
             // no workaround found for iOS 11.2 and later, comment out
             /*
             textLabel.text = ""
@@ -124,8 +124,17 @@ class SearchViewController: UITableViewController {
             }
              */
             if let currentIndex = pdfDocument?.index(for: page) {
-                textLabel.text = String(currentIndex+1)
-                print(textLabel.constraints.debugDescription)
+                pageNumberLabel.text = String(currentIndex+1)
+                print(pageNumberLabel.constraints.debugDescription)
+            }
+        }
+        if let outlineLabel = cell.viewWithTag(3) as? UILabel {
+            if #available(iOS 13, *),
+                let outlineLabelText = pdfDocument?.outlineItem(for: selection)?.label {
+                outlineLabel.text = outlineLabelText
+                outlineLabel.isHidden = false
+            } else {
+                outlineLabel.isHidden = true
             }
         }
         
@@ -139,7 +148,7 @@ class SearchViewController: UITableViewController {
         let attrstr = NSMutableAttributedString(string: extendSelection.string!)
         attrstr.addAttribute(.backgroundColor, value: UIColor.yellow, range: range)
         
-        if let detailTextLabel = cell.viewWithTag(3) as? UILabel {
+        if let detailTextLabel = cell.viewWithTag(4) as? UILabel {
             detailTextLabel.attributedText = attrstr
         }
 
