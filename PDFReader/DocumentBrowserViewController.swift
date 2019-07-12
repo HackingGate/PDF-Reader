@@ -169,6 +169,8 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
         }
         
         navigationController.modalTransitionStyle = .crossDissolve
+        // Presenting modal in iOS 13 fullscreen
+        navigationController.modalPresentationStyle = .fullScreen
         present(navigationController, animated: true, completion: nil)
     }
     
