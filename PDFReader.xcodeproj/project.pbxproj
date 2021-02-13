@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0067DA639DE75671B686D2E6 /* Pods_PDFReader.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EE810CF6830BBCE7B0F55E39 /* Pods_PDFReader.framework */; };
 		7629A3531FF11A7F007402FB /* ContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7629A3521FF11A7F007402FB /* ContainerViewController.swift */; };
 		763764D21FC3125500B41B05 /* PopoverTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763764D11FC3125500B41B05 /* PopoverTableViewController.swift */; };
 		7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7654260C2001CB8600D2FB72 /* CloudKit.framework */; };
@@ -44,7 +43,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2C90F98C5AF6E008BB60D8D4 /* Pods-PDFReader.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PDFReader.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PDFReader/Pods-PDFReader.debug.xcconfig"; sourceTree = "<group>"; };
 		76133A402189280100B7E660 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Main.strings; sourceTree = "<group>"; };
 		76133A412189280100B7E660 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7629A3521FF11A7F007402FB /* ContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerViewController.swift; sourceTree = "<group>"; };
@@ -83,8 +81,6 @@
 		76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutlineTableViewController.swift; sourceTree = "<group>"; };
 		76E72E7A20A3281800350EF4 /* SearchExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchExtension.swift; sourceTree = "<group>"; };
 		76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailCollectionViewController.swift; sourceTree = "<group>"; };
-		B6192C254DB5548C49CF8795 /* Pods-PDFReader.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PDFReader.release.xcconfig"; path = "Pods/Target Support Files/Pods-PDFReader/Pods-PDFReader.release.xcconfig"; sourceTree = "<group>"; };
-		EE810CF6830BBCE7B0F55E39 /* Pods_PDFReader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PDFReader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,7 +89,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */,
-				0067DA639DE75671B686D2E6 /* Pods_PDFReader.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,20 +102,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2945ACEEAC2BAFA6DEA5E682 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				2C90F98C5AF6E008BB60D8D4 /* Pods-PDFReader.debug.xcconfig */,
-				B6192C254DB5548C49CF8795 /* Pods-PDFReader.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
 		7654260B2001CB8600D2FB72 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				7654260C2001CB8600D2FB72 /* CloudKit.framework */,
-				EE810CF6830BBCE7B0F55E39 /* Pods_PDFReader.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -133,7 +118,6 @@
 				76655A8C2187E04B00164F81 /* PDFReaderUITests */,
 				766439E41F7C92D600DAF771 /* Products */,
 				7654260B2001CB8600D2FB72 /* Frameworks */,
-				2945ACEEAC2BAFA6DEA5E682 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -191,13 +175,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 766439F91F7C92D600DAF771 /* Build configuration list for PBXNativeTarget "PDFReader" */;
 			buildPhases = (
-				B739A60DFC8A368F46277488 /* [CP] Check Pods Manifest.lock */,
 				766439DF1F7C92D600DAF771 /* Sources */,
 				766439E01F7C92D600DAF771 /* Frameworks */,
 				766439E11F7C92D600DAF771 /* Resources */,
 				764728042016CE75005E5E88 /* ShellScript */,
 				76DD098721820D9C00F35C96 /* Integrate Reveal Server */,
-				8C2CE4521A1DA3F4AD2BAB7E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -336,46 +318,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "REVEAL_APP_PATH=$(mdfind kMDItemCFBundleIdentifier=\"com.ittybittyapps.Reveal2\" | head -n 1)\nBUILD_SCRIPT_PATH=\"${REVEAL_APP_PATH}/Contents/SharedSupport/Scripts/reveal_server_build_phase.sh\"\nif [ \"${REVEAL_APP_PATH}\" -a -e \"${BUILD_SCRIPT_PATH}\" ]; then\n\"${BUILD_SCRIPT_PATH}\"\nelse\necho \"Reveal Server not loaded: Cannot find a compatible Reveal app.\"\nfi\n";
-		};
-		8C2CE4521A1DA3F4AD2BAB7E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PDFReader/Pods-PDFReader-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/HGPDFKit/HGPDFKit.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/HGPDFKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PDFReader/Pods-PDFReader-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B739A60DFC8A368F46277488 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PDFReader-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -572,7 +514,6 @@
 		};
 		766439FA1F7C92D600DAF771 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2C90F98C5AF6E008BB60D8D4 /* Pods-PDFReader.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
@@ -590,7 +531,6 @@
 		};
 		766439FB1F7C92D600DAF771 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B6192C254DB5548C49CF8795 /* Pods-PDFReader.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PDFReader/PDFReader.entitlements;
