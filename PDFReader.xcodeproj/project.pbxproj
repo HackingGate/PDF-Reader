@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -30,6 +30,7 @@
 		76DED9BA1FF67EA500CF5A23 /* OutlineTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DED9B91FF67EA500CF5A23 /* OutlineTableViewController.swift */; };
 		76E72E7B20A3281800350EF4 /* SearchExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E72E7A20A3281800350EF4 /* SearchExtension.swift */; };
 		76FB109B1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FB109A1FEEA4A0005F1F5B /* ThumbnailCollectionViewController.swift */; };
+		C750558E25D8BF5F005D6DC3 /* HGPDFKit in Frameworks */ = {isa = PBXBuildFile; productRef = C750558D25D8BF5F005D6DC3 /* HGPDFKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +90,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7654260D2001CB8600D2FB72 /* CloudKit.framework in Frameworks */,
+				C750558E25D8BF5F005D6DC3 /* HGPDFKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,6 +188,9 @@
 			dependencies = (
 			);
 			name = PDFReader;
+			packageProductDependencies = (
+				C750558D25D8BF5F005D6DC3 /* HGPDFKit */,
+			);
 			productName = PDFReader;
 			productReference = 766439E31F7C92D600DAF771 /* PDFReader.app */;
 			productType = "com.apple.product-type.application";
@@ -252,6 +257,9 @@
 				ko,
 			);
 			mainGroup = 766439DA1F7C92D600DAF771;
+			packageReferences = (
+				C750558C25D8BF5F005D6DC3 /* XCRemoteSwiftPackageReference "HGPDFKit" */,
+			);
 			productRefGroup = 766439E41F7C92D600DAF771 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -507,7 +515,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -521,7 +530,10 @@
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReader/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackinggate.PDFReader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -538,7 +550,10 @@
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReader/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackinggate.PDFReader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
@@ -554,7 +569,11 @@
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReaderUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackinggate.PDFReaderUITests;
@@ -573,7 +592,11 @@
 				DEVELOPMENT_TEAM = 77CB32R5F4;
 				INFOPLIST_FILE = PDFReaderUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackinggate.PDFReaderUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -614,6 +637,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C750558C25D8BF5F005D6DC3 /* XCRemoteSwiftPackageReference "HGPDFKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/HackingGate/HGPDFKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C750558D25D8BF5F005D6DC3 /* HGPDFKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C750558C25D8BF5F005D6DC3 /* XCRemoteSwiftPackageReference "HGPDFKit" */;
+			productName = HGPDFKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		76C185F41FFF67D200F83A1B /* PDFReader.xcdatamodeld */ = {
