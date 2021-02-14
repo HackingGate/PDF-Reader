@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "HGPDFKit",
+        "repositoryURL": "https://github.com/HackingGate/HGPDFKit",
+        "state": {
+          "branch": null,
+          "revision": "d8bd9bd611c1330cec4442091de5d54b03c2f1f7",
+          "version": "0.0.2"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
