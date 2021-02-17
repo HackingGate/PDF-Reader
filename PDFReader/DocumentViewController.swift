@@ -202,6 +202,8 @@ class DocumentViewController: UIViewController {
         pdfView.addGestureRecognizer(doubleTapGesture)
         navigationController?.barHideOnTapGestureRecognizer.require(toFail: doubleTapGesture)
         navigationController?.barHideOnTapGestureRecognizer.addTarget(self, action: #selector(barHideOnTapGestureRecognizerHandler))
+        // Workaround to fix hidesBarsOnTap isn't working
+        navigationController?.barHideOnTapGestureRecognizer.numberOfTouchesRequired = 2
         
         pdfView.autoScales = true
         pdfView.displaysPageBreaks = true
