@@ -22,6 +22,24 @@ make
 make install
 ```
 
+## Interface Localization
+
+The app interface is localized in different asian languages. 
+
+- Simplified Chinese (China)
+- Traditional Chinese (Taiwan)
+- Traditional Vernacular Written Cantonese (Hong Kong)
+- Standard Japanese (Japan)
+- Korean (South Korea)
+
+In case if you don't know what is Vernacular Cantonese. See this reddit comment.
+https://reddit.com/r/Cantonese/s/ll2FyvPRfX
+
+Traditional Chinese used in China, Hong Kong, and Taiwan are different.  
+（e.g. USB flash drive is "U盤", "USB手指", "隨身碟" in different Traditional Chinese languages.)  
+And Vernacular Written Cantonese is different with Standard Written Chinese in Hong Kong.  
+The goal of this app is trying to provide localized experience as much as possible. (EXPERIMENT)  
+
 ## Acknowledgement
 
 #### HGPDFKit
