@@ -33,7 +33,7 @@ The app interface is localized in different Asian languages.
 - Korean (South Korea)
 
 In case if you don't know what Vernacular Cantonese is. See this Reddit comment.  
-https://reddit.com/r/Cantonese/s/. 
+https://reddit.com/r/Cantonese/s/eAq6kea8j3  
 
 Traditional Chinese used in China, Hong Kong, and Taiwan are different.  
 (e.g. USB flash drive is "U盤", "USB手指", and "隨身碟" in different Traditional Chinese languages.)  
